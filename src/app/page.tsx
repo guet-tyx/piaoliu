@@ -2,7 +2,10 @@ import { Topbar } from "@/components/topbar/Topbar";
 import { Hero } from "@/components/hero/Hero";
 import { MarqueeSection } from "@/components/marquee/MarqueeSection";
 import { CharacterSection } from "@/components/character/CharacterSection";
+import { PlaylistSection } from "@/components/playlist/PlaylistSection";
 import { PlayerSection } from "@/components/player/PlayerSection";
+import { DownloadSection } from "@/components/download/DownloadSection";
+import { Footer } from "@/components/layout/Footer";
 
 export default function Home() {
   return (
@@ -12,8 +15,11 @@ export default function Home() {
         <Hero />
         <MarqueeSection />
         <CharacterSection />
+        <PlaylistSection />
         <PlayerSection />
+        <DownloadSection />
       </main>
+      <Footer />
     </>
   );
 }

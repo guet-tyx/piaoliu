@@ -1,0 +1,71 @@
+/* ============ 页脚 ============ */
+.footer {
+  border-top: 1px solid var(--line);
+  padding: 42px 24px 38px;
+  background: var(--panel);
+}
+.footInner {
+  max-width: 1120px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+.footLeft {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+.brandMark {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  flex: none;
+  background: linear-gradient(135deg, var(--pink), var(--blue));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  box-shadow: 0 6px 14px -6px rgba(251, 114, 153, .6);
+}
+.footName {
+  font-weight: 800;
+  font-size: 1rem;
+  letter-spacing: .05em;
+}
+.footSlogan {
+  font-size: .8rem;
+  color: var(--ink-2);
+  letter-spacing: .08em;
+}
+.footLinks {
+  display: flex;
+  gap: 24px;
+  font-size: .86rem;
+  color: var(--ink-2);
+}
+.footLinks a:hover { color: var(--pink-deep); }
+
+.footCopy {
+  max-width: 1120px;
+  margin: 24px auto 0;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+  font-size: .74rem;
+  color: var(--ink-3);
+  letter-spacing: .1em;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.footCopy b {
+  color: var(--pink-deep);
+  font-weight: 700;
+}
+.credit {
+  font-size: .68rem;
+  letter-spacing: .06em;
+}
