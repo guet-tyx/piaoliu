@@ -1,13 +1,17 @@
+import { StarField } from "./StarField";
+import { HeroDanmaku } from "./HeroDanmaku";
 import styles from "./Hero.module.css";
 
 /**
  * 首屏：深空压轴（米哈游质感）
- * 静态壳：星空粒子 canvas、弹幕带（.dm-zone）留待后续接入
+ * 层级：星尘 canvas → 弹幕带 → 内容（z-index 2），均位于深空背景之上
  */
 export function Hero() {
   return (
     <section className={`${styles.hero} ${styles.heroScrub}`} aria-label="首屏">
-      {/* 星空粒子 canvas + 弹幕歌词带：下一步接入 */}
+      <StarField />
+      <HeroDanmaku />
+
       <span className={`${styles.hudCorner} ${styles.hudTl}`} aria-hidden="true" />
       <span className={`${styles.hudCorner} ${styles.hudBr}`} aria-hidden="true" />
 

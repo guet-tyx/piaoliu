@@ -4,6 +4,7 @@ import Image from "next/image";
 import type { KeyboardEvent } from "react";
 import { PLAYLISTS } from "@/data/playlists";
 import { usePlayerStore } from "@/stores/player";
+import { SectionHead } from "@/components/shared/SectionHead";
 import styles from "./PlaylistSection.module.css";
 
 /**
@@ -29,14 +30,7 @@ export function PlaylistSection() {
 
   return (
     <section className="section" id="playlist">
-      <div className={styles.sectionHead}>
-        <span className={styles.tagDot}>
-          <i />
-          PLAYLISTS
-        </span>
-        <h2>今夜在漂的歌单</h2>
-        <p className={styles.secSub}>每一张都是一条航线。点进去，船就开了。</p>
-      </div>
+      <SectionHead tag="PLAYLISTS" title="今夜在漂的歌单" subtitle="每一张都是一条航线。点进去，船就开了。" />
 
       <div className={styles.pGrid}>
         {PLAYLISTS.map((playlist, index) => (

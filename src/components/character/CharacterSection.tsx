@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { CHARACTER } from "@/data/character";
+import { SectionHead } from "@/components/shared/SectionHead";
 import styles from "./CharacterSection.module.css";
 
 /**
@@ -9,18 +10,17 @@ import styles from "./CharacterSection.module.css";
 export function CharacterSection() {
   return (
     <section className="section" id="char">
-      <div className={styles.sectionHead}>
-        <span className={styles.tagDot}>
-          <i />
-          NEW CHARACTER
-        </span>
-        <h2>星海版首位角色登场</h2>
-        <p className={styles.secSub}>
-          她戴着你没有的耳机，坐着一艘不会沉的纸船。
-          <br />
-          耳机里在播什么？她也不知道——<b>漂到哪首算哪首</b>。
-        </p>
-      </div>
+      <SectionHead
+        tag="NEW CHARACTER"
+        title="星海版首位角色登场"
+        subtitle={
+          <>
+            她戴着你没有的耳机，坐着一艘不会沉的纸船。
+            <br />
+            耳机里在播什么？她也不知道——<b>漂到哪首算哪首</b>。
+          </>
+        }
+      />
 
       <div className={styles.charCard}>
         <div className={styles.charPic}>

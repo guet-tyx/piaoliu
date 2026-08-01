@@ -1,21 +1,22 @@
+import { SectionHead } from "@/components/shared/SectionHead";
 import styles from "./DownloadSection.module.css";
 
 /** 下载 CTA（静态）：双应用商店按钮，SVG 与原型一致 */
 export function DownloadSection() {
   return (
     <section className={`section ${styles.download}`} id="download">
-      <div className={`${styles.sectionHead} ${styles.sectionHeadCenter}`}>
-        <span className={styles.tagDot}>
-          <i />
-          DOWNLOAD
-        </span>
-        <h2>今晚，漂向星海。</h2>
-        <p className={styles.secSub}>
-          免费下载。会员订阅解锁无限漂流、离线收听与无损音质。
-          <br />
-          没有广告，没有排行榜绑架你的耳朵。
-        </p>
-      </div>
+      <SectionHead
+        tag="DOWNLOAD"
+        title="今晚，漂向星海。"
+        centered
+        subtitle={
+          <>
+            免费下载。会员订阅解锁无限漂流、离线收听与无损音质。
+            <br />
+            没有广告，没有排行榜绑架你的耳朵。
+          </>
+        }
+      />
 
       <div className={styles.storeRow}>
         <a className={styles.storeBtn} href="#" aria-label="App Store 免费下载">

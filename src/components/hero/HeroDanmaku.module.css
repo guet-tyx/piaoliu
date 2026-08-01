@@ -1,0 +1,31 @@
+/* 弹幕带（B站规格：白字黑描边，右→左匀速，纯 CSS） */
+.dmZone {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.dm {
+  position: absolute;
+  top: 0;
+  left: 0;
+  will-change: transform;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #fff;
+  opacity: .82;
+  text-shadow: 0 1px 0 #000, 1px 0 0 #000, 0 -1px 0 #000, -1px 0 0 #000, 0 0 3px rgba(0, 0, 0, .8);
+  white-space: nowrap;
+  letter-spacing: .04em;
+  animation: var(--kf-dmFloat) var(--dmdur, 10s) linear infinite;
+  animation-delay: var(--dmdelay, 0s);
+  pointer-events: none;
+}
+.pink {
+  color: var(--pink);
+  text-shadow: 0 1px 0 #000, 1px 0 0 #000, 0 -1px 0 #000, -1px 0 0 #000;
+}
+.blue {
+  color: var(--blue-bright);
+  text-shadow: 0 1px 0 #000, 1px 0 0 #000, 0 -1px 0 #000, -1px 0 0 #000;
+}

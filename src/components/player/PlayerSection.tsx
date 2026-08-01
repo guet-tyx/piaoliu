@@ -3,6 +3,7 @@
 import type { CSSProperties } from "react";
 import { usePlayerStore } from "@/stores/player";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
+import { SectionHead } from "@/components/shared/SectionHead";
 import styles from "./PlayerSection.module.css";
 
 /** 唱片弹幕项：行内 --dmdur/--dmdelay 控制速度与相位（负延迟使弹幕进入时已在中途） */
@@ -64,14 +65,11 @@ export function PlayerSection() {
 
   return (
     <section className="section" id="player">
-      <div className={styles.sectionHead}>
-        <span className={styles.tagDot}>
-          <i />
-          STAR SEA RADIO
-        </span>
-        <h2>星海电台 · 正在播放</h2>
-        <p className={styles.secSub}>点击播放，弹幕会跟着歌一起漂过来。</p>
-      </div>
+      <SectionHead
+        tag="STAR SEA RADIO"
+        title="星海电台 · 正在播放"
+        subtitle="点击播放，弹幕会跟着歌一起漂过来。"
+      />
 
       <div className={styles.playerWrap}>
         <div className={styles.player}>
