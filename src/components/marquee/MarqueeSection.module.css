@@ -1,0 +1,30 @@
+/* ============ 跑马灯：星海航线 ============ */
+.marquee {
+  position: relative;
+  overflow: hidden;
+  background: var(--space);
+  color: #E8EEF7;
+  padding: 15px 0;
+  border-top: 1px solid rgba(123, 177, 255, .16);
+}
+.marqueeTrack {
+  display: flex;
+  width: max-content;
+  animation: var(--kf-marquee) 40s linear infinite;
+}
+.marqueeGroup {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+.mItem {
+  font-size: 1.02rem;
+  font-weight: 600;
+  letter-spacing: .2em;
+  margin: 0 18px;
+}
+.mSep {
+  color: var(--pink);
+  font-size: .9rem;
+  font-weight: 800;
+}

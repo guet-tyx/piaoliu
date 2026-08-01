@@ -28,6 +28,21 @@
   --line: #E3E5E7;
   --ice: #7BB1FF;
   --sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei", "Segoe UI", sans-serif;
+
+  /* keyframes 别名：Turbopack 会把 CSS Module 里的 animation 名局部化，
+   * 直接写全局 keyframes 名会产生悬空引用；经 var() 间接引用可正确解析到
+   * 本文件全局定义的 @keyframes（见下方"共享 keyframes"）。模块内统一
+   * 写作 animation: var(--kf-xxx) … */
+  --kf-dmFloat: dmFloat;
+  --kf-rise: rise;
+  --kf-hintDrop: hintDrop;
+  --kf-marquee: marquee;
+  --kf-spin: spin;
+  --kf-eqb: eqb;
+  --kf-heartPop: heartPop;
+  --kf-revealUp: revealUp;
+  --kf-heroFade: heroFade;
+  --kf-heroScrub: heroScrub;
 }
 
 /* ============ 基础 ============ */
@@ -52,6 +67,17 @@ a:focus-visible, button:focus-visible {
   border-radius: 4px;
 }
 section[id] { scroll-margin-top: 76px; }
+
+/* 共享布局原语：通用段落容器（角色/歌单/播放器/下载等区块共用） */
+.section {
+  position: relative;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 96px 24px;
+}
+@media (max-width: 960px) {
+  .section { padding: 76px 20px; }
+}
 
 /* ============ 共享 keyframes ============
  * 全局定义，各组件 CSS Module 直接按名字引用

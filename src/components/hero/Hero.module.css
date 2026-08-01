@@ -153,7 +153,7 @@
 /* 首屏入场：错落浮起 */
 .heroCopy > * {
   opacity: 0;
-  animation: rise .8s cubic-bezier(.22, .61, .36, 1) forwards;
+  animation: var(--kf-rise) .8s cubic-bezier(.22, .61, .36, 1) forwards;
 }
 .heroCopy > *:nth-child(1) { animation-delay: .1s; }
 .heroCopy > *:nth-child(2) { animation-delay: .2s; }
@@ -181,7 +181,7 @@
   height: 34px;
   display: block;
   background: linear-gradient(180deg, var(--pink), transparent);
-  animation: hintDrop 1.8s ease-in-out infinite;
+  animation: var(--kf-hintDrop) 1.8s ease-in-out infinite;
 }
 
 /* 波峰分隔线（深空 → 亮色） */
@@ -204,13 +204,13 @@
 @supports (animation-timeline: scroll()) {
   /* hero 标题区：滚动离开时渐隐上移（exit range——首屏元素用 exit） */
   .heroCopy {
-    animation: heroFade 1s linear both;
+    animation: var(--kf-heroFade) 1s linear both;
     animation-timeline: view();
     animation-range: exit 0% exit 100%;
   }
   /* hero 整体背景：滚动离开时轻微缩放淡出（wrapper 单动画） */
   .heroScrub {
-    animation: heroScrub 1s linear both;
+    animation: var(--kf-heroScrub) 1s linear both;
     animation-timeline: view();
     animation-range: exit 0% exit 100%;
   }

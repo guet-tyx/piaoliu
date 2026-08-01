@@ -1,37 +1,40 @@
-# 阶段二：跑马灯 + 角色卡组件迁移
+# 阶段三：交互式播放器（Store + Hook + UI）
 
-## 0. Git 基线提交（用户已明确要求）
-- `git add -A && git commit -m "feat: 初始化 Next.js 项目架构与全局样式系统"`
+## 0. Git 提交（用户已明确要求）
+- `git commit -m "feat: 新增跑马灯与角色卡组件，修复 CSS Modules 动画引用冲突"`
 
-## 1. 数据文件
-- **`src/data/marquee.ts`**：导出 `GENRES: string[]`（后摇/爵士嘻哈/城市民谣/环境电子/港乐/独立流行/说唱/氛围/合成器浪潮/部落节拍，共 10 个）
-- **`src/data/character.ts`**：导出 `CHARACTER` 对象 + 类型：
-  - `name: "汐"`、`en: "SIO"`、`lv: "★ 星海版限定"`、`image: "/images/anime-hero.png"`、`alt`
-  - `tags: [{ label: "# 星海导游", variant: "hot" }, { label: "# 纸船船长", variant: "blue" }, …]`（4 个）
-  - `desc`、`stats: [{ value: "128.4", suffix: "万", label: "次播放" }, …]`（3 项）
-  - 统计项**保留 `data-count`/`data-suffix` 属性**为后续数字滚动组件留钩子，本次静态渲染最终值
+## 1. 修正数据（与原型 JS TRACKS 逐字对齐，已核对 861-866 行）
+- `src/data/tracks.ts`：`t` 为纯曲名（UI 渲染时加「」）、`s` 为艺术家行（"一支你没听过的乐队 · 后摇"）、`tag` 修正（晚风告别式→环境电子、雨季漂流记→氛围）、src 顺序对齐原型
 
-## 2. 组件
-- **`src/components/marquee/MarqueeSection.tsx` + `.module.css`**
-  - 深色跑马灯条（`--space` 底 + 顶部蓝色细边），`aria-hidden`
-  - `GENRES` map 渲染，双组轨道实现无缝循环；`animation: marquee 40s linear infinite`（keyframes 已在 globals.css 全局定义）
-  - `.m-item` + `.m-sep`（✦）结构，CSS 原样移植（211-221 行）
-- **`src/components/character/CharacterSection.tsx` + `.module.css`**
-  - `section id="char"` + `.section-head`（tag-dot 发光圆点 + h2 + sec-sub）
-  - `.char-card` 双列 Grid（`minmax(280px,.9fr) 1.1fr`），hover 上浮阴影
-  - 角色图用 **next/image `fill`**（替代裸 `<img>`，避免 ESLint no-img-element 告警，object-fit 由 CSS 保持）
-  - `.char-pic::after` 白色渐变过渡层、`.lv` 金色徽标、4 个 `.ctag`（hot/blue 变体）、`.char-stats` 渐变数字
-  - 滚动揭示 `revealUp`（view() 时间线）移植到 `.section-head`/`.char-card`
-  - 响应式：960px 单列（图片 min-height 240px、渐变改纵向）、420px stats 改 2 列
+## 2. Store 完善 `src/stores/player.ts`
+- 新增状态：`currentTime`、`duration`（秒）、`progress`（0-100）、`failed`
+- 新增动作：`playTrack(index)`（设 currentIndex + isPlaying=true）、`setProgress(cur, dur)`（内部算 progress）、`setFailed`
+- 保留：`toggle()`、`next()/prev()`（模循环）、`toggleLike()`、`toggleDanmaku()`
 
-## 3. 共享样式微调
-- `globals.css` 补一个**共享布局原语** `.section`（max-width 1120px + padding 96px 24px，960px 时 76px 20px）——后续歌单/播放器/下载区共用，避免各模块重复
+## 3. Hook `src/hooks/useAudioPlayer.ts`（桥梁层，重点清理逻辑）
+- 挂载 effect：客户端 `new Audio()`（preload="none"），绑定 4 个监听——`timeupdate`→setProgress、`ended`→next()、`loadedmetadata`→写时长、`error`→多源降级（源索引 ref+1 换 src，全失败 setFailed(true)）；**cleanup：pause + 移除全部监听 + 置空 ref**（StrictMode 双挂载安全，杜绝泄漏）
+- `currentIndex` effect：setProgress(0,0) + 源索引归零 + 设 src；用 `usePlayerStore.getState().isPlaying` 判自动播放（避免闭包过期，切换后保持播放态）
+- `isPlaying` effect：`play().catch()`（autoplay 拒绝静默）/ `pause()`
+- `trackRef` 每渲染同步，error 监听不闭包过期
 
-## 4. 页面组装（`src/app/page.tsx`）
-- 顺序：`<Topbar /> → <Hero /> → <MarqueeSection /> → <CharacterSection />`（nav 的 `#char` 锚点随之生效）
+## 4. 播放器 UI `src/components/player/PlayerSection.tsx` + `.module.css`（"use client"）
+- 结构：`section#player` + section-head（STAR SEA RADIO）+ `.player-wrap`（粉蓝渐变描边）+ `.player`（毛玻璃双列）
+- **UI 全只读**：按钮只调 store actions，类名全部由状态派生
+- 唱片：isPlaying → `.playing`（16s→7s 加速）；封面随 track 内联 background（封面 + 黑色盘面两层）
+- 唱片弹幕：6 条三轨（--dmdur/--dmdelay 行内变量），isPlaying → `.live` 显隐
+- EQ：32 柱用**确定性伪随机** --h/--d（避免 SSR 水合不一致），isPlaying → `.live` 激活
+- 进度条：i 宽度 = progress%；时间行 mm:ss（duration 未载入时 "--:--"）
+- 按钮：⏮/▶(failed 时 !)/❚❚/⏭/♡❤(.liked + heartPop)/弹幕开关（文案切换 + .on）
+- 960 单列居中；reduced-motion 模块内禁用 record/eq/dm 动画
+- 全局 keyframes 经 `var(--kf-dmFloat / spin / eqb / heartPop)` 引用（沿用已修复的约定）
 
-## 5. 验收
-- `npm run lint` 零告警 + `npm run build` 无报错；dev server 冒烟（HTTP 200 + 新区块文案渲染检查）
+## 5. 页面组装
+- page.tsx：CharacterSection 后挂 `<PlayerSection />`（nav #player 锚点生效）
+
+## 6. 验收
+- lint + build 无报错
+- 浏览器（IAB）GUI 实测：点击播放 → record.playing 类 + 按钮变 ❚❚ + eq.live；下一首 → 标题/封面/艺术家切换 + 进度归零；弹幕开关文案/类切换；刷新状态重置
+- 已知环境限制：IAB 动画时钟冻结 → 黑胶转动/进度走动可能无法在 IAB 内观察到（如实报告，代码层面验证类名与状态）
 
 ## 不在本次范围
-- 数字滚动动画、跑马灯 hover 暂停、歌单/播放器等后续区块
+- LocalStorage 持久化、下载/页脚区块、hero 弹幕带、数字滚动组件
