@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#050C1E">
+<meta name="description" content="漂流 DRIFT · 星海版：二次元皮肤页。戴耳机的少女，纸船，星海——漂向下一首没人听过的歌。真正的漂流首页见 index.html。">
+<title>漂流 DRIFT · 星海版</title>
+<style>
+/* ============ 基础 ============ */
+:root{
+  --space:#050C1E;
+  --space-2:#0B1020;
+  --bg:#F6F7F8;
+  --bg-top:#FDF2F7;
+  --panel:#FFFFFF;
+  --panel-2:#F1F2F3;
+  --pink:#FB7299;
+  --pink-bright:#FF9BB5;
+  --pink-deep:#F2597F;
+  --blue:#00AEEC;
+  --blue-bright:#40C5F1;
+  --blue-deep:#008AC5;
+  --gold:#C9A063;
+  --ink:#18191C;
+  --ink-2:#61666D;
+  --ink-3:#9499A0;
+  --line:#E3E5E7;
+  --ice:#7BB1FF;
+  --sans:-apple-system,BlinkMacSystemFont,"PingFang SC","HarmonyOS Sans SC","Microsoft YaHei","Segoe UI",sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:linear-gradient(180deg,var(--bg-top) 0%,var(--bg) 320px,var(--bg) 100%);
+  color:var(--ink);
+  font-family:var(--sans);
+  line-height:1.7;
+  overflow-x:hidden;
+}
+::selection{background:var(--pink);color:#fff}
+a{color:inherit;text-decoration:none}
+a:focus-visible,button:focus-visible{outline:2px solid var(--blue);outline-offset:3px;border-radius:4px}
+section[id]{scroll-margin-top:76px}
+
+/* ============ 顶栏（B站式亮色） ============ */
+.topbar{
+  position:sticky;top:0;z-index:30;
+  background:rgba(255,255,255,.86);
+  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);
+}
+.topbar-in{
+  max-width:1120px;margin:0 auto;
+  display:flex;align-items:center;justify-content:space-between;gap:20px;
+  padding:13px 24px;
+}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-mark{
+  width:32px;height:32px;border-radius:10px;flex:none;
+  background:linear-gradient(135deg,var(--pink),var(--blue));
+  display:flex;align-items:center;justify-content:center;color:#fff;
+  box-shadow:0 6px 14px -6px rgba(251,114,153,.6);
+}
+.brand-name{font-size:1.08rem;font-weight:800;letter-spacing:.06em}
+.demo-badge{
+  font-size:.62rem;font-weight:700;letter-spacing:.12em;
+  color:var(--blue-deep);background:rgba(0,174,236,.1);
+  border:1px solid rgba(0,174,236,.28);
+  padding:3px 8px;border-radius:999px;margin-left:6px;white-space:nowrap;
+}
+.nav-links{display:flex;align-items:center;gap:28px}
+.nav-links a{font-size:.88rem;color:var(--ink-2);position:relative;padding:4px 0}
+.nav-links a:hover{color:var(--ink)}
+.nav-links a::after{
+  content:"";position:absolute;left:0;right:100%;bottom:0;height:2px;
+  background:linear-gradient(90deg,var(--pink),var(--blue));transition:right .25s ease;
+}
+.nav-links a:hover::after{right:0}
+.nav-links .nav-dl{
+  font-size:.86rem;font-weight:700;color:#fff;
+  background:linear-gradient(120deg,var(--pink),var(--pink-deep));
+  padding:10px 22px;border-radius:999px;flex:none;white-space:nowrap;
+  box-shadow:0 10px 20px -10px rgba(251,114,153,.65);
+  transition:transform .2s ease,filter .2s ease;
+}
+.nav-links .nav-dl:hover{filter:brightness(1.06);transform:translateY(-1px)}
+
+/* ============ 首屏：深空压轴（米哈游质感） ============ */
+.hero{
+  position:relative;
+  background:
+    linear-gradient(90deg,rgba(5,12,30,.92) 0%,rgba(5,12,30,.55) 42%,rgba(5,12,30,.18) 72%,rgba(5,12,30,.3) 100%),
+    url('images/anime-hero.png') center/cover no-repeat,
+    linear-gradient(160deg,var(--space) 0%,var(--space-2) 60%,#0A1230 100%);
+  color:#F1EDE3;
+  min-height:100vh;min-height:100svh;
+  display:flex;align-items:center;
+  overflow:hidden;
+}
+/* 全息斜线网格底纹 */
+.hero::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72'%3E%3Cpath d='M0 72 72 0 M-18 18 18 -18 M54 90 90 54' stroke='%237BB1FF' stroke-opacity='.055' stroke-width='1'/%3E%3C/svg%3E");
+}
+/* 四角括号 HUD */
+.hud-corner{position:absolute;width:30px;height:30px;border:2px solid rgba(123,177,255,.4);pointer-events:none}
+.hud-tl{top:96px;left:24px;border-right:none;border-bottom:none}
+.hud-br{bottom:84px;right:24px;border-left:none;border-top:none}
+/* 星尘粒子画布 */
+#stars{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+/* 左下坐标 HUD 字 */
+.hero-coord{
+  position:absolute;left:24px;bottom:26px;z-index:3;pointer-events:none;
+  font-size:.66rem;letter-spacing:.28em;color:rgba(209,225,246,.5);
+  font-weight:600;
+}
+.hero-coord b{color:rgba(251,114,153,.75);font-weight:700}
+.hero-inner{
+  position:relative;z-index:2;max-width:1120px;margin:0 auto;
+  padding:120px 32px 150px;width:100%;
+}
+.eyebrow{
+  display:flex;align-items:center;gap:10px;
+  font-size:.7rem;font-weight:600;letter-spacing:.3em;color:var(--pink);
+  text-transform:uppercase;
+}
+.eyebrow::before{content:"";width:30px;height:1px;background:linear-gradient(90deg,var(--pink),var(--blue))}
+.eyebrow .en{color:rgba(209,225,246,.62);letter-spacing:.32em;font-weight:500}
+h1{
+  font-size:clamp(2rem,5vw,4rem);
+  font-weight:800;line-height:1.22;letter-spacing:.04em;
+  margin:26px 0 22px;
+  text-shadow:0 10px 40px rgba(5,12,30,.6);
+}
+h1 .hl{
+  background:linear-gradient(92deg,var(--pink-bright),#FFD3E0 45%,var(--blue-bright));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.lead{
+  font-size:1.02rem;color:rgba(214,220,228,.9);line-height:1.95;
+  max-width:32em;margin-bottom:34px;
+}
+.lead b{color:#FFF;font-weight:700}
+.cta{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;justify-content:center;
+  font-size:.95rem;font-weight:700;border-radius:999px;
+  padding:17px 34px;flex:none;white-space:nowrap;
+  transition:transform .2s ease,box-shadow .2s ease,background .2s ease,color .2s ease;
+  cursor:pointer;
+}
+.btn-pink{
+  background:linear-gradient(120deg,var(--pink),var(--pink-deep));color:#fff;
+  box-shadow:0 16px 32px -14px rgba(251,114,153,.75);
+}
+.btn-pink:hover{transform:translateY(-2px);box-shadow:0 20px 40px -16px rgba(251,114,153,.85)}
+.btn-blue{
+  border:1.5px solid rgba(123,177,255,.65);color:#DCEBFF;background:transparent;
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+}
+.btn-blue:hover{background:rgba(123,177,255,.12);transform:translateY(-2px)}
+.fineprint{margin-top:24px;font-size:.8rem;color:rgba(209,225,246,.62);letter-spacing:.06em}
+.fineprint i{font-style:normal;color:var(--pink);margin:0 6px}
+
+/* 弹幕（B站规格：白字黑描边，右→左匀速） */
+.dm{
+  position:absolute;top:0;left:0;will-change:transform;
+  font-size:1.05rem;font-weight:700;color:#fff;opacity:.82;
+  text-shadow:0 1px 0 #000,1px 0 0 #000,0 -1px 0 #000,-1px 0 0 #000,0 0 3px rgba(0,0,0,.8);
+  white-space:nowrap;letter-spacing:.04em;
+  animation:dmFloat var(--dmdur,10s) linear infinite;
+  animation-delay:var(--dmdelay,0s);
+  pointer-events:none;
+}
+.dm.pink{color:var(--pink);text-shadow:0 1px 0 #000,1px 0 0 #000,0 -1px 0 #000,-1px 0 0 #000}
+.dm.blue{color:var(--blue-bright);text-shadow:0 1px 0 #000,1px 0 0 #000,0 -1px 0 #000,-1px 0 0 #000}
+.dm-zone{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+@keyframes dmFloat{from{transform:translateX(100vw)}to{transform:translateX(-100%)}}
+
+/* 首屏入场：错落浮起 */
+.hero-copy > *{opacity:0;animation:rise .8s cubic-bezier(.22,.61,.36,1) forwards}
+.hero-copy > *:nth-child(1){animation-delay:.1s}
+.hero-copy > *:nth-child(2){animation-delay:.2s}
+.hero-copy > *:nth-child(3){animation-delay:.32s}
+.hero-copy > *:nth-child(4){animation-delay:.44s}
+.hero-copy > *:nth-child(5){animation-delay:.56s}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+
+/* 下滑指示 */
+.scroll-hint{
+  position:absolute;left:50%;bottom:24px;transform:translateX(-50%);
+  z-index:3;
+  display:flex;flex-direction:column;align-items:center;gap:7px;
+  font-size:.62rem;letter-spacing:.34em;color:rgba(209,225,246,.55);
+}
+.scroll-hint i{
+  width:1px;height:34px;display:block;
+  background:linear-gradient(180deg,var(--pink),transparent);
+  animation:hintDrop 1.8s ease-in-out infinite;
+}
+@keyframes hintDrop{0%{transform:scaleY(0);transform-origin:top}45%{transform:scaleY(1);transform-origin:top}55%{transform:scaleY(1);transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+/* ============ 波峰分隔线（深空→亮色） ============ */
+.wave-divider{
+  position:absolute;left:0;right:0;bottom:-1px;z-index:2;
+  line-height:0;pointer-events:none;
+}
+.wave-divider svg{display:block;width:100%;height:70px}
+
+/* ============ 跑马灯：星海航线 ============ */
+.marquee{
+  position:relative;overflow:hidden;
+  background:var(--space);color:#E8EEF7;padding:15px 0;
+  border-top:1px solid rgba(123,177,255,.16);
+}
+.marquee-track{display:flex;width:max-content;animation:marquee 40s linear infinite}
+.marquee-group{display:flex;align-items:center;white-space:nowrap}
+.m-item{font-size:1.02rem;font-weight:600;letter-spacing:.2em;margin:0 18px}
+.m-sep{color:var(--pink);font-size:.9rem;font-weight:800}
+@keyframes marquee{to{transform:translateX(-50%)}}
+
+/* ============ 通用段落 ============ */
+.section{position:relative;max-width:1120px;margin:0 auto;padding:96px 24px}
+.section-head{max-width:640px;margin-bottom:52px}
+h2{font-weight:800;font-size:clamp(1.6rem,3vw,2.4rem);line-height:1.3;margin:14px 0 14px;letter-spacing:.02em}
+.sec-sub{color:var(--ink-2);line-height:1.95;font-size:1rem}
+.sec-sub b{color:var(--ink)}
+.tag-dot{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:.68rem;font-weight:700;letter-spacing:.2em;color:var(--pink-deep);
+  background:rgba(251,114,153,.08);border:1px solid rgba(251,114,153,.25);
+  padding:4px 11px;border-radius:999px;
+}
+.tag-dot i{width:6px;height:6px;border-radius:50%;background:var(--pink);box-shadow:0 0 6px var(--pink)}
+
+/* ============ 角色登场（B站式角色卡） ============ */
+.char-card{
+  background:var(--panel);border:1px solid var(--line);border-radius:20px;
+  overflow:hidden;
+  box-shadow:0 24px 56px -36px rgba(24,25,28,.28),0 2px 6px rgba(24,25,28,.05);
+  display:grid;grid-template-columns:minmax(280px,.9fr) 1.1fr;
+  transition:transform .25s ease,box-shadow .25s ease;
+}
+.char-card:hover{transform:translateY(-4px);box-shadow:0 34px 66px -38px rgba(251,114,153,.35)}
+.char-pic{position:relative;min-height:320px}
+.char-pic img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.char-pic::after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent 55%,rgba(255,255,255,.92) 100%);
+}
+.char-pic .lv{
+  position:absolute;left:16px;top:16px;z-index:1;
+  font-size:.66rem;font-weight:800;letter-spacing:.14em;color:#fff;
+  background:linear-gradient(120deg,var(--gold),#E7C98A);
+  padding:5px 11px;border-radius:8px;box-shadow:0 8px 18px -8px rgba(201,160,99,.8);
+}
+.char-info{padding:40px 40px 34px}
+.char-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.char-name{font-size:1.9rem;font-weight:800;letter-spacing:.06em}
+.char-name em{font-style:normal;font-size:.78rem;font-weight:600;letter-spacing:.3em;color:var(--ink-3);margin-left:6px}
+.char-tags{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 4px}
+.ctag{
+  font-size:.68rem;font-weight:700;padding:4px 10px;border-radius:999px;
+  background:var(--panel-2);color:var(--ink-2);border:1px solid var(--line);
+}
+.ctag.hot{background:rgba(251,114,153,.1);color:var(--pink-deep);border-color:rgba(251,114,153,.3)}
+.ctag.blue{background:rgba(0,174,236,.08);color:var(--blue-deep);border-color:rgba(0,174,236,.28)}
+.char-desc{font-size:.95rem;color:var(--ink-2);line-height:1.95;margin:16px 0 22px}
+.char-desc b{color:var(--ink)}
+.char-stats{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:12px;
+  padding:18px 20px;border-radius:14px;
+  background:linear-gradient(135deg,rgba(251,114,153,.06),rgba(0,174,236,.06));
+  border:1px solid var(--line);
+}
+.cstat b{
+  display:block;font-size:1.32rem;font-weight:800;letter-spacing:.02em;
+  background:linear-gradient(92deg,var(--pink-deep),var(--blue-deep));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.cstat small{font-size:.68rem;color:var(--ink-3);letter-spacing:.14em}
+
+/* ============ 歌单（B站首页式卡片） ============ */
+.p-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.p-card{
+  background:var(--panel);border:1px solid var(--line);border-radius:16px;
+  padding:12px;cursor:pointer;
+  transition:transform .22s ease,box-shadow .22s ease;
+}
+.p-card:hover{transform:translateY(-5px);box-shadow:0 22px 44px -26px rgba(251,114,153,.5)}
+.p-cover{
+  position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;
+  background:var(--panel-2);
+}
+.p-cover img{width:100%;height:100%;object-fit:cover;transition:transform .35s ease}
+.p-card:hover .p-cover img{transform:scale(1.06)}
+/* 斜切绶带角标（粉→蓝渐变） */
+.ribbon{
+  position:absolute;left:-30px;top:10px;z-index:1;
+  transform:rotate(-45deg);
+  font-size:.6rem;font-weight:800;letter-spacing:.1em;color:#fff;
+  background:linear-gradient(120deg,var(--pink),var(--blue));
+  padding:3px 34px;
+  box-shadow:0 6px 14px -6px rgba(0,0,0,.35);
+}
+.ribbon.gold{background:linear-gradient(120deg,var(--gold),#E7C98A);color:#3A2B08}
+/* 播放角标 */
+.p-play{
+  position:absolute;right:10px;bottom:10px;width:34px;height:34px;border-radius:50%;
+  background:rgba(251,114,153,.92);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:.8rem;
+  opacity:0;transform:translateY(6px);transition:opacity .2s ease,transform .2s ease;
+  box-shadow:0 8px 18px -8px rgba(251,114,153,.9);
+}
+.p-card:hover .p-play{opacity:1;transform:translateY(0)}
+.p-name{font-size:.9rem;font-weight:700;margin:11px 4px 2px;line-height:1.5}
+.p-meta{font-size:.72rem;color:var(--ink-3);margin:0 4px;letter-spacing:.02em}
+.p-meta b{color:var(--ink-2);font-weight:600}
+
+/* ============ 播放器（玻璃拟态 + 弹幕 + 频谱） ============ */
+.player-wrap{
+  position:relative;border-radius:24px;padding:2px;overflow:hidden;
+  background:linear-gradient(120deg,rgba(251,114,153,.45),rgba(0,174,236,.45));
+}
+.player{
+  position:relative;border-radius:22px;padding:34px 38px;
+  background:rgba(255,255,255,.92);
+  -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);
+  display:grid;grid-template-columns:auto 1fr;gap:38px;align-items:center;
+}
+/* 唱片 + 弹幕层 */
+.record-box{position:relative;width:210px;height:210px;flex:none}
+.record{
+  position:absolute;inset:0;border-radius:50;
+  border-radius:50%;
+  background:url('images/cover-anime-1.png') center/cover no-repeat,
+    radial-gradient(circle at 50% 50%,#222 0 30%,transparent 31%);
+  box-shadow:0 26px 48px -22px rgba(24,25,28,.5),inset 0 0 0 8px rgba(0,0,0,.28),inset 0 0 0 9px rgba(255,255,255,.12);
+  animation:spin 16s linear infinite;
+  transition:background-image .4s ease;
+}
+.record::before{
+  content:"";position:absolute;inset:0;border-radius:50%;
+  background:
+    radial-gradient(circle at 34% 28%,rgba(255,255,255,.28),transparent 46%),
+    conic-gradient(from 0deg,transparent 0 32%,rgba(255,255,255,.4) 50%,transparent 68%);
+  animation:spin 3.2s linear infinite;
+}
+.record::after{
+  content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:18px;height:18px;border-radius:50%;
+  background:radial-gradient(circle,#222 0 5px,#fff 6px 7px,#222 8px);
+  box-shadow:0 0 0 3px rgba(0,0,0,.25);
+}
+.record.playing{animation-duration:7s}
+.record.playing::before{animation-duration:2.4s}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* 唱片上的弹幕区：播放时浮现 */
+.record-dm{
+  position:absolute;inset:0;border-radius:50%;overflow:hidden;pointer-events:none;
+  opacity:0;transition:opacity .5s ease;
+}
+.record-box.live .record-dm{opacity:1}
+.record-dm .dm{font-size:.82rem;top:auto;bottom:auto}
+.record-dm .dm-r1{top:22%}
+.record-dm .dm-r2{top:44%}
+.record-dm .dm-r3{top:66%}
+
+.p-now{min-width:0}
+.now-kicker{font-size:.66rem;letter-spacing:.24em;color:var(--pink-deep);font-weight:700}
+.now-title{font-size:1.7rem;font-weight:800;margin:10px 0 2px;letter-spacing:.04em}
+.now-title em{font-style:normal;color:var(--ink-3);font-weight:600;font-size:.8rem;letter-spacing:.2em;margin-left:8px}
+.now-artist{font-size:.84rem;color:var(--ink-2);letter-spacing:.06em}
+/* 频谱（32 条，粉→蓝渐变） */
+.eq{display:flex;align-items:flex-end;gap:3px;height:52px;margin:20px 0 16px}
+.eq i{
+  flex:1;border-radius:2px;
+  background:linear-gradient(180deg,var(--pink),var(--blue));
+  height:var(--h,40%);
+  animation:eqb 1s ease-in-out infinite alternate;
+  animation-delay:var(--d,0s);
+  animation-play-state:paused;
+}
+.eq.live i{animation-play-state:running}
+@keyframes eqb{from{transform:scaleY(.25)}to{transform:scaleY(1)}}
+.progress{width:100%;height:5px;border-radius:3px;background:var(--panel-2);overflow:hidden;position:relative}
+.progress i{
+  display:block;height:100%;width:0%;border-radius:3px;
+  background:linear-gradient(90deg,var(--pink),var(--blue));
+  box-shadow:0 0 10px rgba(251,114,153,.6);
+}
+.time-row{width:100%;display:flex;justify-content:space-between;font-size:.66rem;color:var(--ink-3);margin-top:7px;letter-spacing:.06em}
+.now-ctrl{display:flex;align-items:center;gap:14px;margin-top:18px}
+.np-side{
+  width:38px;height:38px;border-radius:50%;border:1.5px solid var(--line);
+  background:var(--panel);color:var(--ink-2);font-size:.7rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .2s ease,transform .2s ease,border-color .2s ease;
+}
+.np-side:hover{background:rgba(0,174,236,.08);border-color:var(--blue);transform:scale(1.08)}
+.now-play{
+  width:52px;height:52px;border-radius:50%;border:none;cursor:pointer;
+  background:linear-gradient(120deg,var(--pink),var(--pink-deep));color:#fff;font-size:1rem;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 14px 26px -12px rgba(251,114,153,.8);
+  transition:transform .2s ease,filter .2s ease;
+}
+.now-play:hover{transform:scale(1.07);filter:brightness(1.06)}
+.now-heart{
+  width:38px;height:38px;border-radius:50%;border:1.5px solid var(--line);
+  background:var(--panel);font-size:.85rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;color:var(--ink-3);
+  transition:transform .2s ease,color .2s ease,border-color .2s ease;
+}
+.now-heart.liked{color:var(--pink);border-color:rgba(251,114,153,.5);background:rgba(251,114,153,.08)}
+.now-heart.liked i{animation:heartPop .45s cubic-bezier(.34,1.56,.64,1)}
+@keyframes heartPop{0%{transform:scale(1)}45%{transform:scale(1.45)}100%{transform:scale(1)}}
+.dm-toggle{
+  margin-left:auto;font-size:.68rem;font-weight:700;color:var(--ink-3);
+  border:1px solid var(--line);background:var(--panel);border-radius:999px;
+  padding:7px 14px;cursor:pointer;letter-spacing:.1em;
+  transition:color .2s ease,border-color .2s ease;
+}
+.dm-toggle.on{color:var(--blue-deep);border-color:rgba(0,174,236,.45);background:rgba(0,174,236,.06)}
+.dm-toggle i{font-style:normal;color:var(--pink)}
+
+/* ============ 下载 ============ */
+.download{text-align:center;padding-bottom:110px}
+.download .section-head{margin-left:auto;margin-right:auto}
+.store-row{display:flex;justify-content:center;flex-wrap:wrap;gap:16px;margin-top:42px}
+.store-btn{
+  background:var(--panel);color:var(--ink);
+  border:1.5px solid var(--line);border-radius:16px;
+  padding:16px 32px;display:inline-flex;align-items:center;gap:13px;flex:none;
+  box-shadow:0 14px 30px -20px rgba(24,25,28,.25);
+  transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease;
+}
+.store-btn:hover{
+  transform:translateY(-3px);border-color:rgba(251,114,153,.55);
+  box-shadow:0 22px 44px -24px rgba(251,114,153,.55);
+}
+.store-btn svg{width:26px;height:26px;flex:none;color:var(--pink-deep)}
+.store-btn .st-txt{display:flex;flex-direction:column;align-items:flex-start;line-height:1.3;white-space:nowrap}
+.store-btn em{font-style:normal;font-weight:800;font-size:1.02rem;letter-spacing:.04em}
+.store-btn small{font-size:.68rem;color:var(--ink-3);letter-spacing:.14em;font-weight:600}
+.dl-note{margin-top:26px;font-size:.88rem;color:var(--ink-2)}
+.dl-note b{color:var(--pink-deep);font-weight:800}
+
+/* ============ 页脚 ============ */
+footer{border-top:1px solid var(--line);padding:42px 24px 38px;background:var(--panel)}
+.foot-inner{max-width:1120px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:18px}
+.foot-left{display:flex;align-items:center;gap:13px}
+.foot-name{font-weight:800;font-size:1rem;letter-spacing:.05em}
+.foot-slogan{font-size:.8rem;color:var(--ink-2);letter-spacing:.08em}
+.foot-links{display:flex;gap:24px;font-size:.86rem;color:var(--ink-2)}
+.foot-links a:hover{color:var(--pink-deep)}
+.foot-copy{
+  max-width:1120px;margin:24px auto 0;padding-top:20px;
+  border-top:1px solid var(--line);
+  font-size:.74rem;color:var(--ink-3);letter-spacing:.1em;
+  display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+}
+.foot-copy b{color:var(--pink-deep);font-weight:700}
+.foot-copy .credit{font-size:.68rem;letter-spacing:.06em}
+
+/* ============ 视图切换器：四页互跳 ============ */
+.view-switch{position:fixed;top:78px;right:20px;z-index:55;font-family:var(--sans)}
+.view-switch details{position:relative}
+.view-switch summary{
+  list-style:none;cursor:pointer;user-select:none;
+  display:flex;align-items:center;gap:8px;
+  font-size:.78rem;font-weight:700;letter-spacing:.06em;
+  padding:8px 14px;border-radius:999px;
+  background:rgba(255,255,255,.94);border:1.5px solid var(--line);
+  color:var(--ink-2);
+  box-shadow:0 10px 24px -14px rgba(24,25,28,.3);
+  transition:transform .2s ease,border-color .2s ease;
+}
+.view-switch summary:hover{transform:translateY(-1px);border-color:rgba(251,114,153,.5)}
+.view-switch summary::-webkit-details-marker{display:none}
+.vs-caret{font-size:.6rem;opacity:.6;transition:transform .2s ease}
+.view-switch details[open] .vs-caret{transform:rotate(180deg)}
+.vs-menu{
+  position:absolute;right:0;top:calc(100% + 8px);min-width:210px;
+  background:rgba(255,255,255,.97);border:1px solid var(--line);border-radius:14px;
+  padding:6px;box-shadow:0 24px 48px -22px rgba(24,25,28,.35);
+}
+.vs-item{
+  display:flex;align-items:center;gap:9px;
+  padding:10px 12px;border-radius:10px;
+  font-size:.82rem;font-weight:600;color:var(--ink-2);
+  transition:background .18s ease;
+}
+.vs-item:hover{background:rgba(251,114,153,.08)}
+.vs-item.on{background:linear-gradient(120deg,var(--pink),var(--pink-deep));color:#fff}
+.vs-ico{font-size:.85rem;opacity:.8}
+@media (max-width:560px){.view-switch{right:12px;top:70px}}
+
+/* ============ 炫酷动效 ============ */
+/* 滚动揭示：进入视口淡入上浮（view() 时间线，不支持时静态可见） */
+.section-head,.char-card,.p-grid,.player-wrap,.store-row{
+  animation:revealUp .8s cubic-bezier(.22,.61,.36,1) both;
+  animation-timeline:view();
+  animation-range:entry 8% cover 26%;
+}
+@keyframes revealUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+
+/* 光标微光跟随 */
+.cursor-glow{
+  position:fixed;left:0;top:0;width:440px;height:440px;border-radius:50%;
+  pointer-events:none;z-index:0;
+  background:radial-gradient(circle,rgba(251,114,153,.1),transparent 62%);
+  opacity:0;transition:opacity .5s ease;
+}
+
+/* ============ 苹果风格滚动动效（Phase A 模式）============ */
+/* 支持 scroll-driven 的浏览器走合成器；不支持时由 JS 降级 */
+@supports (animation-timeline: scroll()) {
+  /* hero 标题区：滚动离开时渐隐上移（exit range——首屏元素用 exit） */
+  .hero-copy{
+    animation: heroFade 1s linear both;
+    animation-timeline: view();
+    animation-range: exit 0% exit 100%;
+  }
+  @keyframes heroFade{
+    from{opacity:1;translate:0 0}
+    to{opacity:.05;translate:0 -90px}
+  }
+  /* hero 整体背景：滚动离开时轻微缩放淡出（wrapper 单动画） */
+  .hero-scrub{
+    animation: heroScrub 1s linear both;
+    animation-timeline: view();
+    animation-range: exit 0% exit 100%;
+  }
+  @keyframes heroScrub{
+    from{transform:scale(1) translateY(0);opacity:1}
+    to{transform:scale(1.06) translateY(40px);opacity:.25}
+  }
+}
+
+/* ============ 响应式 ============ */
+@media (max-width:960px){
+  .nav-links{display:none}
+  .hero{background:
+    linear-gradient(180deg,rgba(5,12,30,.88) 0%,rgba(5,12,30,.5) 55%,rgba(5,12,30,.22) 100%),
+    url('images/anime-hero.png') center 30%/cover no-repeat,
+    linear-gradient(160deg,var(--space) 0%,var(--space-2) 60%,#0A1230 100%);}
+  .hero-inner{padding:110px 24px 140px}
+  .char-card{grid-template-columns:1fr}
+  .char-pic{min-height:240px}
+  .char-pic::after{background:linear-gradient(180deg,transparent 60%,rgba(255,255,255,.95) 100%)}
+  .p-grid{grid-template-columns:repeat(2,1fr)}
+  .player{grid-template-columns:1fr;justify-items:center;text-align:center;padding:30px 22px}
+  .p-now{width:100%}
+  .progress{max-width:480px;margin:0 auto}
+  .now-ctrl{justify-content:center}
+  .eq{max-width:480px;margin-left:auto;margin-right:auto}
+  .section{padding:76px 20px}
+}
+@media (max-width:420px){
+  .p-grid{grid-template-columns:1fr}
+  .char-stats{grid-template-columns:1fr 1fr}
+}
+
+/* ============ 动效偏好 ============ */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.01ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.01ms !important;
+  }
+  html{scroll-behavior:auto}
+  .dm,.record,.record::before,.eq i,.scroll-hint i{animation:none}
+}
+</style>
+</head>
+<body id="top">
+
+<!-- 光标微光 -->
+<div class="cursor-glow" aria-hidden="true"></div>
+
+<!-- 顶栏 -->
+<header class="topbar">
+  <div class="topbar-in">
+    <a class="brand" href="#top" aria-label="漂流 DRIFT 星海版 回到顶部">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="17" height="17" fill="none">
+          <path d="M12 3v11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <path d="M12 4.5 19 11h-7z" fill="currentColor"/>
+          <path d="M2.5 13.5Q12 17.5 21.5 13.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <path d="M5 18Q8.5 20 12 18" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" opacity=".6"/>
+        </svg>
+      </span>
+      <span class="brand-name">漂流<em class="demo-badge">星海版</em></span>
+    </a>
+    <nav class="nav-links" aria-label="主导航">
+      <a href="#char">角色</a>
+      <a href="#playlist">歌单</a>
+      <a href="#player">电台</a>
+      <a class="nav-dl" href="#download">免费下载</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- 首屏：深空压轴 -->
+  <section class="hero hero-scrub" aria-label="首屏">
+    <canvas id="stars" aria-hidden="true"></canvas>
+    <span class="hud-corner hud-tl" aria-hidden="true"></span>
+    <span class="hud-corner hud-br" aria-hidden="true"></span>
+
+    <!-- 弹幕歌词带 -->
+    <div class="dm-zone" aria-hidden="true">
+      <span class="dm" style="top:20%;--dmdur:12s;--dmdelay:-3s">耳机分你一半</span>
+      <span class="dm pink" style="top:31%;--dmdur:14s;--dmdelay:-9s">下一首 · 未知</span>
+      <span class="dm" style="top:42%;--dmdur:11s;--dmdelay:-2s">这艘船 好安静</span>
+      <span class="dm blue" style="top:52%;--dmdur:15s;--dmdelay:-7s">向着星海的方向</span>
+      <span class="dm" style="top:63%;--dmdur:13s;--dmdelay:-5s">漂过三千首 还是会被一首歌留下</span>
+      <span class="dm" style="top:74%;--dmdur:16s;--dmdelay:-11s">晚安 地球人</span>
+    </div>
+
+    <div class="hero-inner">
+      <div class="hero-copy">
+        <p class="eyebrow">DRIFT × STAR SEA <span class="en">星海版限定</span></p>
+        <h1>在星海里，<br>漂向<span class="hl">下一首歌</span>。</h1>
+        <p class="lead">每晚一条漂流线，从你熟悉的歌出发，<br>漂向<b>星海深处没人听过的旋律</b>。耳机戴好，船要开了。</p>
+        <div class="cta">
+          <a class="btn btn-pink" href="#download">免费下载 <span style="opacity:.85">↘</span></a>
+          <a class="btn btn-blue" href="#player">听听星海电台</a>
+        </div>
+        <p class="fineprint">免费下载<i>·</i>无广告<i>·</i>会员解锁无限漂流</p>
+      </div>
+    </div>
+    <p class="hero-coord" aria-hidden="true">星海站 <b>#3</b> · 22.4°N 118.1°E · 航线未知</p>
+    <div class="scroll-hint" aria-hidden="true">SCROLL<i></i></div>
+    <!-- 波峰分隔线：深空 → 亮色（svg 位于 hero 底部，透明区露出深空） -->
+    <div class="wave-divider" aria-hidden="true">
+      <svg viewBox="0 0 1440 70" preserveAspectRatio="none">
+        <path d="M0 34 Q 120 66 260 50 T 520 44 T 780 52 T 1040 42 T 1300 52 T 1440 40 L 1440 70 L 0 70 Z" fill="#FDF2F7"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- 跑马灯：星海航线 -->
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track">
+      <div class="marquee-group">
+        <span class="m-item">后摇</span><span class="m-sep">✦</span>
+        <span class="m-item">爵士嘻哈</span><span class="m-sep">✦</span>
+        <span class="m-item">城市民谣</span><span class="m-sep">✦</span>
+        <span class="m-item">环境电子</span><span class="m-sep">✦</span>
+        <span class="m-item">港乐</span><span class="m-sep">✦</span>
+        <span class="m-item">独立流行</span><span class="m-sep">✦</span>
+        <span class="m-item">说唱</span><span class="m-sep">✦</span>
+        <span class="m-item">氛围</span><span class="m-sep">✦</span>
+        <span class="m-item">合成器浪潮</span><span class="m-sep">✦</span>
+        <span class="m-item">部落节拍</span><span class="m-sep">✦</span>
+      </div>
+      <div class="marquee-group">
+        <span class="m-item">后摇</span><span class="m-sep">✦</span>
+        <span class="m-item">爵士嘻哈</span><span class="m-sep">✦</span>
+        <span class="m-item">城市民谣</span><span class="m-sep">✦</span>
+        <span class="m-item">环境电子</span><span class="m-sep">✦</span>
+        <span class="m-item">港乐</span><span class="m-sep">✦</span>
+        <span class="m-item">独立流行</span><span class="m-sep">✦</span>
+        <span class="m-item">说唱</span><span class="m-sep">✦</span>
+        <span class="m-item">氛围</span><span class="m-sep">✦</span>
+        <span class="m-item">合成器浪潮</span><span class="m-sep">✦</span>
+        <span class="m-item">部落节拍</span><span class="m-sep">✦</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 角色登场 -->
+  <section class="section" id="char">
+    <div class="section-head">
+      <span class="tag-dot"><i></i>NEW CHARACTER</span>
+      <h2>星海版首位角色登场</h2>
+      <p class="sec-sub">她戴着你没有的耳机，坐着一艘不会沉的纸船。<br>耳机里在播什么？她也不知道——<b>漂到哪首算哪首</b>。</p>
+    </div>
+    <div class="char-card">
+      <div class="char-pic">
+        <span class="lv">★ 星海版限定</span>
+        <img src="images/anime-hero.png" alt="漂流少女「汐」：戴耳机坐在纸船上，漂在星海之间">
+      </div>
+      <div class="char-info">
+        <div class="char-head">
+          <span class="char-name">汐 <em>SIO</em></span>
+        </div>
+        <div class="char-tags">
+          <span class="ctag hot"># 星海导游</span>
+          <span class="ctag blue"># 纸船船长</span>
+          <span class="ctag"># 属性 · 风</span>
+          <span class="ctag"># 登场 · 星海版</span>
+        </div>
+        <p class="char-desc">戴耳机的漂流少女，每晚乘纸船漂过一片星海。她说导航没有用，<b>「不知道下一首是什么」才是最好的方向</b>。身高 152cm（含耳机），声线未知，出场自带极光。</p>
+        <div class="char-stats">
+          <div class="cstat"><b data-count="128.4" data-suffix="万">0</b><small>次播放</small></div>
+          <div class="cstat"><b data-count="32.6" data-suffix="万">0</b><small>次收藏</small></div>
+          <div class="cstat"><b data-count="9999" data-suffix="+">0</b><small>条弹幕</small></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 歌单（B站首页式） -->
+  <section class="section" id="playlist">
+    <div class="section-head">
+      <span class="tag-dot"><i></i>PLAYLISTS</span>
+      <h2>今夜在漂的歌单</h2>
+      <p class="sec-sub">每一张都是一条航线。点进去，船就开了。</p>
+    </div>
+    <div class="p-grid">
+      <div class="p-card" tabindex="0" role="button" aria-label="深夜电台歌单">
+        <div class="p-cover">
+          <span class="ribbon">推荐</span>
+          <img src="images/cover-anime-1.png" alt="深夜电台歌单封面">
+          <span class="p-play">▶</span>
+        </div>
+        <p class="p-name">深夜电台 · 第 1001 夜</p>
+        <p class="p-meta"><b>128.4万</b>播放 · <b>3.2万</b>弹幕 · 2天前</p>
+      </div>
+      <div class="p-card" tabindex="0" role="button" aria-label="城市漫游歌单">
+        <div class="p-cover">
+          <span class="ribbon gold">新</span>
+          <img src="images/cover-anime-2.png" alt="城市漫游 BGM 歌单封面">
+          <span class="p-play">▶</span>
+        </div>
+        <p class="p-name">城市漫游 BGM · 晚霞限定</p>
+        <p class="p-meta"><b>86.2万</b>播放 · <b>1.9万</b>弹幕 · 5天前</p>
+      </div>
+      <div class="p-card" tabindex="0" role="button" aria-label="雨天漂流歌单">
+        <div class="p-cover">
+          <img src="images/cover-anime-3.png" alt="雨天漂流歌单封面">
+          <span class="p-play">▶</span>
+        </div>
+        <p class="p-name">雨天漂流 · 纸船不打烊</p>
+        <p class="p-meta"><b>54.8万</b>播放 · <b>9876</b>弹幕 · 1周前</p>
+      </div>
+      <div class="p-card" tabindex="0" role="button" aria-label="失眠者之海歌单">
+        <div class="p-cover">
+          <span class="ribbon">热</span>
+          <img src="images/cover-anime-4.png" alt="失眠者之海歌单封面">
+          <span class="p-play">▶</span>
+        </div>
+        <p class="p-name">失眠者之海 · 给睡不着的你</p>
+        <p class="p-meta"><b>41.3万</b>播放 · <b>1.1万</b>弹幕 · 1周前</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 星海电台：播放器 -->
+  <section class="section" id="player">
+    <div class="section-head">
+      <span class="tag-dot"><i></i>STAR SEA RADIO</span>
+      <h2>星海电台 · 正在播放</h2>
+      <p class="sec-sub">点击播放，弹幕会跟着歌一起漂过来。</p>
+    </div>
+    <div class="player-wrap">
+      <div class="player">
+        <div class="record-box" id="recordBox">
+          <div class="record" id="record" aria-hidden="true"></div>
+          <div class="record-dm" id="recordDm" aria-hidden="true">
+            <span class="dm dm-r1" style="--dmdur:6s;--dmdelay:-1s">这艘船 好安静</span>
+            <span class="dm pink dm-r2" style="--dmdur:7s;--dmdelay:-4s">下一首 会是什么</span>
+            <span class="dm blue dm-r3" style="--dmdur:6.5s;--dmdelay:-2.5s">晚安 星海</span>
+            <span class="dm dm-r1" style="--dmdur:7.5s;--dmdelay:-5s">后摇接说唱 也可以</span>
+            <span class="dm pink dm-r2" style="--dmdur:6.2s;--dmdelay:-3.2s">21:47 漂到这里</span>
+            <span class="dm dm-r3" style="--dmdur:8s;--dmdelay:-6s">耳机分你一半</span>
+          </div>
+        </div>
+        <div class="p-now">
+          <p class="now-kicker" id="npKicker">星海电台 · 第 1/4 站</p>
+          <h3 class="now-title" id="npTitle">「信风」<em id="npTag">后摇</em></h3>
+          <p class="now-artist" id="npArtist">一支你没听过的乐队 · 星海第 1 站</p>
+          <div class="eq" id="eq" aria-hidden="true"></div>
+          <div class="progress" aria-hidden="true"><i id="barI"></i></div>
+          <div class="time-row"><span id="nowCur">0:00</span><span id="nowTot">--:--</span></div>
+          <div class="now-ctrl">
+            <button class="np-side" id="npPrev" type="button" aria-label="上一首">⏮</button>
+            <button class="now-play" id="nowPlay" type="button" aria-label="播放/暂停">▶</button>
+            <button class="np-side" id="npNext" type="button" aria-label="下一首">⏭</button>
+            <button class="now-heart" id="nowHeart" type="button" aria-label="收藏">♡</button>
+            <button class="dm-toggle on" id="dmToggle" type="button" aria-label="弹幕开关"><i>弹</i> 弹幕开</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 下载 -->
+  <section class="section download" id="download">
+    <div class="section-head">
+      <span class="tag-dot" style="margin:0 auto"><i></i>DOWNLOAD</span>
+      <h2>今晚，漂向星海。</h2>
+      <p class="sec-sub">免费下载。会员订阅解锁无限漂流、离线收听与无损音质。<br>没有广告，没有排行榜绑架你的耳朵。</p>
+    </div>
+    <div class="store-row">
+      <a class="store-btn" href="#" aria-label="App Store 免费下载">
+        <svg viewBox="0 0 384 512" fill="currentColor" aria-hidden="true">
+          <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/>
+        </svg>
+        <span class="st-txt"><em>App Store</em><small>免费下载</small></span>
+      </a>
+      <a class="store-btn" href="#" aria-label="Android 免费下载">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-2 14.5v-9l7 4.5-7 4.5z"/>
+        </svg>
+        <span class="st-txt"><em>Android</em><small>免费下载</small></span>
+      </a>
+    </div>
+    <p class="dl-note">第一次打开，就有一条漂流线在等你。<b>✦</b></p>
+  </section>
+</main>
+
+<!-- 页脚 -->
+<footer>
+  <div class="foot-inner">
+    <div class="foot-left">
+      <span class="brand-mark" aria-hidden="true" style="width:30px;height:30px;border-radius:9px">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none">
+          <path d="M12 3v11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <path d="M12 4.5 19 11h-7z" fill="currentColor"/>
+          <path d="M2.5 13.5Q12 17.5 21.5 13.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </span>
+      <span class="foot-name">漂流 DRIFT · 星海版</span>
+      <span class="foot-slogan">在星海里迷路，是一件好事。</span>
+    </div>
+    <div class="foot-links">
+      <a href="#">B站</a>
+      <a href="#">小红书</a>
+      <a href="#">关于</a>
+    </div>
+  </div>
+  <div class="foot-copy">
+    <span>© 2026 漂流 DRIFT</span>
+    <span class="credit">试听音乐：Kevin MacLeod（incompetech.com）CC-BY-4.0 · SoundHelix · 角色「汐」为虚构形象</span>
+    <span>免费下载，<b>从今天开始</b>。</span>
+  </div>
+</footer>
+
+<!-- 视图切换器：五页互跳 -->
+<div class="view-switch">
+  <details>
+    <summary><span>视图切换</span><span class="vs-caret">▾</span></summary>
+    <div class="vs-menu">
+      <a class="vs-item" href="archive/index.html"><span class="vs-ico">☀</span>漂流 · 日光版</a>
+      <a class="vs-item" href="archive/qqmusic-style.html"><span class="vs-ico">▣</span>假如是 QQ</a>
+      <a class="vs-item" href="archive/wangyiyun-style.html"><span class="vs-ico">♬</span>假如是网易云</a>
+      <a class="vs-item on" href="anime-style.html"><span class="vs-ico">🌠</span>漂流 · 星海版</a>
+      <a class="vs-item" href="archive/mihoyo-style.html"><span class="vs-ico">💫</span>漂流 · 星轨版</a>
+    </div>
+  </details>
+</div>
+
+<script>
+/* 星海电台播放器：4 首曲库自由切换，本地音频优先，多源自动降级，弹幕随播放浮现 */
+(function(){
+  var TRACKS = [
+    {t:'信风', s:'一支你没听过的乐队 · 后摇', tag:'后摇', cover:'images/cover-anime-1.png', src:['audio/zen.mp3','https://incompetech.com/music/royalty-free/mp3-royaltyfree/That%20Zen%20Moment.mp3','https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3']},
+    {t:'晚风告别式', s:'环境电子 · 深夜电台', tag:'环境电子', cover:'images/cover-anime-4.png', src:['audio/gymnopedie1.mp3','https://incompetech.com/music/royalty-free/mp3-royaltyfree/Gymnopedie%20No%201.mp3','https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3']},
+    {t:'凌晨三点半的港', s:'爵士嘻哈 · 失眠人士精选', tag:'爵士嘻哈', cover:'images/cover-anime-2.png', src:['https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3','https://www.soundhelix.com/examples/mp3/SoundHelix-Song-16.mp3']},
+    {t:'雨季漂流记', s:'氛围 · 下雨天限定', tag:'氛围', cover:'images/cover-anime-3.png', src:['https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3','https://www.soundhelix.com/examples/mp3/SoundHelix-Song-14.mp3']}
+  ];
+  var audio = new Audio();
+  audio.preload = 'none';
+  var idx = 0, si = -1;
+  var playing = false, failed = false, liked = false;
+  var btn = document.getElementById('nowPlay');
+  var record = document.getElementById('record');
+  var recordBox = document.getElementById('recordBox');
+  var bar = document.getElementById('barI');
+  var cur = document.getElementById('nowCur');
+  var tot = document.getElementById('nowTot');
+  var kicker = document.getElementById('npKicker');
+  var title = document.getElementById('npTitle');
+  var tag = document.getElementById('npTag');
+  var artist = document.getElementById('npArtist');
+  var eq = document.getElementById('eq');
+  var heart = document.getElementById('nowHeart');
+  var dmToggle = document.getElementById('dmToggle');
+  var recordDm = document.getElementById('recordDm');
+  // 32 条等化器柱，随机高度与延迟
+  for(var e=0;e<32;e++){
+    var s = document.createElement('i');
+    s.style.setProperty('--h', (22 + Math.random()*66) + '%');
+    s.style.setProperty('--d', (-Math.random()*1.1) + 's');
+    eq.appendChild(s);
+  }
+  function fmt(s){ s = Math.floor(s||0); return Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); }
+  function showTrack(){
+    title.textContent = '「' + TRACKS[idx].t + '」';
+    tag.textContent = TRACKS[idx].tag;
+    artist.textContent = TRACKS[idx].s;
+    kicker.textContent = '星海电台 · 第 ' + (idx+1) + '/' + TRACKS.length + ' 站';
+    record.style.backgroundImage = "url('" + TRACKS[idx].cover + "'),radial-gradient(circle at 50% 50%,#222 0 30%,transparent 31%)";
+  }
+  function sync(){
+    btn.textContent = failed ? '!' : (playing ? '❚❚' : '▶');
+    btn.title = failed ? '试听源不可用' : (playing ? '暂停' : '播放');
+    record.classList.toggle('playing', playing);
+    recordBox.classList.toggle('live', playing && dmOn);
+    eq.classList.toggle('live', playing);
+  }
+  var dmOn = true;
+  function syncDm(){
+    recordBox.classList.toggle('live', playing && dmOn);
+    dmToggle.classList.toggle('on', dmOn);
+    dmToggle.textContent = '弹幕' + (dmOn ? '开' : '关');
+  }
+  function loadTrack(i, autoplay){
+    idx = i; si = -1; failed = false;
+    showTrack();
+    cur.textContent = '0:00'; tot.textContent = '--:--';
+    if(bar) bar.style.width = '0%';
+    if(autoplay){ playing = true; sync(); si = 0; audio.src = TRACKS[idx].src[0]; audio.play().catch(function(){}); }
+    else { playing = false; sync(); }
+  }
+  audio.addEventListener('loadedmetadata', function(){ tot.textContent = fmt(audio.duration); });
+  audio.addEventListener('timeupdate', function(){
+    if(bar && audio.duration) bar.style.width = (audio.currentTime/audio.duration*100)+'%';
+    cur.textContent = fmt(audio.currentTime);
+  });
+  audio.addEventListener('ended', function(){ playing = false; sync(); cur.textContent = '0:00'; if(bar) bar.style.width = '0%'; });
+  audio.addEventListener('error', function(){
+    si++;
+    if(si < TRACKS[idx].src.length){ audio.src = TRACKS[idx].src[si]; audio.play().catch(function(){}); }
+    else { playing = false; failed = true; sync(); }
+  });
+  btn.addEventListener('click', function(){
+    if(failed) return;
+    if(playing){ audio.pause(); playing = false; sync(); return; }
+    playing = true; sync();
+    if(si === -1){ si = 0; audio.src = TRACKS[idx].src[0]; }
+    audio.play().catch(function(){});
+  });
+  function step(d){
+    var next = (idx + d + TRACKS.length) % TRACKS.length;
+    var wasPlaying = playing;
+    audio.pause();
+    loadTrack(next, wasPlaying);
+  }
+  document.getElementById('npPrev').addEventListener('click', function(){ step(-1); });
+  document.getElementById('npNext').addEventListener('click', function(){ step(1); });
+  heart.addEventListener('click', function(){
+    liked = !liked;
+    heart.classList.toggle('liked', liked);
+    heart.textContent = liked ? '❤' : '♡';
+  });
+  dmToggle.addEventListener('click', function(){ dmOn = !dmOn; syncDm(); });
+  syncDm();
+  showTrack();
+})();
+
+/* 星尘粒子：hero 深空细闪（≤80 颗，粉蓝双色） */
+(function(){
+  var c = document.getElementById('stars');
+  if(!c) return;
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var ctx = c.getContext('2d');
+  var DPR = Math.min(window.devicePixelRatio || 1, 2);
+  var W, H, stars = [];
+  function resize(){
+    W = c.offsetWidth; H = c.offsetHeight;
+    c.width = W * DPR; c.height = H * DPR;
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    build();
+  }
+  function build(){
+    var n = Math.min(80, Math.floor(W*H/16000));
+    stars = [];
+    for(var i=0;i<n;i++){
+      stars.push({
+        x: Math.random()*W, y: Math.random()*H,
+        r: Math.random()*1.4 + .4,
+        a: Math.random()*.6 + .2,
+        da: (Math.random()*.016 + .004) * (Math.random() < .5 ? 1 : -1),
+        hue: Math.random() < .7 ? '251,114,153' : '0,174,236'
+      });
+    }
+  }
+  function tick(){
+    ctx.clearRect(0,0,W,H);
+    for(var i=0;i<stars.length;i++){
+      var s = stars[i];
+      s.a += s.da;
+      if(s.a > .85 || s.a < .1) s.da *= -1;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(' + s.hue + ',' + s.a + ')';
+      ctx.fill();
+    }
+    raf = requestAnimationFrame(tick);
+  }
+  var raf;
+  addEventListener('resize', resize, { passive: true });
+  document.addEventListener('visibilitychange', function(){
+    if(document.hidden){ cancelAnimationFrame(raf); }
+    else { tick(); }
+  });
+  resize();
+  tick();
+})();
+
+/* 炫酷动效：角色数据滚动 + 光标微光 */
+(function(){
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  // 数字滚动（IntersectionObserver 触发一次）
+  var nums = document.querySelectorAll('.cstat b');
+  if(nums.length && 'IntersectionObserver' in window){
+    var obs = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(!en.isIntersecting) return;
+        obs.unobserve(en.target);
+        var el = en.target;
+        var target = parseFloat(el.getAttribute('data-count'));
+        var suffix = el.getAttribute('data-suffix') || '';
+        var t0 = performance.now(), dur = 1300;
+        (function frame(now){
+          var p = Math.min((now - t0) / dur, 1);
+          var eased = 1 - Math.pow(1-p, 3);
+          var v = target * eased;
+          el.textContent = (target >= 1000 ? Math.round(v).toLocaleString('en-US') : v.toFixed(1)) + suffix;
+          if(p < 1) requestAnimationFrame(frame);
+        })(t0);
+      });
+    }, { threshold: .4 });
+    nums.forEach(function(n){ obs.observe(n); });
+  }
+  // 光标微光
+  var glow = document.querySelector('.cursor-glow');
+  if(glow && window.matchMedia('(hover:hover) and (pointer:fine)').matches){
+    var tx = innerWidth/2, ty = innerHeight/3, cx = tx, cy = ty, shown = false;
+    document.addEventListener('mousemove', function(e){
+      tx = e.clientX; ty = e.clientY;
+      if(!shown){ shown = true; glow.style.opacity = '1'; }
+    });
+    (function loop(){
+      cx += (tx-cx)*0.08; cy += (ty-cy)*0.08;
+      glow.style.transform = 'translate('+(cx-220)+'px,'+(cy-220)+'px)';
+      requestAnimationFrame(loop);
+    })();
+  }
+})();
+
+/* 苹果风格滚动降级：不支持 scroll-driven 时 JS 实现 hero exit-scrub */
+(function(){
+  if(!window.CSS || !CSS.supports || CSS.supports('animation-timeline','scroll()')) return;
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var hero = document.querySelector('.hero');
+  var copy = document.querySelector('.hero-copy');
+  if(!hero || !copy) return;
+  var ticking = false;
+  function update(){
+    ticking = false;
+    var vh = innerHeight;
+    var r = hero.getBoundingClientRect();
+    var p = Math.min(Math.max((vh - r.top) / (vh * 1.1), 0), 1); // 0=页面顶部, 1=完全滚出
+    copy.style.opacity = String(1 - p*0.95);
+    copy.style.translate = '0 ' + (p*-90) + 'px';
+    hero.style.opacity = String(1 - p*0.75);
+    hero.style.transform = 'scale(' + (1 + p*0.06) + ') translateY(' + (p*40) + 'px)';
+  }
+  function onScroll(){ if(!ticking){ ticking = true; requestAnimationFrame(update); } }
+  addEventListener('scroll', onScroll, { passive: true });
+  update();
+})();
+</script>
+</body>
+</html>

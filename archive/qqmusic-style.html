@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0B0E12">
+<meta name="description" content="虚构对照页：假如漂流用 QQ 音乐的语法来做，会是这样。本页仅为演示，真正的漂流首页见 index.html。">
+<title>假如漂流是QQ音乐 · 对照演示</title>
+<style>
+/* ============ 基础 ============ */
+:root{
+  --bg:#0B0E12;
+  --panel:#12181D;
+  --panel-2:#161E24;
+  --green:#31C27C;
+  --green-bright:#4BE3A0;
+  --green-deep:#0F5C3E;
+  --gold:#EFBC54;
+  --gold-deep:#CF8F2A;
+  --txt:#E8F0EA;
+  --txt-2:#A3B0AC;
+  --txt-3:#6E7E7A;
+  --line:rgba(255,255,255,.07);
+  --blue:#3B7BFF;
+  --purple:#8B5CF6;
+  --sans:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","HarmonyOS Sans SC","Segoe UI",sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--txt);
+  font-family:var(--sans);line-height:1.65;
+  overflow-x:hidden;padding-bottom:84px;
+}
+::selection{background:var(--green);color:#06130D}
+a{color:inherit;text-decoration:none}
+a:focus-visible,button:focus-visible{outline:2px solid var(--green);outline-offset:3px;border-radius:6px}
+
+/* ============ 背景光晕 ============ */
+.glow{position:fixed;border-radius:50%;filter:blur(90px);pointer-events:none;z-index:0;will-change:transform,opacity}
+.glow-a{
+  width:min(62vw,820px);aspect-ratio:1;top:-28vw;left:-22vw;
+  background:radial-gradient(circle,rgba(49,194,124,.17),transparent 65%);
+  animation:glowA 9s ease-in-out infinite alternate;
+}
+.glow-b{
+  width:min(54vw,700px);aspect-ratio:1;bottom:-26vw;right:-20vw;
+  background:radial-gradient(circle,rgba(59,123,255,.15),transparent 65%);
+  animation:glowB 12s ease-in-out infinite alternate;
+}
+@keyframes glowA{from{opacity:.65;transform:scale(1)}to{opacity:1;transform:scale(1.18)}}
+@keyframes glowB{from{opacity:.7;transform:scale(1)}to{opacity:1;transform:scale(1.12)}}
+
+/* ============ 顶栏 ============ */
+.topbar{
+  position:sticky;top:0;z-index:40;
+  background:rgba(11,14,18,.85);
+  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);
+}
+.topbar-in{max-width:1120px;margin:0 auto;padding:13px 24px;display:flex;align-items:center;gap:16px}
+.brand{display:flex;align-items:center;gap:10px;flex:none}
+.brand-mark{
+  width:32px;height:32px;border-radius:9px;flex:none;
+  background:linear-gradient(135deg,var(--green),var(--green-deep));
+  display:flex;align-items:center;justify-content:center;color:#fff;
+  box-shadow:0 6px 16px -6px rgba(49,194,124,.7);
+}
+.brand-name{font-weight:800;font-size:1.02rem;letter-spacing:.04em}
+.demo-badge{
+  font-size:.64rem;font-weight:700;letter-spacing:.12em;
+  color:var(--gold);border:1px solid rgba(245,194,92,.5);
+  padding:2px 8px;border-radius:999px;white-space:nowrap;
+}
+.search{
+  flex:1;max-width:320px;display:flex;align-items:center;gap:8px;
+  background:var(--panel);border:1px solid var(--line);border-radius:999px;
+  padding:8px 16px;color:var(--txt-3);font-size:.82rem;
+}
+.search svg{flex:none;opacity:.7}
+.top-dl{
+  margin-left:auto;flex:none;font-size:.82rem;font-weight:800;color:#06130D;
+  background:linear-gradient(120deg,var(--green),#1F9E63);
+  padding:9px 20px;border-radius:999px;
+  box-shadow:0 8px 18px -8px rgba(49,194,124,.6);
+  transition:transform .2s ease;
+}
+.top-dl:hover{transform:translateY(-2px)}
+
+/* ============ 主容器 ============ */
+.wrap{position:relative;z-index:1;max-width:1120px;margin:0 auto;padding:0 24px}
+
+/* ============ 会员横幅 ============ */
+.vip-banner{
+  margin-top:18px;border-radius:18px;overflow:hidden;
+  background:linear-gradient(115deg,#0B3D2A,#127A4E 45%,#31C27C);
+  border:1px solid rgba(75,227,160,.28);
+  padding:30px 36px;display:flex;justify-content:space-between;align-items:center;
+  position:relative;
+}
+.vip-banner::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(105deg,transparent 42%,rgba(255,255,255,.16) 50%,transparent 58%);
+  background-size:250% 100%;
+  animation:shine 4.5s ease-in-out infinite;
+}
+@keyframes shine{0%{background-position:120% 0}60%,100%{background-position:-60% 0}}
+.vip-kicker{font-size:.74rem;font-weight:800;letter-spacing:.2em;color:var(--gold)}
+.vip-banner h2{font-size:clamp(1.3rem,3vw,1.75rem);font-weight:800;margin:8px 0 6px;letter-spacing:.03em}
+.vip-sub{font-size:.85rem;color:#BFEBD8}
+.btn-gold{
+  display:inline-block;margin-top:16px;
+  background:linear-gradient(120deg,#F3CC80,#CF8F2A);color:#241A02;
+  font-weight:800;font-size:.88rem;padding:11px 26px;border-radius:999px;
+  box-shadow:0 10px 22px -10px rgba(239,188,84,.6);
+  transition:transform .2s ease;
+}
+.btn-gold:hover{transform:translateY(-2px)}
+.vip-art{font-size:3.6rem;line-height:1;animation:float 4s ease-in-out infinite;flex:none}
+
+/* ============ 四宫格 ============ */
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:20px}
+.tile{
+  background:var(--panel);border:1px solid var(--line);border-radius:16px;
+  padding:26px 20px;display:flex;flex-direction:column;gap:10px;align-items:flex-start;
+  transition:transform .2s ease,border-color .2s ease;
+}
+.tile:hover{transform:translateY(-3px);border-color:rgba(75,227,160,.5)}
+.tile .ico{
+  width:42px;height:42px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;font-size:1.3rem;
+}
+.tile .ico.i1{background:linear-gradient(135deg,#0F5C3E,#31C27C)}
+.tile .ico.i2{background:linear-gradient(135deg,#123A66,#3B7BFF)}
+.tile .ico.i3{background:linear-gradient(135deg,#2A1A5E,#8B5CF6)}
+.tile .ico.i4{background:linear-gradient(135deg,#6B4A10,#E8A23D)}
+.tile b{font-size:1.02rem;font-weight:800}
+.tile small{font-size:.74rem;color:var(--txt-3)}
+
+/* ============ 轮播 banner ============ */
+.banner{
+  margin-top:20px;border-radius:18px;overflow:hidden;position:relative;
+  background:
+    linear-gradient(105deg,rgba(8,14,18,.85) 0%,rgba(8,14,18,.45) 50%,rgba(8,14,18,.12) 78%),
+    url('../images/banner-stage.jpg') center/cover no-repeat;
+  border:1px solid var(--line);padding:42px 40px;
+}
+.banner::before,.banner::after{
+  content:"";position:absolute;border-radius:50%;pointer-events:none;
+}
+.banner::before{right:-70px;top:-70px;width:230px;height:230px;background:radial-gradient(circle,rgba(75,227,160,.28),transparent 65%)}
+.banner::after{left:-50px;bottom:-80px;width:200px;height:200px;background:radial-gradient(circle,rgba(139,92,246,.3),transparent 65%)}
+.gradient-text{
+  font-size:clamp(1.5rem,3.6vw,2.3rem);font-weight:800;letter-spacing:.05em;
+  background:linear-gradient(90deg,var(--green-bright),#7EE8C0 40%,#9F8CFF);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.banner p{color:#AEBCC9;font-size:.95rem;margin-top:10px}
+.banner .dots{display:flex;gap:6px;margin-top:20px;position:relative;z-index:1}
+.banner .dots i{width:6px;height:6px;border-radius:3px;background:rgba(255,255,255,.25)}
+.banner .dots i.on{width:18px;background:var(--green);animation:dotpulse 2.2s ease-in-out infinite}
+@keyframes dotpulse{0%,100%{opacity:1}50%{opacity:.55}}
+
+/* ============ 面板通用 ============ */
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:26px;margin-top:18px}
+.panel-head{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.panel-head h3{font-size:1.12rem;font-weight:800;letter-spacing:.02em}
+.tag-soft{background:rgba(49,194,124,.14);color:var(--green-bright);font-size:.7rem;font-weight:700;padding:3px 9px;border-radius:6px}
+.more{margin-left:auto;color:var(--txt-3);font-size:.8rem;cursor:pointer}
+.more:hover{color:var(--green-bright)}
+
+/* ============ 榜单 ============ */
+.rank-row{
+  display:flex;align-items:center;gap:14px;
+  padding:13px 12px;border-radius:12px;transition:background .18s ease;
+  cursor:pointer;
+}
+.rank-row:hover{background:rgba(255,255,255,.045)}
+.rank-row.playing{background:rgba(49,194,124,.12)}
+.rank-row.playing .play-badge{display:flex}
+.rank-no{width:26px;text-align:center;font-weight:800;font-size:1.05rem;color:var(--txt-3);font-variant-numeric:tabular-nums}
+.rank-row.r1 .rank-no{color:var(--gold);text-shadow:0 0 14px rgba(245,194,92,.6)}
+.rank-row.r2 .rank-no{color:#C0C8D0}
+.rank-row.r3 .rank-no{color:#B08968}
+.t-mid{flex:1;min-width:0}
+.t-title{font-size:.94rem;font-weight:600;display:flex;align-items:center;gap:8px;white-space:nowrap;overflow:hidden}
+.t-title span{overflow:hidden;text-overflow:ellipsis}
+.t-sub{font-size:.75rem;color:var(--txt-3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.count{font-size:.8rem;color:var(--txt-3);font-weight:600;font-variant-numeric:tabular-nums;flex:none}
+.play-badge{
+  width:30px;height:30px;border-radius:50%;flex:none;
+  background:var(--green);color:#06130D;font-size:.72rem;
+  display:none;align-items:center;justify-content:center;
+}
+.rank-row:hover .play-badge{display:flex}
+
+/* 角标 */
+.tag{font-size:.68rem;font-weight:700;padding:3px 7px;border-radius:5px;letter-spacing:.02em;flex:none}
+.tag-vip{background:linear-gradient(120deg,#EFBC54,#CF8F2A);color:#241A02}
+.tag-first{background:rgba(59,123,255,.16);color:#7FA8FF}
+.tag-hq{background:rgba(139,92,246,.16);color:#B39EFF}
+.tag-ex{background:rgba(255,107,107,.16);color:#FF8A8A}
+.tag-new{background:rgba(49,194,124,.14);color:var(--green-bright);font-size:.7rem;font-weight:700;padding:3px 9px;border-radius:6px}
+
+/* 付费墙——题眼 */
+.locked{
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  margin-top:10px;padding:16px;border-radius:14px;
+  border:1px dashed rgba(245,194,92,.65);
+  background:linear-gradient(90deg,rgba(245,194,92,.13),rgba(49,194,124,.07));
+  position:relative;overflow:hidden;
+}
+.locked::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(105deg,transparent 45%,rgba(255,255,255,.09) 50%,transparent 55%);
+  background-size:250% 100%;animation:shine 5s ease-in-out infinite;
+}
+.lock-ico{font-size:1.25rem;flex:none}
+.locked .lt{flex:1;min-width:0}
+.locked .lt b{color:var(--gold);font-size:.95rem;display:block}
+.locked .lt small{color:var(--txt-2);font-size:.74rem}
+.btn-lock{
+  background:linear-gradient(120deg,#F3CC80,#CF8F2A);color:#241A02;
+  font-weight:800;font-size:.8rem;padding:10px 20px;border-radius:999px;
+  box-shadow:0 10px 22px -10px rgba(239,188,84,.6);
+  transition:transform .2s ease;flex:none;
+}
+.btn-lock:hover{transform:translateY(-2px)}
+
+/* ============ 歌单瀑布 ============ */
+.p-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:4px}
+.p-card{
+  background:var(--panel-2);border:1px solid var(--line);border-radius:16px;
+  padding:14px;transition:transform .2s ease,border-color .2s ease;
+}
+.p-card:hover{transform:translateY(-4px);border-color:rgba(75,227,160,.45)}
+.p-cover{
+  aspect-ratio:1;border-radius:10px;position:relative;
+  display:flex;align-items:center;justify-content:center;font-size:2.7rem;
+  background-size:cover;background-position:center;
+}
+.cv1{background-image:url('../images/cover-qq-postrock.png')}
+.cv2{background-image:url('../images/cover-qq-midnight.png')}
+.cv3{background-image:url('../images/cover-qq-city.png')}
+.cv4{background-image:url('../images/cover-qq-rain.png')}
+.cv5{background-image:url('../images/cover-qq-cantonese.png')}
+.cv6{background-image:url('../images/cover-qq-insomnia.png')}
+.p-cover .tag{position:absolute;left:8px;top:8px}
+.p-play{
+  position:absolute;right:8px;bottom:8px;width:34px;height:34px;border-radius:50%;
+  background:rgba(11,14,18,.65);border:1px solid rgba(255,255,255,.28);
+  display:flex;align-items:center;justify-content:center;font-size:.78rem;color:#fff;
+}
+.p-name{font-size:.88rem;font-weight:600;margin:14px 2px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.p-meta{font-size:.72rem;color:var(--txt-3)}
+
+/* ============ 权益条 ============ */
+.perk-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.perk{background:var(--panel-2);border:1px solid var(--line);border-radius:16px;padding:20px 14px;text-align:center}
+.perk .p-ico{font-size:1.5rem}
+.perk b{display:block;font-size:.88rem;margin:9px 0 4px}
+.perk small{color:var(--txt-3);font-size:.72rem;line-height:1.5;display:block}
+.vip-cta{
+  margin-top:16px;border-radius:16px;padding:26px 28px;
+  background:linear-gradient(120deg,rgba(49,194,124,.16),rgba(245,194,92,.12));
+  border:1px solid rgba(75,227,160,.35);
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;
+}
+.vip-cta b{font-size:1.12rem;font-weight:800;display:block}
+.vip-cta small{color:var(--txt-2);font-size:.78rem;display:block;margin-top:4px}
+
+/* ============ 下载 ============ */
+.download{text-align:center;padding:64px 0 30px}
+.download h2{font-size:clamp(1.4rem,3vw,1.95rem);font-weight:800;letter-spacing:.03em}
+.download .sub{color:var(--txt-2);font-size:.9rem;margin-top:8px}
+.dl-row{display:flex;justify-content:center;gap:14px;margin-top:28px;flex-wrap:wrap}
+.btn-dl{
+  background:linear-gradient(120deg,#35CF8D,#1F9E63);color:#06130D;
+  font-weight:800;font-size:.95rem;padding:15px 36px;border-radius:999px;
+  box-shadow:0 14px 30px -12px rgba(49,194,124,.55);
+  transition:transform .2s ease;
+}
+.btn-dl:hover{transform:translateY(-3px)}
+.btn-vip-o{
+  border:1.5px solid rgba(232,183,90,.55);color:#E8C36A;font-weight:700;
+  font-size:.95rem;padding:15px 36px;border-radius:999px;background:transparent;
+  transition:background .2s ease,transform .2s ease;
+}
+.btn-vip-o:hover{background:rgba(232,183,90,.1);transform:translateY(-3px)}
+.dl-note{color:var(--txt-3);font-size:.78rem;margin-top:16px;letter-spacing:.04em}
+
+/* ============ 题眼页脚 ============ */
+.meta{
+  position:relative;z-index:1;
+  width:min(1120px,calc(100% - 48px));
+  margin:44px auto 100px;
+  padding:36px 30px;border-radius:18px;text-align:center;
+  background:var(--panel);border:1px dashed rgba(75,227,160,.4);
+}
+.meta .demo-tag{
+  display:inline-block;font-size:.66rem;font-weight:800;letter-spacing:.2em;
+  color:var(--gold);border:1px solid rgba(245,194,92,.5);
+  padding:3px 12px;border-radius:999px;margin-bottom:16px;
+}
+.meta b{color:var(--green-bright);font-weight:700}
+.meta p{color:var(--txt-2);font-size:.92rem;line-height:1.9}
+.meta a.back{
+  display:inline-block;margin-top:18px;
+  background:var(--green);color:#06130D;font-weight:800;font-size:.9rem;
+  padding:13px 30px;border-radius:999px;
+  box-shadow:0 12px 26px -12px rgba(49,194,124,.6);
+  transition:transform .2s ease;
+}
+.meta a.back:hover{transform:translateY(-2px)}
+.meta .grace{margin-top:16px;color:var(--txt-3);font-size:.78rem}
+.meta .credit{margin-top:10px;color:var(--txt-3);font-size:.7rem;letter-spacing:.05em}
+
+/* ============ 底部 Tab（模拟 App） ============ */
+.app-tab{
+  position:fixed;left:0;right:0;bottom:0;z-index:50;
+  background:rgba(13,17,21,.93);
+  -webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);
+  border-top:1px solid var(--line);
+}
+.app-tab-in{max-width:1120px;margin:0 auto;display:flex;justify-content:space-around;padding:10px 0 14px}
+.tab-item{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:.72rem;color:var(--txt-3);letter-spacing:.1em}
+.tab-item i{width:5px;height:5px;border-radius:50%}
+.tab-item.on{color:var(--green-bright)}
+.tab-item.on i{background:var(--green);box-shadow:0 0 10px rgba(49,194,124,.9)}
+
+/* ============ 新用户礼包浮窗 ============ */
+.gift{
+  position:fixed;right:12px;bottom:80px;z-index:45;width:168px;
+  background:linear-gradient(150deg,#1B2A20,#122018);
+  border:1px solid rgba(245,194,92,.5);border-radius:16px;padding:13px;
+  box-shadow:0 26px 54px -18px rgba(0,0,0,.65);
+  animation:float 4s ease-in-out infinite;
+  display:none;
+  opacity:.35;
+  transition:opacity .3s ease;
+}
+.gift:hover{opacity:1}
+@media(min-width:900px){.gift{display:block}}
+.gift .x{
+  position:absolute;top:8px;right:10px;background:none;border:none;
+  color:var(--txt-3);font-size:.8rem;cursor:pointer;
+}
+.gift .g-ico{font-size:1.6rem}
+.gift b{display:block;font-size:.92rem;margin:6px 0 4px}
+.gift small{color:var(--txt-2);font-size:.72rem;line-height:1.6;display:block}
+.gift .g-btn{
+  margin-top:11px;text-align:center;
+  background:linear-gradient(120deg,#F3CC80,#CF8F2A);color:#241A02;
+  font-weight:800;font-size:.78rem;padding:9px 0;border-radius:999px;
+}
+@keyframes float{from{transform:translateY(0)}to{transform:translateY(-9px)}}
+
+/* ============ mini 播放条 ============ */
+.mini-player{
+  position:fixed;left:0;right:0;bottom:62px;z-index:49;
+  background:rgba(13,17,21,.95);
+  -webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);
+  border-top:1px solid rgba(75,227,160,.25);
+  display:none;
+}
+.mini-player.on{display:block}
+.mp-in{max-width:1120px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:14px}
+.mp-vinyl{
+  width:28px;height:28px;border-radius:50%;flex:none;position:relative;
+  background:radial-gradient(circle,var(--green) 0 5px,#1A1A1C 6px 12px,#262629 13px 15px);
+  animation:spin 20s linear infinite;
+}
+.mp-info{flex:1;min-width:0;line-height:1.35}
+.mp-info b{display:block;font-size:.8rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mp-info small{font-size:.64rem;color:var(--txt-3)}
+.mp-play{
+  width:32px;height:32px;border-radius:50%;flex:none;
+  background:var(--green);color:#06130D;font-size:.7rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 14px -2px rgba(49,194,124,.7);
+}
+.mp-side{
+  flex:none;font-size:.82rem;color:var(--txt-2);cursor:pointer;
+  padding:4px 6px;border-radius:8px;transition:color .2s ease,background .2s ease;
+}
+.mp-side:hover{color:var(--green-bright);background:rgba(49,194,124,.12)}
+.mp-heart{flex:none;font-size:1.05rem;color:var(--txt-3);cursor:pointer;transition:color .2s ease}
+.mp-heart.liked{color:var(--gold);text-shadow:0 0 10px rgba(239,188,84,.6)}
+.mp-bar{width:110px;height:3px;border-radius:2px;background:rgba(255,255,255,.12);overflow:hidden;flex:none;display:none}
+.mp-bar i{display:block;height:100%;width:0;background:var(--green)}
+@media(min-width:900px){.mp-bar{display:block}}
+
+/* ============ 视图切换器：三页互跳 ============ */
+.view-switch{position:fixed;top:84px;right:20px;z-index:55;font-family:var(--sans)}
+.view-switch details{position:relative}
+.view-switch summary{
+  list-style:none;cursor:pointer;user-select:none;
+  display:flex;align-items:center;gap:8px;
+  font-size:.78rem;font-weight:600;letter-spacing:.06em;
+  padding:8px 14px;border-radius:999px;
+  background:rgba(18,24,29,.92);border:1px solid rgba(75,227,160,.5);
+  box-shadow:0 10px 24px -12px rgba(0,0,0,.5);
+  transition:transform .2s ease;
+}
+.view-switch summary::-webkit-details-marker{display:none}
+.view-switch summary:hover{transform:translateY(-1px)}
+.vs-caret{font-size:.6rem;opacity:.6;transition:transform .2s ease}
+.view-switch details[open] .vs-caret{transform:rotate(180deg)}
+.vs-menu{
+  position:absolute;right:0;top:calc(100% + 8px);min-width:200px;
+  background:rgba(18,24,29,.97);border:1px solid rgba(75,227,160,.4);border-radius:14px;
+  padding:6px;box-shadow:0 24px 48px -20px rgba(0,0,0,.6);
+}
+.vs-item{
+  display:flex;align-items:center;gap:9px;
+  padding:10px 12px;border-radius:10px;
+  font-size:.82rem;font-weight:600;color:var(--txt);
+  transition:background .18s ease;
+}
+.vs-item:hover{background:rgba(49,194,124,.14)}
+.vs-item.on{background:linear-gradient(120deg,var(--green),#1F9E63);color:#06130D}
+.vs-ico{font-size:.85rem;opacity:.8}
+@media (max-width:560px){.view-switch{right:12px;top:74px}}
+
+/* ============ 炫酷动效 ============ */
+/* 滚动揭示 */
+.section-head,.banner,.grid-4,.panel,.store-row,.dl-row,.meta{
+  animation:revealUp .8s cubic-bezier(.22,.61,.36,1) both;
+  animation-timeline:view();
+  animation-range:entry 8% cover 26%;
+}
+@keyframes revealUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+
+/* 光标微光（荧光绿） */
+.cursor-glow{
+  position:fixed;left:0;top:0;width:440px;height:440px;border-radius:50%;
+  pointer-events:none;z-index:0;
+  background:radial-gradient(circle,rgba(49,194,124,.08),transparent 62%);
+  opacity:0;transition:opacity .5s ease;
+}
+
+/* 榜单行 hover 流光 */
+.rank-row{position:relative;overflow:hidden}
+.rank-row::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(105deg,transparent 42%,rgba(75,227,160,.14) 50%,transparent 58%);
+  transform:translateX(-130%);
+  transition:transform .55s ease;
+}
+.rank-row:hover::after{transform:translateX(130%)}
+
+/* banner 双色激光扫动 */
+.laser{
+  position:absolute;left:-24%;top:0;bottom:0;width:34%;pointer-events:none;
+  background:linear-gradient(100deg,transparent,rgba(75,227,160,.2),rgba(139,92,246,.16),transparent);
+  transform:skewX(-14deg);
+  animation:laserSweep 5.2s ease-in-out infinite;
+}
+@keyframes laserSweep{0%{left:-24%}55%,100%{left:112%}}
+
+/* 礼包 spring 弹入 */
+.gift{animation:giftIn .6s cubic-bezier(.34,1.56,.64,1) .9s both,float 4s ease-in-out 1.6s infinite}
+@keyframes giftIn{from{opacity:0;transform:translateY(26px) scale(.82)}to{opacity:1;transform:none}}
+
+/* ============ 响应式 ============ */
+@media (max-width:900px){
+  .grid-4{grid-template-columns:repeat(2,1fr)}
+  .p-grid{grid-template-columns:repeat(2,1fr)}
+  .perk-grid{grid-template-columns:repeat(2,1fr)}
+  .vip-banner{padding:28px 26px}
+  .vip-art{display:none}
+  .search{max-width:none}
+}
+@media (max-width:560px){
+  .banner{padding:30px 24px}
+  .demo-badge{display:none}
+  .top-dl{font-size:.74rem;padding:8px 15px}
+  .wrap{padding:0 16px}
+  .meta{margin:36px 16px 90px;padding:28px 20px}
+}
+
+/* ============ 动效偏好 ============ */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.01ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.01ms !important;
+  }
+  html{scroll-behavior:auto}
+  .gift{animation:none}
+}
+</style>
+</head>
+<body>
+
+<!-- 背景光晕 -->
+<div class="glow glow-a"></div>
+<div class="glow glow-b"></div>
+<!-- 光标微光 -->
+<div class="cursor-glow" aria-hidden="true"></div>
+
+<!-- 顶栏 -->
+<header class="topbar">
+  <div class="topbar-in">
+    <a class="brand" href="#top">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor">
+          <path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/>
+        </svg>
+      </span>
+      <span class="brand-name">漂流音乐</span>
+      <span class="demo-badge">对照版</span>
+    </a>
+    <div class="search" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <circle cx="11" cy="11" r="7"/><path d="m16.5 16.5 5 5"/>
+      </svg>
+      <span>搜索歌曲、歌手、歌词</span>
+    </div>
+    <a class="top-dl" href="#download">下载客户端</a>
+  </div>
+</header>
+
+<main class="wrap" id="top">
+  <!-- 会员横幅 -->
+  <section class="vip-banner">
+    <div>
+      <p class="vip-kicker">👑 绿钻 VIP · 无限漂流</p>
+      <h2>开通绿钻，今晚就漂</h2>
+      <p class="vip-sub">首月 ¥6 · 解锁全部航线 · 下一站提前预览</p>
+      <a class="btn-gold" href="#download">立即开通</a>
+    </div>
+    <div class="vip-art" aria-hidden="true">👑</div>
+  </section>
+
+  <!-- 四宫格 -->
+  <section class="grid-4">
+    <a class="tile" href="#rank">
+      <span class="ico i1" aria-hidden="true">🏆</span>
+      <b>排行榜</b>
+      <small>巅峰榜 · 热歌榜</small>
+    </a>
+    <a class="tile" href="#">
+      <span class="ico i2" aria-hidden="true">📺</span>
+      <b>直播</b>
+      <small>24h 在线直播间</small>
+    </a>
+    <a class="tile" href="#">
+      <span class="ico i3" aria-hidden="true">🎤</span>
+      <b>K歌</b>
+      <small>唱出你的漂</small>
+    </a>
+    <a class="tile" href="#">
+      <span class="ico i4" aria-hidden="true">💬</span>
+      <b>扑通</b>
+      <small>年轻人的社区</small>
+    </a>
+  </section>
+
+  <!-- 轮播 banner -->
+  <section class="banner" aria-label="轮播图">
+    <div class="laser" aria-hidden="true"></div>
+    <h2 class="gradient-text">全民都在漂</h2>
+    <p>漂流巅峰榜 · 周榜热力更新中 · 129 万人正在听</p>
+    <div class="dots" aria-hidden="true"><i class="on"></i><i></i><i></i></div>
+  </section>
+
+  <!-- 热歌榜 -->
+  <section class="panel" id="rank">
+    <div class="panel-head">
+      <h3>漂流热歌榜</h3>
+      <span class="tag-soft">周榜</span>
+      <span class="more">更多 ▸</span>
+    </div>
+    <div class="rank-row r1" data-track="0">
+      <span class="rank-no">1</span>
+      <div class="t-mid"><div class="t-title"><span>信风</span><span class="tag tag-vip">VIP</span></div><div class="t-sub">后摇 · 一支你没听过的乐队</div></div>
+      <span class="count">9978.2万</span>
+      <span class="play-badge">▶</span>
+    </div>
+    <div class="rank-row r2" data-track="1">
+      <span class="rank-no">2</span>
+      <div class="t-mid"><div class="t-title"><span>晚风告别式</span><span class="tag tag-first">首发</span></div><div class="t-sub">环境电子 · 深夜电台</div></div>
+      <span class="count">8421.5万</span>
+      <span class="play-badge">▶</span>
+    </div>
+    <div class="rank-row r3" data-track="2">
+      <span class="rank-no">3</span>
+      <div class="t-mid"><div class="t-title"><span>海岸线之外</span><span class="tag tag-hq">HQ</span></div><div class="t-sub">城市民谣 · 通勤标配</div></div>
+      <span class="count">7310.9万</span>
+      <span class="play-badge">▶</span>
+    </div>
+    <div class="rank-row" data-track="3">
+      <span class="rank-no">4</span>
+      <div class="t-mid"><div class="t-title"><span>凌晨三点半的港</span></div><div class="t-sub">爵士嘻哈 · 失眠人士精选</div></div>
+      <span class="count">6550.3万</span>
+      <span class="play-badge">▶</span>
+    </div>
+    <div class="rank-row" data-track="4">
+      <span class="rank-no">5</span>
+      <div class="t-mid"><div class="t-title"><span>雨季漂流记</span></div><div class="t-sub">氛围 · 下雨天限定</div></div>
+      <span class="count">5988.7万</span>
+      <span class="play-badge">▶</span>
+    </div>
+    <div class="locked" aria-label="VIP 专属内容">
+      <span class="lock-ico" aria-hidden="true">🔒</span>
+      <div class="lt">
+        <b>VIP 专属 · 下一站：未知</b>
+        <small>漂流的惊喜感，需要会员才能体验</small>
+      </div>
+      <a class="btn-lock" href="#download">开通解锁</a>
+    </div>
+  </section>
+
+  <!-- 歌单瀑布 -->
+  <section class="panel">
+    <div class="panel-head">
+      <h3>大家都在漂的歌单</h3>
+      <span class="tag-new">热门</span>
+      <span class="more">更多 ▸</span>
+    </div>
+    <div class="p-grid">
+      <div class="p-card">
+        <div class="p-cover cv1"><span class="tag tag-ex">独家</span><span class="p-play">▶</span></div>
+        <p class="p-name">后摇到说唱 · 一站到底</p>
+        <p class="p-meta">128万收藏 · 每晚更新</p>
+      </div>
+      <div class="p-card">
+        <div class="p-cover cv2"><span class="p-play">▶</span></div>
+        <p class="p-name">深夜漂流电台</p>
+        <p class="p-meta">86万收藏 · 凌晨时段限定</p>
+      </div>
+      <div class="p-card">
+        <div class="p-cover cv3"><span class="p-play">▶</span></div>
+        <p class="p-name">城市漫游 BGM</p>
+        <p class="p-meta">32万收藏 · 通勤专用</p>
+      </div>
+      <div class="p-card">
+        <div class="p-cover cv4"><span class="p-play">▶</span></div>
+        <p class="p-name">下雨天适合漂</p>
+        <p class="p-meta">54万收藏 · 雨天限定</p>
+      </div>
+      <div class="p-card">
+        <div class="p-cover cv5"><span class="p-play">▶</span></div>
+        <p class="p-name">粤语残片之夜</p>
+        <p class="p-meta">19万收藏 · 情怀专场</p>
+      </div>
+      <div class="p-card">
+        <div class="p-cover cv6"><span class="tag tag-new">新</span><span class="p-play">▶</span></div>
+        <p class="p-name">给失眠者的海</p>
+        <p class="p-meta">11万收藏 · 助眠分区</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 权益条 -->
+  <section class="panel">
+    <div class="panel-head">
+      <h3>绿钻会员权益</h3>
+      <span class="tag-soft">限时开通</span>
+    </div>
+    <div class="perk-grid">
+      <div class="perk"><span class="p-ico" aria-hidden="true">👑</span><b>VIP专属漂流线</b><small>高级航线 · 下一站提前预览</small></div>
+      <div class="perk"><span class="p-ico" aria-hidden="true">🎧</span><b>无损音质</b><small>HQ · SQ 全规格解锁</small></div>
+      <div class="perk"><span class="p-ico" aria-hidden="true">📴</span><b>离线漂流</b><small>没网也能继续漂</small></div>
+      <div class="perk"><span class="p-ico" aria-hidden="true">🚫</span><b>免广告</b><small>开屏广告一键跳过</small></div>
+    </div>
+    <div class="vip-cta">
+      <div>
+        <b>开通绿钻 · 无限漂流</b>
+        <small>首月 ¥6 · 次月 ¥12 可随时取消</small>
+      </div>
+      <a class="btn-lock" href="#download">立即开通</a>
+    </div>
+  </section>
+
+  <!-- 下载 -->
+  <section class="download" id="download">
+    <h2>漂流音乐 · 免费下载</h2>
+    <p class="sub">App Store / Android 均已上架</p>
+    <div class="dl-row">
+      <a class="btn-dl" href="#">立即下载</a>
+      <a class="btn-vip-o" href="#">开通会员</a>
+    </div>
+    <p class="dl-note">免费下载 · 会员解锁全部功能 · 下载即送 7 天绿钻体验</p>
+  </section>
+</main>
+
+<!-- 题眼 -->
+<footer class="meta">
+  <span class="demo-tag">对照演示</span>
+  <p><b>本页是虚构对照——假如漂流用 QQ 音乐的语法来做，会是这样。</b><br>同样的产品，换一种视觉语言，它就变成了另一个东西。</p>
+  <a class="back" href="index.html">真正的漂流首页 →</a>
+  <p class="grace">没有嘲讽 QQ 音乐的意思——它做得很成功。只是漂流不想做成这样。</p>
+  <p class="credit">试听音乐：Kevin MacLeod（incompetech.com）CC-BY-4.0 · SoundHelix · 演示曲目</p>
+</footer>
+
+<!-- 底部 Tab -->
+<nav class="app-tab" aria-label="App 底部导航（模拟）">
+  <div class="app-tab-in">
+    <span class="tab-item on">推荐<i></i></span>
+    <span class="tab-item">音乐馆<i></i></span>
+    <span class="tab-item">直播<i></i></span>
+    <span class="tab-item">我的<i></i></span>
+  </div>
+</nav>
+
+<!-- mini 播放条（播放后出现） -->
+<div class="mini-player" id="miniPlayer">
+  <div class="mp-in">
+    <span class="mp-vinyl" aria-hidden="true"></span>
+    <span class="mp-info"><b id="mpTitle">信风</b><small id="mpSub">一支你没听过的乐队 · 后摇</small></span>
+    <span class="mp-side" id="mpPrev" role="button" aria-label="上一首">⏮</span>
+    <span class="mp-play" id="mpPlay" role="button" aria-label="播放/暂停">▶</span>
+    <span class="mp-side" id="mpNext" role="button" aria-label="下一首">⏭</span>
+    <span class="mp-heart" id="mpHeart" role="button" aria-label="喜欢">♡</span>
+    <span class="mp-bar" aria-hidden="true"><i id="mpBar"></i></span>
+  </div>
+</div>
+
+<!-- 新用户礼包浮窗 -->
+<div class="gift" role="complementary" aria-label="新用户礼包">
+  <button class="x" aria-label="关闭">✕</button>
+  <span class="g-ico" aria-hidden="true">🎁</span>
+  <b>新用户首充礼包</b>
+  <small>首月 ¥6 领绿钻<br>无限漂流 · 立即到账</small>
+  <div class="g-btn">立即领取</div>
+</div>
+
+<!-- 视图切换器：五页互跳 -->
+<div class="view-switch">
+  <details>
+    <summary><span>视图切换</span><span class="vs-caret">▾</span></summary>
+    <div class="vs-menu">
+      <a class="vs-item" href="index.html"><span class="vs-ico">☀</span>漂流 · 日光版</a>
+      <a class="vs-item on" href="qqmusic-style.html"><span class="vs-ico">▣</span>假如是 QQ</a>
+      <a class="vs-item" href="wangyiyun-style.html"><span class="vs-ico">♬</span>假如是网易云</a>
+      <a class="vs-item" href="../anime-style.html"><span class="vs-ico">🌠</span>漂流 · 星海版</a>
+      <a class="vs-item" href="mihoyo-style.html"><span class="vs-ico">💫</span>漂流 · 星轨版</a>
+    </div>
+  </details>
+</div>
+
+<script>
+/* 榜单试听播放器：行点击播放，mini 播放条联动，多源降级 */
+(function(){
+  var TRACKS = [
+    {t:'信风', s:'一支你没听过的乐队 · 后摇', src:['../audio/cipher.mp3','https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3']},
+    {t:'晚风告别式', s:'环境电子 · 深夜电台', src:['../audio/80s.mp3','https://www.soundhelix.com/examples/mp3/SoundHelix-Song-15.mp3']},
+    {t:'海岸线之外', s:'城市民谣 · 通勤标配', src:['https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3','https://www.soundhelix.com/examples/mp3/SoundHelix-Song-17.mp3']},
+    {t:'凌晨三点半的港', s:'爵士嘻哈 · 失眠人士精选', src:['https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3','https://www.soundhelix.com/examples/mp3/SoundHelix-Song-16.mp3']},
+    {t:'雨季漂流记', s:'氛围 · 下雨天限定', src:['https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3','https://www.soundhelix.com/examples/mp3/SoundHelix-Song-14.mp3']}
+  ];
+  var audio = new Audio();
+  audio.preload = 'none';
+  var curIdx = -1, si = 0, playing = false, liked = false;
+  var rows = document.querySelectorAll('.rank-row');
+  var mp = document.getElementById('miniPlayer');
+  var mpTitle = document.getElementById('mpTitle');
+  var mpSub = document.getElementById('mpSub');
+  var mpPlay = document.getElementById('mpPlay');
+  var mpHeart = document.getElementById('mpHeart');
+  var mpBar = document.getElementById('mpBar');
+  var mpPrev = document.getElementById('mpPrev');
+  var mpNext = document.getElementById('mpNext');
+
+  function sync(){
+    rows.forEach(function(row, i){
+      row.classList.toggle('playing', i === curIdx && playing);
+      var badge = row.querySelector('.play-badge');
+      if(badge) badge.textContent = (i === curIdx && playing) ? '❚❚' : '▶';
+    });
+    mpPlay.textContent = playing ? '❚❚' : '▶';
+    mp.classList.toggle('on', curIdx >= 0);
+  }
+  function loadTrack(i, autoplay){
+    var tr = TRACKS[i];
+    curIdx = i; si = 0;
+    mpTitle.textContent = tr.t;
+    mpSub.textContent = tr.s;
+    mpBar.style.width = '0%';
+    if(autoplay){
+      playing = true;
+      audio.src = tr.src[0];
+      audio.play().catch(function(){});
+    } else {
+      playing = false;
+      audio.pause();
+    }
+    sync();
+  }
+  function play(idx){
+    var tr = TRACKS[idx];
+    if(idx === curIdx && playing){ audio.pause(); playing = false; sync(); return; }
+    loadTrack(idx, true);
+  }
+  function step(d){
+    if(curIdx < 0){ loadTrack(0, true); return; }
+    loadTrack((curIdx + d + TRACKS.length) % TRACKS.length, playing);
+  }
+  rows.forEach(function(row){
+    row.addEventListener('click', function(){
+      var i = Number(row.getAttribute('data-track'));
+      if(!isNaN(i)) play(i);
+    });
+  });
+  mpPlay.addEventListener('click', function(){
+    if(curIdx < 0) return;
+    if(playing){ audio.pause(); playing = false; sync(); return; }
+    playing = true; audio.play().catch(function(){}); sync();
+  });
+  mpPrev.addEventListener('click', function(){ step(-1); });
+  mpNext.addEventListener('click', function(){ step(1); });
+  mpHeart.addEventListener('click', function(){
+    liked = !liked;
+    mpHeart.classList.toggle('liked', liked);
+    mpHeart.textContent = liked ? '❤' : '♡';
+  });
+  audio.addEventListener('loadedmetadata', function(){});
+  audio.addEventListener('timeupdate', function(){
+    if(audio.duration) mpBar.style.width = (audio.currentTime/audio.duration*100)+'%';
+  });
+  audio.addEventListener('ended', function(){ playing = false; sync(); mpBar.style.width = '0%'; });
+  audio.addEventListener('error', function(){
+    if(curIdx < 0) return;
+    si++;
+    if(si < TRACKS[curIdx].src.length){
+      audio.src = TRACKS[curIdx].src[si];
+      audio.play().catch(function(){});
+    } else {
+      playing = false; sync();
+    }
+  });
+})();
+</script>
+
+<script>
+/* 炫酷动效：播放量数字滚动 + 光标微光 */
+(function(){
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // 数字滚动（进入视口触发一次）
+  if(!reduced){
+    var counts = document.querySelectorAll('.count');
+    if(counts.length){
+      function fmt(n){
+        if(n >= 10000) return (n/10000).toFixed(1) + '万';
+        return String(Math.round(n));
+      }
+      var io = new IntersectionObserver(function(entries){
+        entries.forEach(function(en){
+          if(!en.isIntersecting) return;
+          var el = en.target;
+          io.unobserve(el);
+          var raw = el.textContent;
+          var num = parseFloat(raw) * (raw.indexOf('万') >= 0 ? 10000 : 1);
+          if(!num) return;
+          var t0 = null;
+          function step(ts){
+            if(!t0) t0 = ts;
+            var p = Math.min((ts - t0) / 1400, 1);
+            var e = 1 - Math.pow(1 - p, 3);
+            el.textContent = fmt(num * e);
+            if(p < 1) requestAnimationFrame(step);
+          }
+          requestAnimationFrame(step);
+        });
+      }, { threshold: .4 });
+      counts.forEach(function(c){ io.observe(c); });
+    }
+  }
+  // 光标微光
+  var glow = document.querySelector('.cursor-glow');
+  if(glow && !reduced && window.matchMedia('(hover:hover) and (pointer:fine)').matches){
+    var tx = innerWidth/2, ty = innerHeight/3, cx = tx, cy = ty, shown = false;
+    document.addEventListener('mousemove', function(e){
+      tx = e.clientX; ty = e.clientY;
+      if(!shown){ shown = true; glow.style.opacity = '1'; }
+    });
+    (function loop(){
+      cx += (tx-cx)*0.08; cy += (ty-cy)*0.08;
+      glow.style.transform = 'translate('+(cx-220)+'px,'+(cy-220)+'px)';
+      requestAnimationFrame(loop);
+    })();
+  }
+})();
+</script>
+</body>
+</html>

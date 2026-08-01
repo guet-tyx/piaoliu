@@ -1,0 +1,120 @@
+/* ============ Drift 全局样式 ============
+ * 重构自 archive/anime-style.html（2026-08-01）
+ * 约定：
+ * - 设计变量、基础样式、共享 keyframes 全局生效；组件私有样式一律放各组件 *.module.css
+ * - 断点：960px 导航隐藏/区块单列；560px 悬浮组件；420px 网格单列
+ * - 滚动动效：CSS scroll-driven 优先（@supports），不支持时由组件内 JS 降级
+ * - 动效只动 transform/opacity，prefers-reduced-motion 双保险
+ */
+
+/* ============ 设计变量（沿用原版全部变量） ============ */
+:root {
+  --space: #050C1E;
+  --space-2: #0B1020;
+  --bg: #F6F7F8;
+  --bg-top: #FDF2F7;
+  --panel: #FFFFFF;
+  --panel-2: #F1F2F3;
+  --pink: #FB7299;
+  --pink-bright: #FF9BB5;
+  --pink-deep: #F2597F;
+  --blue: #00AEEC;
+  --blue-bright: #40C5F1;
+  --blue-deep: #008AC5;
+  --gold: #C9A063;
+  --ink: #18191C;
+  --ink-2: #61666D;
+  --ink-3: #9499A0;
+  --line: #E3E5E7;
+  --ice: #7BB1FF;
+  --sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei", "Segoe UI", sans-serif;
+}
+
+/* ============ 基础 ============ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+html { scroll-behavior: smooth; }
+body {
+  background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg) 320px, var(--bg) 100%);
+  color: var(--ink);
+  font-family: var(--sans);
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+::selection { background: var(--pink); color: #fff; }
+a { color: inherit; text-decoration: none; }
+a:focus-visible, button:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+section[id] { scroll-margin-top: 76px; }
+
+/* ============ 共享 keyframes ============
+ * 全局定义，各组件 CSS Module 直接按名字引用
+ */
+/* 弹幕：右→左匀速 */
+@keyframes dmFloat {
+  from { transform: translateX(100vw); }
+  to { transform: translateX(-100%); }
+}
+/* 首屏文案入场：淡入上浮 */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+/* "SCROLL" 指示线呼吸 */
+@keyframes hintDrop {
+  0% { transform: scaleY(0); transform-origin: top; }
+  45% { transform: scaleY(1); transform-origin: top; }
+  55% { transform: scaleY(1); transform-origin: bottom; }
+  100% { transform: scaleY(0); transform-origin: bottom; }
+}
+/* 跑马灯无缝循环（双组轨道 -50%） */
+@keyframes marquee {
+  to { transform: translateX(-50%); }
+}
+/* 唱片旋转 */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+/* 频谱柱呼吸 */
+@keyframes eqb {
+  from { transform: scaleY(.25); }
+  to { transform: scaleY(1); }
+}
+/* 点赞心形弹跳 */
+@keyframes heartPop {
+  0% { transform: scale(1); }
+  45% { transform: scale(1.45); }
+  100% { transform: scale(1); }
+}
+/* 滚动揭示：进入视口淡入上浮（view() 时间线触发） */
+@keyframes revealUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+/* 苹果风格滚动动效（首屏元素用 exit range：滚动离开时生效） */
+@keyframes heroFade {
+  from { opacity: 1; translate: 0 0; }
+  to { opacity: .05; translate: 0 -90px; }
+}
+@keyframes heroScrub {
+  from { transform: scale(1) translateY(0); opacity: 1; }
+  to { transform: scale(1.06) translateY(40px); opacity: .25; }
+}
+
+/* ============ 动效偏好 ============
+ * 全局压制；组件级的彻底禁用（.dm/.record/.eq i 等）放各组件 module
+ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+  html { scroll-behavior: auto; }
+}

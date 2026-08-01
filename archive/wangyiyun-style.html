@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#121213">
+<meta name="description" content="虚构对照页：假如漂流用网易云音乐的语法来做，会是这样。本页仅为演示，真正的漂流首页见 index.html。">
+<title>假如漂流是网易云音乐 · 对照演示</title>
+<style>
+/* ============ 基础 ============ */
+:root{
+  --bg:#121213;
+  --bg-2:#18181A;
+  --panel:#1E1E21;
+  --panel-2:#242427;
+  --red:#EC4141;
+  --red-deep:#C20C0C;
+  --txt:#F2F2F2;
+  --txt-2:#A6A6A6;
+  --txt-3:#757575;
+  --line:rgba(255,255,255,.07);
+  --sans:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","HarmonyOS Sans SC","Segoe UI",sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--txt);
+  font-family:var(--sans);line-height:1.65;
+  overflow-x:hidden;padding-bottom:88px;
+}
+::selection{background:var(--red);color:#fff}
+a{color:inherit;text-decoration:none}
+a:focus-visible,button:focus-visible{outline:2px solid var(--red);outline-offset:3px;border-radius:6px}
+
+/* ============ 背景红晕 ============ */
+.halo{position:fixed;border-radius:50%;filter:blur(90px);pointer-events:none;z-index:0;will-change:transform,opacity}
+.halo-a{
+  width:min(60vw,800px);aspect-ratio:1;top:-30vw;left:8vw;
+  background:radial-gradient(circle,rgba(236,65,65,.14),transparent 65%);
+  animation:haloA 10s ease-in-out infinite alternate;
+}
+.halo-b{
+  width:min(48vw,620px);aspect-ratio:1;bottom:-24vw;right:-14vw;
+  background:radial-gradient(circle,rgba(194,12,12,.12),transparent 65%);
+  animation:haloB 14s ease-in-out infinite alternate;
+}
+@keyframes haloA{from{opacity:.6;transform:scale(1)}to{opacity:1;transform:scale(1.2)}}
+@keyframes haloB{from{opacity:.7;transform:scale(1)}to{opacity:1;transform:scale(1.1)}}
+
+/* ============ 顶栏 ============ */
+.topbar{
+  position:sticky;top:0;z-index:40;
+  background:rgba(18,18,19,.88);
+  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);
+}
+.topbar-in{max-width:1180px;margin:0 auto;padding:13px 24px;display:flex;align-items:center;gap:16px}
+.brand{display:flex;align-items:center;gap:10px;flex:none}
+.brand-mark{
+  width:32px;height:32px;border-radius:50%;flex:none;
+  background:linear-gradient(135deg,var(--red),var(--red-deep));
+  display:flex;align-items:center;justify-content:center;color:#fff;
+  box-shadow:0 0 18px -2px rgba(236,65,65,.6);
+}
+.brand-name{font-weight:800;font-size:1.02rem;letter-spacing:.04em}
+.demo-badge{
+  font-size:.64rem;font-weight:700;letter-spacing:.12em;
+  color:var(--red);border:1px solid rgba(236,65,65,.5);
+  padding:2px 8px;border-radius:999px;white-space:nowrap;
+}
+.search{
+  flex:1;max-width:320px;display:flex;align-items:center;gap:8px;
+  background:var(--panel);border:1px solid var(--line);border-radius:999px;
+  padding:8px 16px;color:var(--txt-3);font-size:.82rem;
+}
+.search svg{flex:none;opacity:.7}
+.top-dl{
+  margin-left:auto;flex:none;font-size:.82rem;font-weight:800;color:#fff;
+  background:linear-gradient(120deg,var(--red),var(--red-deep));
+  padding:9px 20px;border-radius:999px;
+  box-shadow:0 8px 18px -8px rgba(236,65,65,.6);
+  transition:transform .2s ease;
+}
+.top-dl:hover{transform:translateY(-2px)}
+
+/* ============ 布局：左侧导航 + 内容 ============ */
+.layout{position:relative;z-index:1;max-width:1180px;margin:0 auto;display:flex;align-items:flex-start}
+.sidebar{
+  width:196px;flex:none;position:sticky;top:76px;
+  padding:26px 14px;margin-right:20px;
+}
+.s-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 14px;border-radius:10px;margin-bottom:4px;
+  font-size:.88rem;color:var(--txt-2);position:relative;transition:background .18s ease;
+}
+.s-item .s-ico{font-size:1rem;width:20px;text-align:center}
+.s-item:hover{background:rgba(255,255,255,.05);color:var(--txt)}
+.s-item.on{background:rgba(255,255,255,.07);color:#fff;font-weight:700}
+.s-item.on::before{
+  content:"";position:absolute;left:-14px;top:20%;bottom:20%;
+  width:3px;border-radius:2px;background:var(--red);
+  box-shadow:0 0 10px rgba(236,65,65,.8);
+}
+.s-vip{
+  margin:18px 6px 0;padding:13px 12px;border-radius:12px;
+  background:linear-gradient(140deg,rgba(236,65,65,.18),rgba(194,12,12,.1));
+  border:1px solid rgba(236,65,65,.35);
+  font-size:.76rem;color:#FFB3B3;text-align:center;
+}
+.s-vip b{display:block;color:var(--red);font-size:.82rem;margin-top:4px}
+.content{flex:1;min-width:0;padding:0 20px 40px}
+
+/* ============ 情绪大字报 ============ */
+.poster{
+  border-radius:18px;overflow:hidden;position:relative;
+  background:linear-gradient(160deg,#2A0E0E 0%,#1A0F12 45%,#121213 100%);
+  border:1px solid rgba(236,65,65,.22);
+  padding:52px 44px 46px;
+}
+.poster::before,.poster::after{content:"";position:absolute;border-radius:50%;pointer-events:none}
+.poster::before{right:-80px;top:-80px;width:260px;height:260px;background:radial-gradient(circle,rgba(236,65,65,.3),transparent 65%)}
+.poster::after{left:-60px;bottom:-100px;width:240px;height:240px;background:radial-gradient(circle,rgba(236,65,65,.18),transparent 65%)}
+.poster .p-kicker{font-size:.72rem;font-weight:800;letter-spacing:.26em;color:var(--red);position:relative;z-index:1}
+.poster h2{
+  position:relative;z-index:1;
+  font-size:clamp(1.7rem,4.4vw,2.9rem);font-weight:900;letter-spacing:.06em;
+  margin:14px 0 12px;line-height:1.3;
+}
+.poster h2 em{font-style:normal;color:var(--red);text-shadow:0 0 26px rgba(236,65,65,.65)}
+.poster p{position:relative;z-index:1;color:var(--txt-2);font-size:.9rem;letter-spacing:.05em}
+.poster .p-time{display:inline-block;margin-top:18px;font-size:.72rem;letter-spacing:.18em;color:#FFB3B3;border:1px solid rgba(236,65,65,.4);padding:6px 14px;border-radius:999px}
+
+/* ============ 黑胶播放卡 ============ */
+.now{
+  margin-top:20px;border-radius:18px;padding:34px 38px;
+  background:linear-gradient(140deg,var(--panel),var(--bg-2));
+  border:1px solid var(--line);
+  display:flex;align-items:center;gap:36px;flex-wrap:wrap;
+}
+.vinyl-wrap{position:relative;width:150px;height:150px;flex:none}
+.vinyl{
+  width:150px;height:150px;border-radius:50%;position:relative;
+  background:radial-gradient(circle,
+    var(--red) 0 17px,
+    #2C2C2F 18px 21px,
+    #1A1A1C 22px 33px,
+    #262629 34px 36px,
+    #1A1A1C 37px 50px,
+    #262629 51px 53px,
+    #1A1A1C 54px 67px,
+    #262629 68px 70px,
+    #1A1A1C 71px 78px);
+  box-shadow:0 24px 46px -18px rgba(0,0,0,.85),inset 0 0 0 1px rgba(255,255,255,.06);
+  animation:spin 20s linear infinite;
+  cursor:pointer;
+}
+.vinyl.playing{animation-duration:8s}
+.vinyl::after{
+  content:"";position:absolute;inset:0;border-radius:50%;
+  background:linear-gradient(115deg,rgba(255,255,255,.22),transparent 38%,transparent 68%,rgba(255,255,255,.08));
+}
+.vinyl .n{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:52px;height:52px;border-radius:50%;z-index:1;
+  background:url('../images/cover-yy-vinyl.png') center/cover no-repeat;
+  border:3px solid #1B1E23;
+  box-shadow:0 4px 10px rgba(0,0,0,.5);
+  color:transparent;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.now-info{flex:1;min-width:240px}
+.now-kicker{font-size:.7rem;font-weight:700;letter-spacing:.24em;color:var(--red)}
+.now-title{font-size:1.65rem;font-weight:800;margin:10px 0 4px;letter-spacing:.04em}
+.now-artist{font-size:.78rem;color:var(--txt-2);margin-bottom:18px}
+.now-bar{height:3px;border-radius:2px;background:rgba(255,255,255,.12);overflow:hidden}
+.now-bar i{display:block;height:100%;background:var(--red);box-shadow:0 0 8px rgba(236,65,65,.7);animation:playbar 34s linear infinite}
+.now-bar i.live{animation:none}
+@keyframes playbar{from{width:0}to{width:100%}}
+.now-time{display:flex;justify-content:space-between;font-size:.66rem;color:var(--txt-3);margin-top:7px;font-variant-numeric:tabular-nums}
+.now-actions{display:flex;align-items:center;gap:18px;margin-top:16px}
+.heart{font-size:1.35rem;color:var(--txt-3);cursor:pointer;transition:color .2s ease,text-shadow .2s ease}
+.heart.liked{color:var(--red);text-shadow:0 0 14px rgba(236,65,65,.7)}
+.cmt-bubble{
+  font-size:.74rem;color:var(--txt-2);
+  border:1px solid var(--line);border-radius:999px;padding:7px 14px;
+}
+.cmt-bubble b{color:var(--red);font-weight:800}
+.now-vip{
+  flex:none;text-align:center;padding:14px 18px;border-radius:14px;
+  background:linear-gradient(140deg,rgba(236,65,65,.16),rgba(194,12,12,.08));
+  border:1px solid rgba(236,65,65,.35);
+}
+.now-vip small{display:block;font-size:.7rem;color:#FFB3B3;letter-spacing:.12em}
+.now-vip b{display:block;font-size:.8rem;color:var(--red);margin:6px 0 10px}
+.btn-red{
+  display:inline-block;background:linear-gradient(120deg,var(--red),var(--red-deep));
+  color:#fff;font-weight:800;font-size:.78rem;padding:9px 18px;border-radius:999px;
+  box-shadow:0 10px 22px -10px rgba(236,65,65,.65);
+  transition:transform .2s ease;
+}
+.btn-red:hover{transform:translateY(-2px)}
+
+/* ============ 面板 ============ */
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:26px;margin-top:16px}
+.panel-head{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.panel-head h3{font-size:1.08rem;font-weight:800;letter-spacing:.02em}
+.tag-red{background:rgba(236,65,65,.15);color:#FF8A8A;font-size:.7rem;font-weight:700;padding:3px 9px;border-radius:6px}
+.more{margin-left:auto;color:var(--txt-3);font-size:.8rem;cursor:pointer}
+.more:hover{color:var(--red)}
+
+/* 每日推荐（反讽点：猜你想漂） */
+.rec-row{
+  display:flex;align-items:center;gap:14px;
+  padding:11px 10px;border-radius:12px;transition:background .18s ease;
+}
+.rec-row:hover{background:rgba(255,255,255,.05)}
+.rec-cover{width:42px;height:42px;border-radius:8px;flex:none;display:flex;align-items:center;justify-content:center;font-size:1.05rem}
+.rc1{background:linear-gradient(135deg,#4A1212,#7E1D1D)}
+.rc2{background:linear-gradient(135deg,#121C3A,#1E3A66)}
+.rc3{background:linear-gradient(135deg,#1F1226,#3A1D4A)}
+.rec-mid{flex:1;min-width:0}
+.rec-name{font-size:.92rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rec-why{font-size:.72rem;color:var(--txt-3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rec-why b{color:#FF8A8A;font-weight:600}
+.rec-play{width:30px;height:30px;border-radius:50%;background:var(--red);color:#fff;font-size:.7rem;display:none;align-items:center;justify-content:center;flex:none}
+.rec-row:hover .rec-play{display:flex}
+.rec-hint{display:flex;align-items:center;gap:10px;margin-top:14px;padding:13px 16px;border-radius:12px;background:rgba(236,65,65,.08);border:1px dashed rgba(236,65,65,.4)}
+.rec-hint small{color:var(--txt-2);font-size:.78rem;line-height:1.6}
+.rec-hint b{color:var(--red);font-weight:700}
+
+/* 热评（反讽点：情绪评论） */
+.cmt-card{
+  display:flex;gap:14px;padding:14px 10px;border-radius:12px;transition:background .18s ease;
+}
+.cmt-card:hover{background:rgba(255,255,255,.05)}
+.cmt-ava{width:42px;height:42px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:1rem;color:#fff;font-weight:800}
+.av1{background:linear-gradient(135deg,#EC4141,#8E1818)}
+.av2{background:linear-gradient(135deg,#3B3B44,#1E1E24)}
+.cmt-body{flex:1;min-width:0}
+.cmt-name{font-size:.78rem;color:var(--txt-2)}
+.cmt-name b{color:var(--txt);font-weight:600;margin-right:8px}
+.cmt-name .day{color:var(--txt-3);font-size:.68rem}
+.cmt-text{font-size:.9rem;color:#D8D8D8;margin:7px 0 9px;line-height:1.8}
+.cmt-text em{font-style:normal;color:var(--red);font-weight:600}
+.cmt-meta{display:flex;align-items:center;gap:16px;font-size:.72rem;color:var(--txt-3)}
+.cmt-meta .like{color:var(--red);font-weight:700}
+.cmt-input{margin-top:14px;display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:999px;background:var(--bg-2);border:1px solid var(--line)}
+.cmt-input span{color:var(--txt-3);font-size:.8rem;flex:1}
+.cmt-input i{font-style:normal;font-size:.72rem;color:var(--red);font-weight:700}
+
+/* 年度报告（反讽点：情绪数据化） */
+.report{
+  margin-top:16px;border-radius:18px;overflow:hidden;
+  background:linear-gradient(150deg,#1C1012,#2A1216 55%,#171012);
+  border:1px solid rgba(236,65,65,.28);
+  padding:40px 38px;text-align:center;position:relative;
+}
+.report::before{content:"";position:absolute;left:50%;top:-120px;transform:translateX(-50%);width:420px;height:300px;background:radial-gradient(ellipse,rgba(236,65,65,.22),transparent 70%);pointer-events:none}
+.report .r-kicker{font-size:.7rem;font-weight:800;letter-spacing:.3em;color:var(--red)}
+.report h3{font-size:clamp(1.25rem,2.6vw,1.7rem);font-weight:900;margin:12px 0 8px;letter-spacing:.08em}
+.report .r-sub{color:var(--txt-2);font-size:.8rem;letter-spacing:.08em}
+.r-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:26px 0 8px}
+.r-stat{background:rgba(0,0,0,.25);border:1px solid rgba(236,65,65,.2);border-radius:12px;padding:14px 12px}
+.r-stat b{display:block;font-size:1.35rem;font-weight:900;color:var(--txt);font-variant-numeric:tabular-nums}
+.r-stat small{font-size:.68rem;color:var(--txt-2);letter-spacing:.1em}
+.report .btn-red{margin-top:18px}
+
+/* 歌单 */
+.p-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:4px}
+.p-card{background:var(--panel-2);border:1px solid var(--line);border-radius:14px;padding:12px;transition:transform .2s ease,border-color .2s ease}
+.p-card:hover{transform:translateY(-4px);border-color:rgba(236,65,65,.4)}
+.p-cover{aspect-ratio:1;border-radius:10px;position:relative;display:flex;align-items:center;justify-content:center;font-size:2.5rem;background-size:cover;background-position:center}
+.cv1{background-image:url('../images/cover-yy-midnight.png')}
+.cv2{background-image:url('../images/cover-yy-sea.png')}
+.cv3{background-image:url('../images/cover-yy-dawn.png')}
+.p-cover .p-heart{position:absolute;left:9px;top:9px;color:#fff;font-size:.72rem;background:rgba(0,0,0,.45);width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.p-play{position:absolute;right:8px;bottom:8px;width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:.74rem;color:#fff}
+.p-name{font-size:.9rem;font-weight:700;margin:11px 2px 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.p-meta{font-size:.72rem;color:var(--txt-3)}
+
+/* 云村动态 */
+.feed{padding:13px 10px;border-bottom:1px solid var(--line)}
+.feed:last-of-type{border-bottom:none}
+.feed-top{display:flex;align-items:center;gap:12px}
+.feed-ava{width:36px;height:36px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:.85rem;color:#fff;font-weight:800}
+.fa1{background:linear-gradient(135deg,#EC4141,#8E1818)}
+.fa2{background:linear-gradient(135deg,#3B3B44,#1E1E24)}
+.fa3{background:linear-gradient(135deg,#1E3A66,#121C3A)}
+.feed-name{font-size:.88rem;font-weight:700}
+.feed-time{font-size:.68rem;color:var(--txt-3);margin-top:1px}
+.feed-text{font-size:.88rem;color:#D8D8D8;margin:10px 0 10px 48px;line-height:1.8}
+.feed-text em{font-style:normal;color:var(--red);font-weight:600}
+.feed-meta{margin-left:48px;display:flex;gap:18px;font-size:.72rem;color:var(--txt-3)}
+.feed-meta .on{color:var(--red);font-weight:700}
+
+/* 下载 */
+.download{text-align:center;padding:58px 0 20px}
+.download h2{font-size:clamp(1.35rem,3vw,1.9rem);font-weight:900;letter-spacing:.05em}
+.download .sub{color:var(--txt-2);font-size:.9rem;margin-top:8px}
+.dl-row{display:flex;justify-content:center;gap:14px;margin-top:28px;flex-wrap:wrap}
+.btn-big{font-size:.95rem;font-weight:800;padding:15px 38px;border-radius:999px;transition:transform .2s ease}
+.btn-dl{background:linear-gradient(120deg,var(--red),var(--red-deep));color:#fff;box-shadow:0 14px 30px -12px rgba(236,65,65,.6)}
+.btn-dl:hover{transform:translateY(-3px)}
+.btn-ghost{border:1.5px solid var(--txt-2);color:var(--txt);background:transparent}
+.btn-ghost:hover{background:rgba(255,255,255,.06);transform:translateY(-3px)}
+.dl-note{color:var(--txt-3);font-size:.76rem;margin-top:16px;letter-spacing:.05em}
+
+/* ============ 题眼页脚 ============ */
+.meta{
+  position:relative;z-index:1;
+  width:min(1180px,calc(100% - 48px));
+  margin:44px auto 100px;padding:36px 30px;border-radius:18px;text-align:center;
+  background:var(--panel);border:1px dashed rgba(236,65,65,.45);
+}
+.meta .demo-tag{
+  display:inline-block;font-size:.66rem;font-weight:800;letter-spacing:.2em;
+  color:var(--red);border:1px solid rgba(236,65,65,.5);
+  padding:3px 12px;border-radius:999px;margin-bottom:16px;
+}
+.meta b{color:var(--red);font-weight:700}
+.meta p{color:var(--txt-2);font-size:.92rem;line-height:1.9}
+.meta a.back{
+  display:inline-block;margin-top:18px;
+  background:var(--red);color:#fff;font-weight:800;font-size:.9rem;
+  padding:13px 30px;border-radius:999px;
+  box-shadow:0 12px 26px -12px rgba(236,65,65,.6);
+  transition:transform .2s ease;
+}
+.meta a.back:hover{transform:translateY(-2px)}
+.meta .grace{margin-top:16px;color:var(--txt-3);font-size:.78rem}
+.meta .credit{margin-top:10px;color:var(--txt-3);font-size:.7rem;letter-spacing:.05em}
+
+/* ============ 常驻播放条 ============ */
+.player-bar{
+  position:fixed;left:0;right:0;bottom:0;z-index:50;
+  background:rgba(24,24,26,.94);
+  -webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);
+  border-top:1px solid rgba(201,58,58,.3);
+}
+.pb-in{max-width:1180px;margin:0 auto;padding:10px 24px;display:flex;align-items:center;gap:16px}
+.pb-vinyl{
+  width:30px;height:30px;border-radius:50%;flex:none;position:relative;
+  background:radial-gradient(circle,var(--red) 0 5px,#1A1A1C 6px 13px,#262629 14px 16px);
+  animation:spin 20s linear infinite;
+}
+.pb-info{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.4}
+.pb-info b{font-size:.82rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pb-info small{font-size:.66rem;color:var(--txt-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pb-ctrl{display:flex;align-items:center;gap:14px;flex:none;color:var(--txt-2);font-size:.9rem}
+.pb-ctrl .pb-side{cursor:pointer;padding:4px 6px;border-radius:8px;transition:color .2s ease,background .2s ease}
+.pb-ctrl .pb-side:hover{color:var(--red);background:rgba(236,65,65,.12)}
+.pb-ctrl .main{
+  width:34px;height:34px;border-radius:50%;background:#C93A3A;color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:.72rem;
+  box-shadow:0 0 16px -2px rgba(201,58,58,.7);
+}
+.pb-heart{flex:none;font-size:1.05rem;color:var(--txt-3);cursor:pointer;transition:color .2s ease,text-shadow .2s ease}
+.pb-heart.liked{color:#C93A3A;text-shadow:0 0 12px rgba(201,58,58,.7)}
+.pb-bar{width:110px;height:3px;border-radius:2px;background:rgba(255,255,255,.12);overflow:hidden;flex:none;display:none}
+.pb-bar i{display:block;height:100%;background:#C93A3A;animation:playbar 34s linear infinite}
+.pb-bar i.live{animation:none}
+@media(min-width:900px){.pb-bar{display:block}}
+
+/* ============ 视图切换器：三页互跳 ============ */
+.view-switch{position:fixed;top:84px;right:20px;z-index:55;font-family:var(--sans)}
+.view-switch details{position:relative}
+.view-switch summary{
+  list-style:none;cursor:pointer;user-select:none;
+  display:flex;align-items:center;gap:8px;
+  font-size:.78rem;font-weight:600;letter-spacing:.06em;
+  padding:8px 14px;border-radius:999px;
+  background:rgba(18,18,19,.92);border:1px solid rgba(236,65,65,.5);
+  box-shadow:0 10px 24px -12px rgba(0,0,0,.5);
+  transition:transform .2s ease;
+}
+.view-switch summary::-webkit-details-marker{display:none}
+.view-switch summary:hover{transform:translateY(-1px)}
+.vs-caret{font-size:.6rem;opacity:.6;transition:transform .2s ease}
+.view-switch details[open] .vs-caret{transform:rotate(180deg)}
+.vs-menu{
+  position:absolute;right:0;top:calc(100% + 8px);min-width:200px;
+  background:rgba(18,18,19,.97);border:1px solid rgba(236,65,65,.4);border-radius:14px;
+  padding:6px;box-shadow:0 24px 48px -20px rgba(0,0,0,.6);
+}
+.vs-item{
+  display:flex;align-items:center;gap:9px;
+  padding:10px 12px;border-radius:10px;
+  font-size:.82rem;font-weight:600;color:var(--txt);
+  transition:background .18s ease;
+}
+.vs-item:hover{background:rgba(236,65,65,.14)}
+.vs-item.on{background:linear-gradient(120deg,var(--red),var(--red-deep));color:#fff}
+.vs-ico{font-size:.85rem;opacity:.8}
+@media (max-width:560px){.view-switch{right:12px;top:74px}}
+
+/* ============ 炫酷动效 ============ */
+/* 滚动揭示 */
+.poster,.now,.panel,.report,.download,.meta,.quote-card{
+  animation:revealUp .8s cubic-bezier(.22,.61,.36,1) both;
+  animation-timeline:view();
+  animation-range:entry 8% cover 26%;
+}
+@keyframes revealUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+/* 热评交错浮现 */
+.cmt-card{
+  animation:revealUp .7s cubic-bezier(.22,.61,.36,1) both;
+  animation-timeline:view();
+  animation-range:entry 8% cover 22%;
+}
+.cmt-card:nth-of-type(2){animation-delay:.12s}
+
+/* 光标微光（红） */
+.cursor-glow{
+  position:fixed;left:0;top:0;width:440px;height:440px;border-radius:50%;
+  pointer-events:none;z-index:0;
+  background:radial-gradient(circle,rgba(236,65,65,.08),transparent 62%);
+  opacity:0;transition:opacity .5s ease;
+}
+
+/* 播放波形（播放时跳动） */
+.now-wave{
+  display:flex;align-items:center;justify-content:center;gap:4px;
+  height:26px;margin-top:10px;opacity:0;transition:opacity .3s ease;
+}
+.now-wave.live{opacity:1}
+.now-wave i{width:3px;height:7px;border-radius:2px;background:var(--red);animation:waveBounce 1s ease-in-out infinite}
+.now-wave i:nth-child(2){animation-delay:.15s}
+.now-wave i:nth-child(3){animation-delay:.3s}
+.now-wave i:nth-child(4){animation-delay:.45s}
+.now-wave i:nth-child(5){animation-delay:.6s}
+@keyframes waveBounce{0%,100%{height:7px}50%{height:22px}}
+
+/* 红心点赞特效 */
+.heart,.pb-heart{position:relative}
+.heart.pop,.pb-heart.pop{animation:heartPop .5s cubic-bezier(.34,1.56,.64,1)}
+@keyframes heartPop{0%{transform:scale(1)}35%{transform:scale(1.5)}70%{transform:scale(.88)}100%{transform:scale(1)}}
+.heart.pop::after,.pb-heart.pop::after{
+  content:"";position:absolute;inset:-12px;border-radius:50%;
+  border:2px solid rgba(236,65,65,.55);
+  animation:heartRing .55s ease-out forwards;
+}
+@keyframes heartRing{from{transform:scale(.35);opacity:1}to{transform:scale(1.6);opacity:0}}
+
+/* 黑胶播放环境光 */
+.vinyl{transition:box-shadow .5s ease}
+.vinyl.playing{box-shadow:0 24px 46px -18px rgba(0,0,0,.85),0 0 46px -4px rgba(236,65,65,.5),inset 0 0 0 1px rgba(255,255,255,.06)}
+
+/* ============ 苹果风格滚动动效（Phase A）============ */
+@supports (animation-timeline: scroll()) {
+  /* 黑胶转台：滚动离开时旋转 360° 淡出（黑胶在首屏内可见，exit range 过程可感知） */
+  .vinyl-wrap{
+    animation: vinylScrub 1s linear both;
+    animation-timeline: view();
+    animation-range: exit 0% exit 100%;
+  }
+  @keyframes vinylScrub{
+    from{rotate:0deg;opacity:1;translate:0 0}
+    to{rotate:360deg;opacity:0;translate:0 -40px}
+  }
+}
+
+/* ============ 响应式 ============ */
+@media (max-width:1024px){
+  .sidebar{display:none}
+  .content{padding:0 24px 30px}
+}
+@media (max-width:720px){
+  .now{flex-direction:column;align-items:flex-start;gap:22px}
+  .now-vip{width:100%}
+  .p-grid{grid-template-columns:repeat(2,1fr)}
+  .r-stats{grid-template-columns:repeat(2,1fr)}
+  .poster{padding:40px 26px}
+  .search{max-width:none}
+  .demo-badge{display:none}
+}
+@media (max-width:520px){
+  .content{padding:0 16px 24px}
+  .meta{margin:36px 16px 90px;padding:28px 20px}
+  .report{padding:32px 20px}
+  .top-dl{font-size:.74rem;padding:8px 15px}
+}
+
+/* ============ 动效偏好 ============ */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.01ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.01ms !important;
+  }
+  html{scroll-behavior:auto}
+  .vinyl,.pb-vinyl{animation:none}
+}
+</style>
+</head>
+<body>
+
+<!-- 背景红晕 -->
+<div class="halo halo-a"></div>
+<div class="halo halo-b"></div>
+<!-- 光标微光 -->
+<div class="cursor-glow" aria-hidden="true"></div>
+
+<!-- 顶栏 -->
+<header class="topbar">
+  <div class="topbar-in">
+    <a class="brand" href="#top">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+          <path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/>
+        </svg>
+      </span>
+      <span class="brand-name">漂流云音乐</span>
+      <span class="demo-badge">对照版</span>
+    </a>
+    <div class="search" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <circle cx="11" cy="11" r="7"/><path d="m16.5 16.5 5 5"/>
+      </svg>
+      <span>搜索音乐、歌单、评论</span>
+    </div>
+    <a class="top-dl" href="#download">下载客户端</a>
+  </div>
+</header>
+
+<div class="layout" id="top">
+  <!-- 左侧导航 -->
+  <aside class="sidebar" aria-label="侧边导航">
+    <a class="s-item on" href="#"><span class="s-ico">♪</span>发现音乐</a>
+    <a class="s-item" href="#"><span class="s-ico">📻</span>私人FM</a>
+    <a class="s-item" href="#feed"><span class="s-ico">☁</span>云村</a>
+    <a class="s-item" href="#"><span class="s-ico">👤</span>我的</a>
+    <a class="s-item" href="#"><span class="s-ico">🛍️</span>商城</a>
+    <div class="s-vip">黑胶 VIP<b>开通 →</b></div>
+  </aside>
+
+  <main class="content">
+    <!-- 情绪大字报 -->
+    <section class="poster">
+      <p class="p-kicker">深夜电台 · 开播</p>
+      <h2>你听的不是歌，<br>是<em>漂流</em>。</h2>
+      <p>今夜，让一首歌收留你。</p>
+      <span class="p-time">21:47 · 128,431 人正在漂</span>
+    </section>
+
+    <!-- 黑胶播放卡 -->
+    <section class="now" aria-label="正在播放">
+      <div class="vinyl-wrap">
+        <div class="vinyl" id="npVinyl" role="button" aria-label="播放试听" title="播放试听"><span class="n">♪</span></div>
+      </div>
+      <div class="now-info">
+        <p class="now-kicker" id="npKicker">正在播放 · 深夜电台</p>
+        <h3 class="now-title" id="npTitle">信风</h3>
+        <p class="now-artist" id="npArtist">一支你没听过的乐队 · 后摇</p>
+        <div class="now-bar" aria-hidden="true"><i id="nowBarI"></i></div>
+        <div class="now-wave" id="nowWave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="now-time"><span id="nowCur">1:42</span><span id="nowTot">4:07</span></div>
+        <div class="now-actions">
+          <span class="heart" id="nowHeart" role="button" aria-label="点亮红心">♡</span>
+          <span class="cmt-bubble">评论 <b>999+</b></span>
+        </div>
+      </div>
+      <div class="now-vip">
+        <small>黑胶 VIP</small>
+        <b>解锁深夜电台</b>
+        <a class="btn-red" href="#download">开通</a>
+      </div>
+    </section>
+
+    <!-- 每日推荐（反讽点：猜你想漂） -->
+    <section class="panel">
+      <div class="panel-head">
+        <h3>每日推荐</h3>
+        <span class="tag-red">猜你想漂</span>
+        <span class="more">换一批 ▸</span>
+      </div>
+      <div class="rec-row">
+        <span class="rec-cover rc1" aria-hidden="true">🌊</span>
+        <div class="rec-mid"><div class="rec-name">晚风告别式</div><div class="rec-why"><b>因为你</b>在深夜听过 3 首后摇</div></div>
+        <span class="rec-play">▶</span>
+      </div>
+      <div class="rec-row">
+        <span class="rec-cover rc2" aria-hidden="true">🌃</span>
+        <div class="rec-mid"><div class="rec-name">凌晨三点半的港</div><div class="rec-why"><b>因为你</b>收藏过爵士嘻哈</div></div>
+        <span class="rec-play">▶</span>
+      </div>
+      <div class="rec-row">
+        <span class="rec-cover rc3" aria-hidden="true">🌙</span>
+        <div class="rec-mid"><div class="rec-name">雨季漂流记</div><div class="rec-why"><b>因为</b> 12,847 人与你同听</div></div>
+        <span class="rec-play">▶</span>
+      </div>
+      <div class="rec-hint">
+        <span aria-hidden="true">💡</span>
+        <small>推荐基于你的<b>听歌行为数据</b>计算。<br>漂流的未知感？系统会替你安排好的。</small>
+      </div>
+    </section>
+
+    <!-- 热评（反讽点：情绪评论） -->
+    <section class="panel">
+      <div class="panel-head">
+        <h3>热门评论</h3>
+        <span class="tag-red">999+</span>
+        <span class="more">更多 ▸</span>
+      </div>
+      <div class="cmt-card">
+        <span class="cmt-ava av1" aria-hidden="true">夜</span>
+        <div class="cmt-body">
+          <p class="cmt-name"><b>夜航船</b><span class="day">漂流第 41 夜 · 01:23</span></p>
+          <p class="cmt-text">「第一次漂到这首歌，我愣了很久。<br>原来<em>我是这种人</em>。」</p>
+          <p class="cmt-meta"><span class="like">♡ 12.3万</span><span>回复 2,341</span><span>分享</span></p>
+        </div>
+      </div>
+      <div class="cmt-card">
+        <span class="cmt-ava av2" aria-hidden="true">信</span>
+        <div class="cmt-body">
+          <p class="cmt-name"><b>信风收听中</b><span class="day">漂流第 3 夜 · 22:47</span></p>
+          <p class="cmt-text">「深夜听到这首歌，突然想起很多事。<br>网易云没有骗我，<em>音乐真的会收留人</em>。」</p>
+          <p class="cmt-meta"><span class="like">♡ 4,872</span><span>回复 936</span><span>分享</span></p>
+        </div>
+      </div>
+      <div class="cmt-input">
+        <span>写下此刻的心事…</span>
+        <i>发布</i>
+      </div>
+    </section>
+
+    <!-- 年度报告（反讽点：情绪数据化） -->
+    <section class="report">
+      <p class="r-kicker">年度总结 · 生成中</p>
+      <h3>你的漂流年度报告</h3>
+      <p class="r-sub">漂流第 41 夜 · 你的情绪已被整理成数据</p>
+      <div class="r-stats">
+        <div class="r-stat"><b>1,247</b><small>播放歌曲</small></div>
+        <div class="r-stat"><b>63</b><small>深夜漂流次数</small></div>
+        <div class="r-stat"><b>2</b><small>听哭次数</small></div>
+        <div class="r-stat"><b>3</b><small>听愣住次数</small></div>
+      </div>
+      <a class="btn-red" href="#">生成并分享</a>
+    </section>
+
+    <!-- 歌单 -->
+    <section class="panel">
+      <div class="panel-head">
+        <h3>歌单广场</h3>
+        <span class="tag-red">深夜限定</span>
+        <span class="more">更多 ▸</span>
+      </div>
+      <div class="p-grid">
+        <div class="p-card">
+          <div class="p-cover cv1"><span class="p-heart">♡</span><span class="p-play">▶</span></div>
+          <p class="p-name">深夜收藏夹</p>
+          <p class="p-meta">12万收藏 · 23:00 后收听</p>
+        </div>
+        <div class="p-card">
+          <div class="p-cover cv2"><span class="p-heart">♡</span><span class="p-play">▶</span></div>
+          <p class="p-name">一个人的海</p>
+          <p class="p-meta">8万收藏 · 独处专用</p>
+        </div>
+        <div class="p-card">
+          <div class="p-cover cv3"><span class="p-heart">♡</span><span class="p-play">▶</span></div>
+          <p class="p-name">凌晨电台</p>
+          <p class="p-meta">3万收藏 · 定时关闭</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 云村动态 -->
+    <section class="panel" id="feed">
+      <div class="panel-head">
+        <h3>云村 · 此刻有人在漂</h3>
+        <span class="tag-red">实时</span>
+        <span class="more">进入云村 ▸</span>
+      </div>
+      <div class="feed">
+        <div class="feed-top">
+          <span class="feed-ava fa1" aria-hidden="true">夜</span>
+          <div><div class="feed-name">夜航船</div><div class="feed-time">刚刚</div></div>
+        </div>
+        <p class="feed-text">第 41 夜。漂到一首叫《信风》的歌，<em>愣住</em>了。</p>
+        <p class="feed-meta"><span class="on">♡ 12.3万</span><span>评论 2,341</span><span>转发 896</span></p>
+      </div>
+      <div class="feed">
+        <div class="feed-top">
+          <span class="feed-ava fa2" aria-hidden="true">木</span>
+          <div><div class="feed-name">木木</div><div class="feed-time">12 分钟前</div></div>
+        </div>
+        <p class="feed-text">深夜电台听到想哭。<em>音乐的力量</em>，是真的。</p>
+        <p class="feed-meta"><span class="on">♡ 4,872</span><span>评论 936</span><span>转发 214</span></p>
+      </div>
+      <div class="feed">
+        <div class="feed-top">
+          <span class="feed-ava fa3" aria-hidden="true">陆</span>
+          <div><div class="feed-name">陆上行舟</div><div class="feed-time">1 小时前</div></div>
+        </div>
+        <p class="feed-text">把《信风》设为深夜单曲循环第 7 次。<em>谁懂</em>。</p>
+        <p class="feed-meta"><span class="on">♡ 2,103</span><span>评论 448</span><span>转发 96</span></p>
+      </div>
+    </section>
+
+    <!-- 下载 -->
+    <section class="download" id="download">
+      <h2>漂流云音乐 · 免费下载</h2>
+      <p class="sub">Android / iOS 均已上架</p>
+      <div class="dl-row">
+        <a class="btn-big btn-dl" href="#">立即下载</a>
+        <a class="btn-big btn-ghost" href="#">开通黑胶VIP</a>
+      </div>
+      <p class="dl-note">免费下载 · 黑胶 VIP 首月 ¥8 · 解锁深夜电台与无损音质</p>
+    </section>
+  </main>
+</div>
+
+<!-- 题眼 -->
+<footer class="meta">
+  <span class="demo-tag">对照演示</span>
+  <p><b>本页是虚构对照——假如漂流用网易云的语法来做，会是这样。</b><br>深色、红色、情绪、乐评、年度报告：未知变成了「猜你想漂」，诗意变成了数据。</p>
+  <a class="back" href="index.html">真正的漂流首页 →</a>
+  <p class="grace">没有嘲讽网易云的意思——它的乐评文化确实动人。只是漂流不想把情绪做成报表。</p>
+  <p class="credit">试听音乐：Kevin MacLeod（incompetech.com）CC-BY-4.0 · IMSLP 公有领域</p>
+</footer>
+
+<!-- 常驻播放条 -->
+<div class="player-bar" role="complementary" aria-label="播放器（模拟）">
+  <div class="pb-in">
+    <span class="pb-vinyl" aria-hidden="true"></span>
+    <span class="pb-info"><b id="pbTitle">信风</b><small id="pbSub">一支你没听过的乐队 · 后摇</small></span>
+    <span class="pb-ctrl">
+      <span class="pb-side" id="pbPrev" role="button" aria-label="上一首">⏮</span>
+      <span class="main" id="pbPlay" role="button" aria-label="播放/暂停">▶</span>
+      <span class="pb-side" id="pbNext" role="button" aria-label="下一首">⏭</span>
+    </span>
+    <span class="pb-heart" id="pbHeart" role="button" aria-label="点亮红心">♡</span>
+    <span class="pb-bar" aria-hidden="true"><i id="pbBarI"></i></span>
+  </div>
+</div>
+
+<!-- 视图切换器：五页互跳 -->
+<div class="view-switch">
+  <details>
+    <summary><span>视图切换</span><span class="vs-caret">▾</span></summary>
+    <div class="vs-menu">
+      <a class="vs-item" href="index.html"><span class="vs-ico">☀</span>漂流 · 日光版</a>
+      <a class="vs-item" href="qqmusic-style.html"><span class="vs-ico">▣</span>假如是 QQ</a>
+      <a class="vs-item on" href="wangyiyun-style.html"><span class="vs-ico">♬</span>假如是网易云</a>
+      <a class="vs-item" href="../anime-style.html"><span class="vs-ico">🌠</span>漂流 · 星海版</a>
+      <a class="vs-item" href="mihoyo-style.html"><span class="vs-ico">💫</span>漂流 · 星轨版</a>
+    </div>
+  </details>
+</div>
+
+<script>
+/* 深夜电台播放器：4 首曲库自由切换，黑胶/播放条双控制，多源降级 */
+(function(){
+  var TRACKS = [
+    {t:'信风', s:'一支你没听过的乐队 · 后摇', src:['../audio/gymnopedie1.mp3','https://incompetech.com/music/royalty-free/mp3-royaltyfree/Gymnopedie%20No%201.mp3','https://www.soundhelix.com/examples/mp3/SoundHelix-Song-17.mp3']},
+    {t:'晚风告别式', s:'环境电子 · 深夜电台', src:['../audio/zen.mp3','https://incompetech.com/music/royalty-free/mp3-royaltyfree/That%20Zen%20Moment.mp3','https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3']},
+    {t:'凌晨三点半的港', s:'爵士嘻哈 · 失眠人士精选', src:['https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3','https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3']},
+    {t:'雨季漂流记', s:'氛围 · 下雨天限定', src:['https://www.soundhelix.com/examples/mp3/SoundHelix-Song-17.mp3','https://www.soundhelix.com/examples/mp3/SoundHelix-Song-14.mp3']}
+  ];
+  var audio = new Audio();
+  audio.preload = 'none';
+  var idx = 0, si = -1, playing = false, liked = false, failed = false;
+  var vinyl = document.getElementById('npVinyl');
+  var barI = document.getElementById('nowBarI');
+  var cur = document.getElementById('nowCur');
+  var tot = document.getElementById('nowTot');
+  var kicker = document.getElementById('npKicker');
+  var title = document.getElementById('npTitle');
+  var artist = document.getElementById('npArtist');
+  var nowHeart = document.getElementById('nowHeart');
+  var pbPlay = document.getElementById('pbPlay');
+  var pbHeart = document.getElementById('pbHeart');
+  var pbBarI = document.getElementById('pbBarI');
+  var pbPrev = document.getElementById('pbPrev');
+  var pbNext = document.getElementById('pbNext');
+  var nowWave = document.getElementById('nowWave');
+  function fmt(s){ s = Math.floor(s||0); return Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); }
+  function sync(){
+    if(vinyl) vinyl.classList.toggle('playing', playing);
+    pbPlay.textContent = failed ? '!' : (playing ? '❚❚' : '▶');
+    if(barI) barI.classList.toggle('live', playing);
+    if(pbBarI) pbBarI.classList.toggle('live', playing);
+    if(nowWave) nowWave.classList.toggle('live', playing);
+  }
+  function popHeart(el){
+    el.classList.remove('pop');
+    void el.offsetWidth;
+    el.classList.add('pop');
+  }
+  function showTrack(){
+    title.textContent = TRACKS[idx].t;
+    artist.textContent = TRACKS[idx].s;
+    kicker.textContent = '正在播放 · 深夜电台 · 第 ' + (idx+1) + '/' + TRACKS.length + ' 首';
+  }
+  function setLiked(v){
+    liked = v;
+    nowHeart.classList.toggle('liked', liked);
+    nowHeart.textContent = liked ? '❤' : '♡';
+    pbHeart.classList.toggle('liked', liked);
+    pbHeart.textContent = liked ? '❤' : '♡';
+    if(liked){ popHeart(nowHeart); popHeart(pbHeart); }
+  }
+  function loadTrack(i, autoplay){
+    idx = i; si = -1; failed = false;
+    showTrack();
+    cur.textContent = '0:00'; tot.textContent = '--:--';
+    if(barI){ barI.style.width = '0%'; }
+    if(pbBarI){ pbBarI.style.width = '0%'; }
+    if(autoplay){ playing = true; sync(); si = 0; audio.src = TRACKS[idx].src[0]; audio.play().catch(function(){}); }
+    else { playing = false; audio.pause(); sync(); }
+  }
+  function toggle(){
+    if(failed) return;
+    if(playing){ audio.pause(); playing = false; sync(); return; }
+    playing = true; sync();
+    if(si === -1){ si = 0; audio.src = TRACKS[idx].src[0]; }
+    audio.play().catch(function(){});
+  }
+  function step(d){
+    loadTrack((idx + d + TRACKS.length) % TRACKS.length, playing);
+  }
+  audio.addEventListener('loadedmetadata', function(){ tot.textContent = fmt(audio.duration); });
+  audio.addEventListener('timeupdate', function(){
+    if(barI && audio.duration) barI.style.width = (audio.currentTime/audio.duration*100)+'%';
+    if(pbBarI && audio.duration) pbBarI.style.width = (audio.currentTime/audio.duration*100)+'%';
+    cur.textContent = fmt(audio.currentTime);
+  });
+  audio.addEventListener('ended', function(){
+    playing = false; sync();
+    cur.textContent = '0:00';
+    if(barI) barI.style.width = '0%';
+    if(pbBarI) pbBarI.style.width = '0%';
+  });
+  audio.addEventListener('error', function(){
+    si++;
+    if(si < TRACKS[idx].src.length){ audio.src = TRACKS[idx].src[si]; audio.play().catch(function(){}); }
+    else { playing = false; failed = true; sync(); }
+  });
+  if(vinyl) vinyl.addEventListener('click', toggle);
+  pbPlay.addEventListener('click', toggle);
+  pbPrev.addEventListener('click', function(){ step(-1); });
+  pbNext.addEventListener('click', function(){ step(1); });
+  nowHeart.addEventListener('click', function(){ setLiked(!liked); });
+  pbHeart.addEventListener('click', function(){ setLiked(!liked); });
+  showTrack();
+})();
+</script>
+
+<script>
+/* 炫酷动效：年度报告数字滚动 + 光标微光 */
+(function(){
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // 数字滚动（r-stat 数字）
+  if(!reduced){
+    var stats = document.querySelectorAll('.r-stat b');
+    if(stats.length){
+      function fmt(n){ return Math.round(n).toLocaleString('en-US'); }
+      var io = new IntersectionObserver(function(entries){
+        entries.forEach(function(en){
+          if(!en.isIntersecting) return;
+          var el = en.target;
+          io.unobserve(el);
+          var target = parseFloat(el.textContent.replace(/,/g, ''));
+          if(!target) return;
+          var t0 = null;
+          function step(ts){
+            if(!t0) t0 = ts;
+            var p = Math.min((ts - t0) / 1200, 1);
+            var e = 1 - Math.pow(1 - p, 3);
+            el.textContent = fmt(target * e);
+            if(p < 1) requestAnimationFrame(step);
+          }
+          requestAnimationFrame(step);
+        });
+      }, { threshold: .4 });
+      stats.forEach(function(s){ io.observe(s); });
+    }
+  }
+  // 光标微光
+  var glow = document.querySelector('.cursor-glow');
+  if(glow && !reduced && window.matchMedia('(hover:hover) and (pointer:fine)').matches){
+    var tx = innerWidth/2, ty = innerHeight/3, cx = tx, cy = ty, shown = false;
+    document.addEventListener('mousemove', function(e){
+      tx = e.clientX; ty = e.clientY;
+      if(!shown){ shown = true; glow.style.opacity = '1'; }
+    });
+    (function loop(){
+      cx += (tx-cx)*0.08; cy += (ty-cy)*0.08;
+      glow.style.transform = 'translate('+(cx-220)+'px,'+(cy-220)+'px)';
+      requestAnimationFrame(loop);
+    })();
+  }
+})();
+</script>
+
+<script>
+/* 苹果风格滚动降级：黑胶转台 JS 实现（不支持 scroll-driven 时） */
+(function(){
+  if(!window.CSS || !CSS.supports || CSS.supports('animation-timeline','scroll()')) return;
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var vinyl = document.getElementById('npVinyl');
+  if(!vinyl) return;
+  var ticking = false;
+  function update(){
+    ticking = false;
+    var vh = innerHeight;
+    var r = vinyl.getBoundingClientRect();
+    var p = Math.min(Math.max((vh - r.top) / (vh * 1.1), 0), 1); // 0=页面顶部, 1=完全滚出
+    vinyl.style.rotate = String(p * 360) + 'deg';
+    vinyl.style.opacity = String(1 - p);
+    vinyl.style.translate = '0 ' + (p * -40) + 'px';
+  }
+  function onScroll(){ if(!ticking){ ticking = true; requestAnimationFrame(update); } }
+  addEventListener('scroll', onScroll, { passive: true });
+  update();
+})();
+</script>
+</body>
+</html>
