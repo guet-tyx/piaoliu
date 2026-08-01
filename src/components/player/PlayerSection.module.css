@@ -1,0 +1,324 @@
+/* ============ 通用段落头（同角色卡） ============ */
+.sectionHead {
+  max-width: 640px;
+  margin-bottom: 52px;
+}
+.sectionHead h2 {
+  font-weight: 800;
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  line-height: 1.3;
+  margin: 14px 0;
+  letter-spacing: .02em;
+}
+.secSub {
+  color: var(--ink-2);
+  line-height: 1.95;
+  font-size: 1rem;
+}
+.tagDot {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .2em;
+  color: var(--pink-deep);
+  background: rgba(251, 114, 153, .08);
+  border: 1px solid rgba(251, 114, 153, .25);
+  padding: 4px 11px;
+  border-radius: 999px;
+}
+.tagDot i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--pink);
+  box-shadow: 0 0 6px var(--pink);
+}
+
+/* ============ 播放器（玻璃拟态 + 弹幕 + 频谱） ============ */
+.playerWrap {
+  position: relative;
+  border-radius: 24px;
+  padding: 2px;
+  overflow: hidden;
+  background: linear-gradient(120deg, rgba(251, 114, 153, .45), rgba(0, 174, 236, .45));
+}
+.player {
+  position: relative;
+  border-radius: 22px;
+  padding: 34px 38px;
+  background: rgba(255, 255, 255, .92);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 38px;
+  align-items: center;
+}
+
+/* 唱片 + 弹幕层 */
+.recordBox {
+  position: relative;
+  width: 210px;
+  height: 210px;
+  flex: none;
+}
+.record {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow: 0 26px 48px -22px rgba(24, 25, 28, .5), inset 0 0 0 8px rgba(0, 0, 0, .28), inset 0 0 0 9px rgba(255, 255, 255, .12);
+  animation: var(--kf-spin) 16s linear infinite;
+  transition: background .4s ease;
+}
+/* 高光锥形反光 */
+.record::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 34% 28%, rgba(255, 255, 255, .28), transparent 46%),
+    conic-gradient(from 0deg, transparent 0 32%, rgba(255, 255, 255, .4) 50%, transparent 68%);
+  animation: var(--kf-spin) 3.2s linear infinite;
+}
+/* 轴心点 */
+.record::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #222 0 5px, #fff 6px 7px, #222 8px);
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, .25);
+}
+.record.playing { animation-duration: 7s; }
+.record.playing::before { animation-duration: 2.4s; }
+
+/* 唱片上的弹幕区：播放时浮现 */
+.recordDm {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .5s ease;
+}
+.live .recordDm { opacity: 1; }
+.recordDm .dm { font-size: .82rem; }
+.dmR1 { top: 22%; }
+.dmR2 { top: 44%; }
+.dmR3 { top: 66%; }
+
+/* 弹幕（B站规格：白字黑描边，右→左匀速） */
+.dm {
+  position: absolute;
+  top: 0;
+  left: 0;
+  will-change: transform;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #fff;
+  opacity: .82;
+  text-shadow: 0 1px 0 #000, 1px 0 0 #000, 0 -1px 0 #000, -1px 0 0 #000, 0 0 3px rgba(0, 0, 0, .8);
+  white-space: nowrap;
+  letter-spacing: .04em;
+  animation: var(--kf-dmFloat) var(--dmdur, 10s) linear infinite;
+  animation-delay: var(--dmdelay, 0s);
+  pointer-events: none;
+}
+.dm.pink {
+  color: var(--pink);
+  text-shadow: 0 1px 0 #000, 1px 0 0 #000, 0 -1px 0 #000, -1px 0 0 #000;
+}
+.dm.blue {
+  color: var(--blue-bright);
+  text-shadow: 0 1px 0 #000, 1px 0 0 #000, 0 -1px 0 #000, -1px 0 0 #000;
+}
+
+.pNow { min-width: 0; }
+.nowKicker {
+  font-size: .66rem;
+  letter-spacing: .24em;
+  color: var(--pink-deep);
+  font-weight: 700;
+}
+.nowTitle {
+  font-size: 1.7rem;
+  font-weight: 800;
+  margin: 10px 0 2px;
+  letter-spacing: .04em;
+}
+.nowTag {
+  font-style: normal;
+  color: var(--ink-3);
+  font-weight: 600;
+  font-size: .8rem;
+  letter-spacing: .2em;
+  margin-left: 8px;
+}
+.nowArtist {
+  font-size: .84rem;
+  color: var(--ink-2);
+  letter-spacing: .06em;
+}
+
+/* 频谱（32 条，粉→蓝渐变，.live 才跳动） */
+.eq {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 52px;
+  margin: 20px 0 16px;
+}
+.eq i {
+  flex: 1;
+  border-radius: 2px;
+  background: linear-gradient(180deg, var(--pink), var(--blue));
+  height: var(--h, 40%);
+  animation: var(--kf-eqb) 1s ease-in-out infinite alternate;
+  animation-delay: var(--d, 0s);
+  animation-play-state: paused;
+}
+.eq.live i { animation-play-state: running; }
+
+.progress {
+  width: 100%;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--panel-2);
+  overflow: hidden;
+  position: relative;
+}
+.progress i {
+  display: block;
+  height: 100%;
+  width: 0%;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--pink), var(--blue));
+  box-shadow: 0 0 10px rgba(251, 114, 153, .6);
+  transition: width .2s linear;
+}
+.timeRow {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  font-size: .66rem;
+  color: var(--ink-3);
+  margin-top: 7px;
+  letter-spacing: .06em;
+}
+
+.nowCtrl {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 18px;
+}
+.npSide {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1.5px solid var(--line);
+  background: var(--panel);
+  color: var(--ink-2);
+  font-size: .7rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .2s ease, transform .2s ease, border-color .2s ease;
+}
+.npSide:hover {
+  background: rgba(0, 174, 236, .08);
+  border-color: var(--blue);
+  transform: scale(1.08);
+}
+.nowPlay {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(120deg, var(--pink), var(--pink-deep));
+  color: #fff;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 14px 26px -12px rgba(251, 114, 153, .8);
+  transition: transform .2s ease, filter .2s ease;
+}
+.nowPlay:hover {
+  transform: scale(1.07);
+  filter: brightness(1.06);
+}
+.nowHeart {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1.5px solid var(--line);
+  background: var(--panel);
+  font-size: .85rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-3);
+  transition: transform .2s ease, color .2s ease, border-color .2s ease;
+}
+.nowHeart i { font-style: normal; }
+.nowHeart.liked {
+  color: var(--pink);
+  border-color: rgba(251, 114, 153, .5);
+  background: rgba(251, 114, 153, .08);
+}
+.nowHeart.liked i { animation: var(--kf-heartPop) .45s cubic-bezier(.34, 1.56, .64, 1); }
+
+.dmToggle {
+  margin-left: auto;
+  font-size: .68rem;
+  font-weight: 700;
+  color: var(--ink-3);
+  border: 1px solid var(--line);
+  background: var(--panel);
+  border-radius: 999px;
+  padding: 7px 14px;
+  cursor: pointer;
+  letter-spacing: .1em;
+  transition: color .2s ease, border-color .2s ease;
+}
+.dmToggle i { font-style: normal; color: var(--pink); }
+.dmToggle.on {
+  color: var(--blue-deep);
+  border-color: rgba(0, 174, 236, .45);
+  background: rgba(0, 174, 236, .06);
+}
+
+@media (max-width: 960px) {
+  .player {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+    padding: 30px 22px;
+  }
+  .pNow { width: 100%; }
+  .progress { max-width: 480px; margin: 0 auto; }
+  .nowCtrl { justify-content: center; }
+  .eq { max-width: 480px; margin-left: auto; margin-right: auto; }
+}
+
+/* 动效偏好：组件级彻底禁用 */
+@media (prefers-reduced-motion: reduce) {
+  .dm,
+  .record,
+  .record::before,
+  .eq i {
+    animation: none;
+  }
+}
