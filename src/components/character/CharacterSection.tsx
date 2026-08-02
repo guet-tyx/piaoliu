@@ -91,14 +91,14 @@ export function CharacterSection() {
       <div className={styles.charCard}>
         <div className={styles.charPic}>
           <span className={styles.lv}>{active.lv}</span>
-          {/* key 重挂载触发切换 fade */}
+          {/* key 重挂载触发切换 fade；objectPosition 偏上保证脸部完整（竖图 cover 居中会裁掉头部） */}
           <Image
             key={active.id}
             src={active.image}
             alt={active.imageAlt}
             fill
             sizes="(max-width: 960px) 65vw, 33vw"
-            style={{ objectFit: "cover" }}
+            style={{ objectFit: "cover", objectPosition: "50% 18%" }}
           />
         </div>
 
