@@ -22,6 +22,7 @@ export function Topbar() {
           <a href="#char">角色</a>
           <a href="#playlist">歌单</a>
           <a href="#player">电台</a>
+          <a href="#bottle">漂流</a>
           <a className={styles.navDl} href="#download">
             免费下载
           </a>

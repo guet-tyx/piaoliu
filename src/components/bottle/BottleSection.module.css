@@ -1,0 +1,461 @@
+/* ============ 纸船漂流（FR-7） ============ */
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+.sailorLine {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: .8rem;
+  color: var(--ink-2);
+  letter-spacing: .06em;
+}
+.sailorLine b {
+  color: var(--ink);
+  font-weight: 800;
+  background: linear-gradient(120deg, var(--pink), var(--blue));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.sailorBoat {
+  width: 17px;
+  height: 17px;
+  color: var(--pink-deep);
+  flex: none;
+}
+.limitLine {
+  margin-left: 6px;
+  padding-left: 12px;
+  border-left: 1px solid var(--line);
+  color: var(--ink-3);
+  font-size: .72rem;
+  letter-spacing: .1em;
+}
+.inboxBtn {
+  position: relative;
+  font-size: .76rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+  color: var(--ink-2);
+  border: 1px solid var(--line);
+  background: var(--panel);
+  border-radius: 999px;
+  padding: 9px 18px;
+  cursor: pointer;
+  transition: color .2s ease, border-color .2s ease, transform .2s ease;
+}
+.inboxBtn:hover {
+  color: var(--pink-deep);
+  border-color: rgba(251, 114, 153, .5);
+  transform: translateY(-1px);
+}
+.inboxBtn.hasNew {
+  color: #fff;
+  border-color: transparent;
+  background: linear-gradient(120deg, var(--pink), var(--pink-deep));
+  box-shadow: 0 10px 22px -10px rgba(251, 114, 153, .8);
+}
+.inboxBadge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--pink-deep);
+  color: #fff;
+  font-size: .62rem;
+  font-style: normal;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px -3px rgba(242, 89, 127, .7);
+}
+
+.bottleGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+  align-items: start;
+}
+@media (max-width: 960px) {
+  .bottleGrid { grid-template-columns: 1fr; }
+}
+
+.card {
+  position: relative;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 26px 26px 24px;
+  box-shadow: 0 18px 40px -26px rgba(24, 25, 28, .28);
+}
+.cardTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.02rem;
+  font-weight: 800;
+  letter-spacing: .08em;
+  margin-bottom: 18px;
+}
+.cardTitle i {
+  font-style: normal;
+  color: var(--pink-deep);
+}
+
+/* ---- 投瓶：当前歌曲绑定 ---- */
+.nowPlaying {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--panel-2);
+  border-radius: 14px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+}
+.nowCover {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  object-fit: cover;
+  flex: none;
+}
+.nowMeta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.45;
+}
+.nowMeta b {
+  font-size: .88rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.nowMeta small {
+  font-size: .7rem;
+  color: var(--ink-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.nowTag {
+  margin-left: auto;
+  flex: none;
+  font-size: .64rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+  color: var(--blue-deep);
+  border: 1px solid rgba(0, 174, 236, .35);
+  border-radius: 999px;
+  padding: 3px 10px;
+}
+
+/* ---- 投瓶：输入 ---- */
+.textWrap {
+  position: relative;
+}
+.input {
+  width: 100%;
+  border: 1.5px solid var(--line);
+  border-radius: 14px;
+  padding: 13px 14px 28px;
+  font-size: .9rem;
+  font-family: var(--sans);
+  color: var(--ink);
+  background: var(--panel);
+  resize: vertical;
+  line-height: 1.7;
+  transition: border-color .2s ease;
+}
+.input:focus {
+  outline: none;
+  border-color: var(--blue);
+}
+.count {
+  position: absolute;
+  right: 12px;
+  bottom: 9px;
+  font-size: .68rem;
+  color: var(--ink-3);
+  letter-spacing: .08em;
+}
+.count.warn { color: var(--pink-deep); }
+
+.error {
+  margin-top: 10px;
+  font-size: .76rem;
+  color: var(--pink-deep);
+  letter-spacing: .04em;
+}
+.success {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+  font-size: .84rem;
+  color: var(--ink-2);
+  line-height: 1.7;
+}
+.successBoat {
+  width: 22px;
+  height: 22px;
+  color: var(--pink-deep);
+  flex: none;
+  animation: var(--kf-bottleFloat) 1.6s ease-in-out infinite;
+}
+
+.launchBtn {
+  width: 100%;
+  margin-top: 14px;
+  border: none;
+  border-radius: 999px;
+  padding: 13px;
+  font-size: .92rem;
+  font-weight: 800;
+  letter-spacing: .24em;
+  color: #fff;
+  background: linear-gradient(120deg, var(--pink), var(--pink-deep));
+  cursor: pointer;
+  box-shadow: 0 14px 26px -12px rgba(251, 114, 153, .8);
+  transition: transform .2s ease, filter .2s ease, opacity .2s ease;
+}
+.launchBtn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  filter: brightness(1.06);
+}
+.launchBtn:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* ---- 启航动画层（纸船驶向星海 + 水波） ---- */
+.launchFx {
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  overflow: hidden;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(5, 12, 30, .86), rgba(5, 12, 30, .55));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+}
+.fxBoat {
+  width: 64px;
+  height: 64px;
+  color: var(--pink-bright);
+  animation: var(--kf-bottleSail) 1.4s cubic-bezier(.22, .61, .36, 1) forwards;
+  filter: drop-shadow(0 8px 18px rgba(251, 114, 153, .6));
+}
+.fxWave {
+  position: absolute;
+  left: 50%;
+  bottom: 18%;
+  width: 180px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid rgba(123, 177, 255, .7);
+  transform: translateX(-50%);
+  animation: var(--kf-bottleWave) 1.4s ease-out forwards;
+}
+
+/* ---- 拾瓶池 ---- */
+.dock {
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 18px 0 6px;
+}
+.dockSlot {
+  width: 92px;
+  height: 92px;
+  border-radius: 18px;
+  border: 1.5px dashed rgba(0, 174, 236, .45);
+  background: rgba(0, 174, 236, .05);
+  color: var(--blue-deep);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform .2s ease, border-color .2s ease, background .2s ease;
+  animation: var(--kf-bottleFloat) 2.6s ease-in-out infinite;
+  animation-delay: var(--dly, 0s);
+}
+.dockSlot:hover:not(:disabled) {
+  transform: translateY(-4px);
+  border-color: var(--pink);
+  background: rgba(251, 114, 153, .08);
+  color: var(--pink-deep);
+}
+.dockSlot.wait { opacity: .5; cursor: wait; }
+.dockBoat {
+  width: 34px;
+  height: 34px;
+}
+.dockHint {
+  width: 100%;
+  text-align: center;
+  font-size: .74rem;
+  color: var(--ink-3);
+  letter-spacing: .1em;
+}
+
+/* ---- 卡牌翻转开箱 ---- */
+.flipBox {
+  perspective: 900px;
+  width: 100%;
+  max-width: 340px;
+}
+.flipCard {
+  position: relative;
+  width: 100%;
+  min-height: 230px;
+  transform-style: preserve-3d;
+  transition: transform .6s cubic-bezier(.22, .61, .36, 1);
+}
+.flipCard.opened { transform: rotateY(180deg); }
+.flipBack,
+.flipFront {
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  backface-visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 18px;
+}
+.flipBack {
+  background: linear-gradient(160deg, var(--space-2), var(--space));
+  color: var(--ice);
+  font-size: .8rem;
+  letter-spacing: .2em;
+}
+.flipBack .dockBoat {
+  width: 44px;
+  height: 44px;
+  animation: var(--kf-bottleFloat) 1.8s ease-in-out infinite;
+}
+.flipFront {
+  background: var(--panel-2);
+  transform: rotateY(180deg);
+  align-items: flex-start;
+  text-align: left;
+}
+.dockMark {
+  font-size: .74rem;
+  font-weight: 800;
+  color: var(--blue-deep);
+  letter-spacing: .08em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sysTag {
+  font-style: normal;
+  font-size: .6rem;
+  color: var(--gold);
+  border: 1px solid rgba(201, 160, 99, .5);
+  border-radius: 999px;
+  padding: 1px 8px;
+}
+.dockText {
+  font-size: .9rem;
+  color: var(--ink);
+  line-height: 1.8;
+  max-height: 120px;
+  overflow: auto;
+}
+.dockSong {
+  font-size: .74rem;
+  color: var(--ink-3);
+  letter-spacing: .04em;
+}
+.replyBox {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+.replyInput {
+  width: 100%;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  padding: 10px;
+  font-size: .82rem;
+  font-family: var(--sans);
+  color: var(--ink);
+  resize: vertical;
+  line-height: 1.6;
+}
+.replyInput:focus {
+  outline: none;
+  border-color: var(--blue);
+}
+.replyBtn {
+  align-self: flex-end;
+  border: none;
+  border-radius: 999px;
+  padding: 8px 22px;
+  font-size: .78rem;
+  font-weight: 800;
+  letter-spacing: .16em;
+  color: #fff;
+  background: linear-gradient(120deg, var(--pink), var(--pink-deep));
+  cursor: pointer;
+  transition: transform .2s ease, filter .2s ease, opacity .2s ease;
+}
+.replyBtn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(1.06);
+}
+.replyBtn:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+.emptyNote {
+  margin-top: 8px;
+  font-size: .8rem;
+  color: var(--ink-2);
+  text-align: center;
+  letter-spacing: .06em;
+}
+.notice {
+  margin-top: 12px;
+  font-size: .78rem;
+  color: var(--ink-2);
+  text-align: center;
+  letter-spacing: .04em;
+}
+
+/* 动效偏好：启航/开箱动画在 reduce 时直接呈现终态 */
+@media (prefers-reduced-motion: reduce) {
+  .dockSlot,
+  .successBoat,
+  .flipBack .dockBoat {
+    animation: none;
+  }
+  .fxBoat,
+  .fxWave {
+    animation-duration: .01ms !important;
+  }
+}

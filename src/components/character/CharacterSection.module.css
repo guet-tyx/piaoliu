@@ -122,6 +122,37 @@
   letter-spacing: .14em;
 }
 
+/* 汐的每日一句（深空卡，与角色卡区隔） */
+.greetCard {
+  margin-top: 18px;
+  padding: 18px 20px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--space-2), var(--space));
+  border: 1px solid rgba(123, 177, 255, .25);
+  position: relative;
+  overflow: hidden;
+}
+.greetKicker {
+  font-size: .64rem;
+  font-weight: 800;
+  letter-spacing: .22em;
+  color: var(--ice);
+}
+.greetText {
+  margin-top: 8px;
+  font-size: .94rem;
+  color: #fff;
+  line-height: 1.9;
+  letter-spacing: .04em;
+}
+.greetSign {
+  margin-top: 8px;
+  font-size: .72rem;
+  color: rgba(255, 255, 255, .5);
+  letter-spacing: .16em;
+  text-align: right;
+}
+
 /* 滚动揭示：进入视口淡入上浮（view() 时间线，不支持时静态可见）
  * 注：section-head 的 revealUp 已在共享组件 SectionHead.module.css 中 */
 .charCard {

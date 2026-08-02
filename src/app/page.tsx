@@ -4,6 +4,7 @@ import { MarqueeSection } from "@/components/marquee/MarqueeSection";
 import { CharacterSection } from "@/components/character/CharacterSection";
 import { PlaylistSection } from "@/components/playlist/PlaylistSection";
 import { PlayerSection } from "@/components/player/PlayerSection";
+import { BottleSection } from "@/components/bottle/BottleSection";
 import { DownloadSection } from "@/components/download/DownloadSection";
 import { Footer } from "@/components/layout/Footer";
 
@@ -17,6 +18,7 @@ export default function Home() {
         <CharacterSection />
         <PlaylistSection />
         <PlayerSection />
+        <BottleSection />
         <DownloadSection />
       </main>
       <Footer />

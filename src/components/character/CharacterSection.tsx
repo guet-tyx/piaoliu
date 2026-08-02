@@ -1,16 +1,36 @@
 "use client";
 
+import { useEffect } from "react";
 import Image from "next/image";
 import { CHARACTER } from "@/data/character";
 import { SectionHead } from "@/components/shared/SectionHead";
 import { CountUp } from "@/components/shared/CountUp";
+import { useShioStore } from "@/stores/shio";
+import type { ShioSlot } from "@/data/shio-lines";
 import styles from "./CharacterSection.module.css";
+
+/** 每日一句时段的展示语汇（PRD §3） */
+const SLOT_LABEL: Record<ShioSlot, string> = {
+  night: "深夜电台 · 治愈系",
+  morning: "清晨航线 · 元气系",
+  day: "日常星海",
+};
 
 /**
  * 角色登场（B站式角色卡）：双列 Grid，数据来自 src/data/character.ts
  * 统计数据用 CountUp 滚动增长（进入视口触发）
+ * 每日一句（FR-8 最小版）：汐按时段问候，白名单文案库（NFR-2）
  */
 export function CharacterSection() {
+  const greeting = useShioStore((s) => s.greeting);
+  const slot = useShioStore((s) => s.slot);
+  const ensureDailyGreeting = useShioStore((s) => s.ensureDailyGreeting);
+
+  // 每日首次挂载：按时段选句（客户端专属，effect 内读取 localStorage）
+  useEffect(() => {
+    ensureDailyGreeting();
+  }, [ensureDailyGreeting]);
+
   return (
     <section className="section" id="char">
       <SectionHead
@@ -68,6 +88,17 @@ export function CharacterSection() {
                 <small>{stat.label}</small>
               </div>
             ))}
+          </div>
+
+          {/* 汐的每日一句（FR-8 最小版：时段变化 + 白名单文案） */}
+          <div className={styles.greetCard}>
+            <p className={styles.greetKicker}>
+              汐的今日问候{slot ? ` · ${SLOT_LABEL[slot]}` : ""}
+            </p>
+            <p className={styles.greetText}>
+              {greeting ? `「${greeting.text}」` : "……"}
+            </p>
+            <p className={styles.greetSign}>—— 汐</p>
           </div>
         </div>
       </div>

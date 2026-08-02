@@ -1,0 +1,124 @@
+/* ============ 星海来讯（FR-7.5） ============ */
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 26px 0;
+}
+.title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: .14em;
+  background: linear-gradient(120deg, var(--pink), var(--blue));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.close {
+  border: none;
+  background: none;
+  color: var(--ink-3);
+  font-size: .95rem;
+  cursor: pointer;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  transition: background .2s ease, color .2s ease;
+}
+.close:hover {
+  background: var(--panel-2);
+  color: var(--ink);
+}
+
+/* 靠岸动画 + 汐旁白 */
+.landing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 18px 26px 14px;
+}
+.landBoat {
+  width: 46px;
+  height: 46px;
+  color: var(--pink-deep);
+  animation: var(--kf-bottleLand) .9s cubic-bezier(.22, .61, .36, 1);
+  filter: drop-shadow(0 6px 14px rgba(251, 114, 153, .45));
+}
+.narrate {
+  font-size: .8rem;
+  color: var(--ink-2);
+  letter-spacing: .08em;
+}
+.empty {
+  padding: 18px 26px 28px;
+  font-size: .86rem;
+  color: var(--ink-3);
+  text-align: center;
+  line-height: 1.9;
+}
+
+.list {
+  list-style: none;
+  padding: 0 26px 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.item {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 16px;
+  background: var(--panel);
+}
+.orig {
+  background: var(--panel-2);
+  border-radius: 12px;
+  padding: 13px 15px;
+}
+.origMark {
+  font-size: .7rem;
+  font-weight: 800;
+  color: var(--blue-deep);
+  letter-spacing: .1em;
+}
+.origMark em {
+  font-style: normal;
+  color: var(--ink-3);
+  font-weight: 600;
+  margin-left: 6px;
+}
+.origText {
+  font-size: .88rem;
+  color: var(--ink);
+  line-height: 1.8;
+  margin-top: 7px;
+}
+.origSong {
+  margin-top: 8px;
+  font-size: .72rem;
+  color: var(--ink-3);
+  letter-spacing: .04em;
+}
+.replies {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+}
+.reply {
+  border-left: 3px solid rgba(251, 114, 153, .55);
+  padding: 4px 0 4px 12px;
+}
+.replyMark {
+  font-size: .68rem;
+  font-weight: 800;
+  color: var(--pink-deep);
+  letter-spacing: .08em;
+}
+.replyText {
+  margin-top: 3px;
+  font-size: .84rem;
+  color: var(--ink-2);
+  line-height: 1.8;
+}

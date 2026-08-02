@@ -43,6 +43,10 @@
   --kf-revealUp: revealUp;
   --kf-heroFade: heroFade;
   --kf-heroScrub: heroScrub;
+  --kf-bottleFloat: bottleFloat;
+  --kf-bottleSail: bottleSail;
+  --kf-bottleWave: bottleWave;
+  --kf-bottleLand: bottleLand;
 }
 
 /* ============ 基础 ============ */
@@ -131,6 +135,27 @@ section[id] { scroll-margin-top: 76px; }
 @keyframes heroScrub {
   from { transform: scale(1) translateY(0); opacity: 1; }
   to { transform: scale(1.06) translateY(40px); opacity: .25; }
+}
+/* 纸船浮动（拾瓶池船位/成功旁白，轻微呼吸） */
+@keyframes bottleFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+/* 启航：纸船驶向星海深处（渐隐上漂） */
+@keyframes bottleSail {
+  0% { transform: translate(-30px, 70px) scale(.7); opacity: 0; }
+  35% { opacity: 1; }
+  100% { transform: translate(80px, -110px) scale(1); opacity: 0; }
+}
+/* 启航/靠岸水波扩散 */
+@keyframes bottleWave {
+  0% { transform: translateX(-50%) scale(.4); opacity: .9; }
+  100% { transform: translateX(-50%) scale(1.7); opacity: 0; }
+}
+/* 靠岸：纸船驶入（星海来讯） */
+@keyframes bottleLand {
+  from { transform: translateX(140%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
 }
 
 /* ============ 动效偏好 ============
