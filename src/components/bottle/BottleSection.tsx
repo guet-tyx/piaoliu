@@ -88,10 +88,11 @@ export function BottleSection() {
   }, [unreadCount]);
 
   return (
-    <section className="section" id="bottle">
+    <section className={`section ${styles.bottleSection}`} id="bottle">
       <SectionHead
         tag="PAPER BOAT"
         title="纸船漂流"
+        className={styles.bottleHead}
         subtitle="匿名投出一艘纸船，装着心情和正在听的歌，漂向星海的陌生人。"
       />
 
