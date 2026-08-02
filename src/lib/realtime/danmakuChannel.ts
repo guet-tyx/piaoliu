@@ -12,8 +12,12 @@ import type { DanmakuMessage } from "./types";
 
 type DanmakuListener = (msg: DanmakuMessage) => void;
 
+type SbChannel = ReturnType<NonNullable<ReturnType<typeof getSupabase>>["channel"]>;
+
 /** 本标签页订阅者（按曲目频道分组，隔离不同曲目的弹幕） */
 const localListeners = new Map<string, Set<DanmakuListener>>();
+/** 真实模式发布频道缓存（channel 需 subscribe 加入 Realtime socket 后才可 send） */
+const sbChannels = new Map<string, SbChannel>();
 
 function genId(): string {
   return `dm-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -44,8 +48,7 @@ export function subscribeDanmaku(trackId: string, cb: DanmakuListener): () => vo
   set.add(cb);
 
   let bc: BroadcastChannel | null = null;
-  let sbChannel: ReturnType<NonNullable<ReturnType<typeof getSupabase>>["channel"]> | null =
-    null;
+  let sbChannel: SbChannel | null = null;
 
   if (isSupabaseReady()) {
     const sb = getSupabase();
@@ -53,7 +56,10 @@ export function subscribeDanmaku(trackId: string, cb: DanmakuListener): () => vo
       sbChannel = sb
         .channel(`danmaku:${trackId}`)
         .on("broadcast", { event: "danmaku" }, (payload) => {
-          cb(payload.payload as DanmakuMessage);
+          const msg = payload.payload as DanmakuMessage;
+          // 忽略 Realtime 回显的自己消息（本地已通过 notifyLocal 显示，避免同页重复）
+          if (msg.peerId === getPeerId()) return;
+          cb(msg);
         })
         .subscribe();
     }
@@ -94,9 +100,16 @@ export function publishDanmaku(trackId: string, text: string): boolean {
 
   // 广播给其他标签页 / 真实模式 Realtime
   if (isSupabaseReady()) {
-    getSupabase()
-      ?.channel(`danmaku:${trackId}`)
-      .send({ type: "broadcast", event: "danmaku", payload: msg });
+    const sb = getSupabase();
+    if (sb) {
+      let ch = sbChannels.get(trackId);
+      if (!ch) {
+        ch = sb.channel(`danmaku:${trackId}`);
+        ch.subscribe();
+        sbChannels.set(trackId, ch);
+      }
+      ch.send({ type: "broadcast", event: "danmaku", payload: msg });
+    }
   } else if (typeof BroadcastChannel !== "undefined") {
     const bc = new BroadcastChannel(`drift-dm:${trackId}`);
     bc.postMessage(msg);

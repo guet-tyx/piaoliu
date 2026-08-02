@@ -150,9 +150,18 @@ function readReplies(): Reply[] {
 /** 本地拾瓶上限（投 1 / 拾 3） */
 const PICK_LIMIT = 3;
 
-/** 今日限额快照（UI 提示「今日可投 1 / 可拾 3」；真实模式由服务端 RPC 权威执行） */
-export function getDailyLimits(): DailyLimits {
-  return isSupabaseReady() ? { date: localDate(), launched: 0, picked: 0 } : readLimits();
+/** 今日限额快照（UI 提示「今日可投 1 / 可拾 3」；真实模式由服务端 RPC 权威统计） */
+export async function getDailyLimits(): Promise<DailyLimits> {
+  if (!isSupabaseReady()) return readLimits();
+  const sb = getSupabase();
+  if (!sb) return { date: localDate(), launched: 0, picked: 0 };
+  const { data } = await sb.rpc("get_daily_limits");
+  const r = (data ?? {}) as Record<string, unknown>;
+  return {
+    date: localDate(),
+    launched: typeof r.launched === "number" ? r.launched : 0,
+    picked: typeof r.picked === "number" ? r.picked : 0,
+  };
 }
 
 /* ---------- 公开接口 ---------- */
@@ -199,7 +208,9 @@ export async function launchBottle(
     p_track: track,
     p_style: style ?? "paper",
   });
-  if (error || !data) return { ok: false, reason: "offline" };
+  if (error || !data) {
+    return { ok: false, reason: reasonOf(error, "offline") } as LaunchResult;
+  }
   return { ok: true, bottle: mapBottleRow(data) };
 }
 
@@ -224,7 +235,7 @@ export async function pickBottle(): Promise<PickResult> {
   const sb = getSupabase();
   if (!sb) return { ok: false, reason: "offline" };
   const { data, error } = await sb.rpc("pick_bottle");
-  if (error) return { ok: false, reason: "offline" };
+  if (error) return { ok: false, reason: reasonOf(error, "offline") } as PickResult;
   if (!data) return { ok: false, reason: "empty" };
   return { ok: true, bottle: mapBottleRow(data) };
 }
@@ -260,8 +271,8 @@ export async function replyBottle(bottleId: string, text: string): Promise<Reply
   const sb = getSupabase();
   if (!sb) return { ok: false, reason: "offline" };
   const { data, error } = await sb.rpc("reply_bottle", { p_bottle_id: bottleId, p_text: trimmed });
-  if (error) return { ok: false, reason: "offline" };
-  return { ok: true, reply: data as Reply };
+  if (error) return { ok: false, reason: reasonOf(error, "offline") } as ReplyResult;
+  return { ok: true, reply: mapReplyRow(data) };
 }
 
 /** 收件箱（星海来讯）：本人发起且已有回信的瓶子 + 回信列表 */
@@ -283,7 +294,7 @@ export async function fetchInbox(): Promise<{ bottle: Bottle; replies: Reply[] }
   if (error || !data) return [];
   return (data as { bottle: unknown; replies: unknown[] }[]).map((row) => ({
     bottle: mapBottleRow(row.bottle),
-    replies: (row.replies as unknown[]).map((r) => r as Reply),
+    replies: (row.replies as unknown[]).map(mapReplyRow),
   }));
 }
 
@@ -325,6 +336,40 @@ export async function reportBottle(
     p_reason: reason,
   });
   return !error;
+}
+
+/** RPC 抛出的错误 message → 业务 reason（服务端 raise 文案见 001/002 迁移；恢复本地路径已有的区分能力） */
+type FailReason =
+  | "limit"
+  | "bad-word"
+  | "too-short"
+  | "too-long"
+  | "forbidden"
+  | "empty"
+  | "offline";
+
+function reasonOf(error: { message?: string } | null, fallback: FailReason): FailReason {
+  const m = error?.message ?? "";
+  if (m.includes("limit reached")) return "limit";
+  if (m.includes("bad word")) return "bad-word";
+  if (m.includes("forbidden")) return "forbidden";
+  if (m.includes("already replied")) return "limit";
+  if (m.includes("text length")) return "too-short";
+  return fallback;
+}
+
+/** Supabase 回信行（snake_case）→ 本地模型（camelCase） */
+function mapReplyRow(row: unknown): Reply {
+  const r = (row ?? {}) as Record<string, unknown>;
+  const parseTs = (v: unknown): number | null =>
+    typeof v === "string" ? Date.parse(v) : null;
+  return {
+    id: typeof r.id === "string" ? r.id : "",
+    bottleId: typeof r.bottle_id === "string" ? r.bottle_id : "",
+    anonMark: typeof r.anon_mark === "string" ? r.anon_mark : "匿名船客",
+    text: typeof r.text === "string" ? r.text : "",
+    createdAt: parseTs(r.created_at) ?? Date.now(),
+  };
 }
 
 /** Supabase 行（snake_case）→ 本地模型（camelCase）；RPC 返回类型宽，逐字段安全转换 */

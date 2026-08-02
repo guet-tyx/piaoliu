@@ -271,7 +271,11 @@ export async function earnBond(kind: BondKind, oncePerDay = false): Promise<Sail
 
   const sb = getSupabase();
   if (!sb) return null;
-  const { data: row, error } = await sb.rpc("earn_bond", { p_kind: kind });
+  // 真实模式：p_once_per_day 由服务端按 action_logs 去重（每日每种限一次）
+  const { data: row, error } = await sb.rpc("earn_bond", {
+    p_kind: kind,
+    p_once_per_day: oncePerDay,
+  });
   if (error || !row) return null;
   const sailor = readLocal();
   if (sailor) {

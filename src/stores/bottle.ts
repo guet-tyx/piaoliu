@@ -59,7 +59,7 @@ export const useBottleStore = create<BottleState>()((set, get) => ({
     set({ busy: true });
     try {
       const result = await launchBottle(text, track, style);
-      set({ limits: getDailyLimits() });
+      set({ limits: await getDailyLimits() });
       return result;
     } finally {
       // 无论成败都释放 busy，防止异常导致按钮永久禁用
@@ -72,7 +72,7 @@ export const useBottleStore = create<BottleState>()((set, get) => ({
     set({ busy: true });
     try {
       const result = await pickBottle();
-      set({ limits: getDailyLimits() });
+      set({ limits: await getDailyLimits() });
       return result;
     } finally {
       set({ busy: false });

@@ -117,18 +117,31 @@ export const useIdentityStore = create<IdentityState>()((set, get) => ({
     const local = getLocalSailorSync();
     if (local) set({ sailor: local, status: "ready", title: titleOf(local.level) });
 
-    // 匿名身份引导（真实模式）；cleanup 释放 onAuthStateChange 订阅
-    const cleanup = ensureAnonSession();
+    // 匿名身份引导（真实模式）就绪后再取船员证——消除「signInAnonymously 未完成
+    // 就调 RPC 被拒 → 首屏误报 offline」的竞态；cancel 防 unmount 后 setState
+    let cancel = false;
+    let authCleanup: (() => void) | null = null;
 
-    getOrCreateSailor()
+    ensureAnonSession()
+      .then((cleanup) => {
+        authCleanup = cleanup;
+        if (cancel) return;
+        return getOrCreateSailor();
+      })
       .then((s) => {
+        if (cancel) return;
         set(s ? { sailor: s, status: "ready", title: titleOf(s.level) } : { status: "offline" });
         // 航行 1 天 +1 羁绊（每日一次）
         if (s) get().bond("daily", true);
       })
-      .catch(() => set({ status: "offline" }));
+      .catch(() => {
+        if (!cancel) set({ status: "offline" });
+      });
 
-    return cleanup;
+    return () => {
+      cancel = true;
+      authCleanup?.();
+    };
   },
 
   rename: async (nickname) => {
