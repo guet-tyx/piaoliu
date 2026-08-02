@@ -107,6 +107,16 @@
   animation-range: entry 8% cover 26%;
 }
 
+/* 米哈游风格：卡片逐个错落浮现（各自 view() 时间线 + 负延迟错开） */
+.pCard {
+  animation: var(--kf-revealUp) .8s cubic-bezier(.22, .61, .36, 1) both;
+  animation-timeline: view();
+  animation-range: entry 8% cover 26%;
+}
+.pCard:nth-child(2) { animation-delay: -.12s; }
+.pCard:nth-child(3) { animation-delay: -.24s; }
+.pCard:nth-child(4) { animation-delay: -.36s; }
+
 @media (max-width: 960px) {
   .pGrid { grid-template-columns: repeat(2, 1fr); }
 }

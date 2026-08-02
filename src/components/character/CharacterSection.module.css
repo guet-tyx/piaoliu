@@ -18,6 +18,14 @@
   position: relative;
   min-height: 320px;
 }
+/* 米哈游风格视差：图片随滚动轻微上移（scroll() 时间线，仅 transform；卡片 overflow hidden 裁剪） */
+@supports (animation-timeline: scroll()) {
+  .charPic {
+    animation: var(--kf-parallax) linear both;
+    animation-timeline: scroll(root);
+    animation-range: entry 0% exit 45%;
+  }
+}
 .charPic::after {
   content: "";
   position: absolute;

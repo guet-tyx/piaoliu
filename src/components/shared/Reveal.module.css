@@ -1,0 +1,36 @@
+/* ============ 滚动揭示（米哈游风格）：scroll-driven 优先 + IO 降级 ============ */
+.rv {
+  /* scroll-driven：元素进入视口时 revealUp 浮现（view() 时间线，entry range）
+     delay 负值（stagger）：进入时进度已在中途，形成错落 */
+  animation: var(--kf-revealUp) .8s cubic-bezier(.22, .61, .36, 1) both;
+  animation-timeline: view();
+  animation-range: entry 8% cover 26%;
+  animation-delay: var(--rvDelay, 0s);
+}
+
+/* JS 降级：不支持 scroll-driven 时，初始隐藏 + IO 触发后过渡浮现 */
+@supports not (animation-timeline: view()) {
+  .rv {
+    animation: none;
+    opacity: 0;
+    transform: translateY(30px);
+    transition:
+      opacity .7s cubic-bezier(.22, .61, .36, 1),
+      transform .7s cubic-bezier(.22, .61, .36, 1);
+    transition-delay: var(--rvDelay, 0s);
+  }
+  .rv.in {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* 动效偏好：直接可见（无动画） */
+@media (prefers-reduced-motion: reduce) {
+  .rv {
+    animation: none;
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

@@ -47,6 +47,7 @@
   --kf-bottleSail: bottleSail;
   --kf-bottleWave: bottleWave;
   --kf-bottleLand: bottleLand;
+  --kf-parallax: parallax;
 }
 
 /* ============ 基础 ============ */
@@ -156,6 +157,11 @@ section[id] { scroll-margin-top: 76px; }
 @keyframes bottleLand {
   from { transform: translateX(140%); opacity: 0; }
   to { transform: translateX(0); opacity: 1; }
+}
+/* 视差：内容随滚动缓慢上移（米哈游观感；配合 scroll(root) 时间线，仅 transform） */
+@keyframes parallax {
+  from { transform: translateY(0); }
+  to { transform: translateY(-36px); }
 }
 
 /* ============ 动效偏好 ============

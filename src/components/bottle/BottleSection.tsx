@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import Image from "next/image";
 import { SectionHead } from "@/components/shared/SectionHead";
+import { Reveal } from "@/components/shared/Reveal";
 import { SkinBoat, type SkinVariant } from "@/components/shared/SkinBoat";
 import { InboxModal } from "@/components/bottle/InboxModal";
 import { useIdentityStore } from "@/stores/identity";
@@ -59,8 +60,8 @@ export function BottleSection() {
         subtitle="匿名投出一艘纸船，装着心情和正在听的歌，漂向星海的陌生人。"
       />
 
-      {/* 区块工具条：船员证 + 星海来讯 */}
-      <div className={styles.toolbar}>
+      {/* 区块工具条：船员证 + 星海来讯（米哈游风格：进入视口浮现） */}
+      <Reveal className={styles.toolbar}>
         <p className={styles.sailorLine}>
           <SkinBoat className={styles.sailorBoat} />
           <span>
@@ -78,12 +79,13 @@ export function BottleSection() {
           星海来讯
           {unreadCount > 0 && <i className={styles.inboxBadge}>{unreadCount}</i>}
         </button>
-      </div>
+      </Reveal>
 
-      <div className={styles.bottleGrid}>
+      {/* 投/拾双卡（米哈游风格：进入视口浮现） */}
+      <Reveal className={styles.bottleGrid}>
         <LaunchCard />
         <DockCard />
-      </div>
+      </Reveal>
 
       {/* 星海漂流三幕场景条 */}
       <div className={styles.sceneStrip}>

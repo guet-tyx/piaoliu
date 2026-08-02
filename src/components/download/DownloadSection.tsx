@@ -1,4 +1,5 @@
 import { SectionHead } from "@/components/shared/SectionHead";
+import { Reveal } from "@/components/shared/Reveal";
 import styles from "./DownloadSection.module.css";
 
 /** 下载 CTA（静态）：双应用商店按钮，SVG 与原型一致 */
@@ -18,7 +19,8 @@ export function DownloadSection() {
         }
       />
 
-      <div className={styles.storeRow}>
+      {/* 米哈游风格：下载按钮区进入视口浮现 */}
+      <Reveal className={styles.storeRow}>
         {/* FR-6：暂无真实应用商店落地页，明确标注「敬请期待」，不再指向 # */}
         <span className={`${styles.storeBtn} ${styles.soon}`} aria-label="App Store 免费下载，敬请期待">
           <svg viewBox="0 0 384 512" fill="currentColor" aria-hidden="true">
@@ -40,11 +42,11 @@ export function DownloadSection() {
           </span>
           <b className={styles.soonTag}>敬请期待</b>
         </span>
-      </div>
+      </Reveal>
 
-      <p className={styles.dlNote}>
+      <Reveal as="p" className={styles.dlNote}>
         第一次打开，就有一条漂流线在等你。<b>✦</b>
-      </p>
+      </Reveal>
     </section>
   );
 }

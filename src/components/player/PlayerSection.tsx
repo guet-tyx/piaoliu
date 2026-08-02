@@ -12,6 +12,7 @@ import { publishDanmaku } from "@/lib/realtime/danmakuChannel";
 import { avatarColor } from "@/lib/realtime/types";
 import { isSafeText } from "@/lib/api/moderation";
 import { SectionHead } from "@/components/shared/SectionHead";
+import { Reveal } from "@/components/shared/Reveal";
 import styles from "./PlayerSection.module.css";
 
 /** 播放模式展示元数据（FR-3） */
@@ -121,7 +122,8 @@ export function PlayerSection() {
         subtitle="点击播放，弹幕会跟着歌一起漂过来。"
       />
 
-      <div className={styles.playerWrap}>
+      {/* 米哈游风格：播放器卡进入视口浮现 */}
+      <Reveal className={styles.playerWrap}>
         <div className={styles.player}>
           {/* 唱片 + 同船弹幕层（V1.3 实时弹幕，假数据已移除） */}
           <div className={`${styles.recordBox}${isPlaying ? ` ${styles.live}` : ""}`}>
@@ -293,7 +295,7 @@ export function PlayerSection() {
             {dmErr && <p className={styles.dmErr}>{dmErr}</p>}
           </div>
         </div>
-      </div>
+      </Reveal>
     </section>
   );
 }
