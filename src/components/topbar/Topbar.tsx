@@ -5,6 +5,7 @@ import styles from "./Topbar.module.css";
 
 /** 首页锚点导航（V1.2 多页：非首页时自动加 / 前缀，保证跨页跳转正确） */
 const ANCHORS = [
+  { href: "#top", label: "首页" },
   { href: "#char", label: "角色" },
   { href: "#playlist", label: "歌单" },
   { href: "#player", label: "电台" },
