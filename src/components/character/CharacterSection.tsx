@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { CHARACTERS } from "@/data/character";
 import { SectionHead } from "@/components/shared/SectionHead";
@@ -30,11 +30,13 @@ export function CharacterSection() {
   const active = CHARACTERS.find((c) => c.id === activeId) ?? CHARACTERS[0];
   const isSio = activeId === "sio";
 
-  // 表情切换浮现（WAAPI：主图先起，说明文字 .08s 后浮现；切角色时一并重播）
+  // 表情切换浮现（rAF 驱动：主图先起，说明文字 .08s 后浮现；切角色时一并重播）
+  // 注意：deps 必须 useMemo 缓存稳定引用（React Compiler 按引用比较依赖，字面量数组会导致 effect 反复重跑）
+  const exprDeps = useMemo(() => [active.id, exprIndex], [active.id, exprIndex]);
   const exprImgRef = useRef<HTMLImageElement | null>(null);
   const exprCapRef = useRef<HTMLElement | null>(null);
-  useFadeIn(exprImgRef, [active.id, exprIndex]);
-  useFadeIn(exprCapRef, [active.id, exprIndex], 80);
+  useFadeIn(exprImgRef, exprDeps);
+  useFadeIn(exprCapRef, exprDeps, 80);
 
   const greeting = useShioStore((s) => s.greeting);
   const slot = useShioStore((s) => s.slot);

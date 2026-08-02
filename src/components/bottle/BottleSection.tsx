@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import Image from "next/image";
 import { SectionHead } from "@/components/shared/SectionHead";
@@ -62,13 +62,15 @@ export function BottleSection() {
   const [sceneIndex, setSceneIndex] = useState(0);
   const autoOpenedRef = useRef(false);
 
-  // 切换场景浮现（WAAPI：主图先起，标题 .08s、描述 .16s 依次浮现）
+  // 切换场景浮现（WAAPI/rAF 由 useFadeIn 驱动：主图先起，标题 .08s、描述 .16s 依次浮现）
+  // 注意：deps 必须 useMemo 缓存稳定引用（React Compiler 按引用比较依赖，字面量数组会导致 effect 反复重跑）
+  const sceneDeps = useMemo(() => [sceneIndex], [sceneIndex]);
   const sceneImgRef = useRef<HTMLImageElement | null>(null);
   const sceneTitleRef = useRef<HTMLSpanElement | null>(null);
   const sceneDescRef = useRef<HTMLSpanElement | null>(null);
-  useFadeIn(sceneImgRef, [sceneIndex]);
-  useFadeIn(sceneTitleRef, [sceneIndex], 80);
-  useFadeIn(sceneDescRef, [sceneIndex], 160);
+  useFadeIn(sceneImgRef, sceneDeps);
+  useFadeIn(sceneTitleRef, sceneDeps, 80);
+  useFadeIn(sceneDescRef, sceneDeps, 160);
 
   // 身份引导 + 收件箱拉取（星海来讯）
   useEffect(() => {
