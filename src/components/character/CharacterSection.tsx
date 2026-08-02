@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { CHARACTERS } from "@/data/character";
 import { SectionHead } from "@/components/shared/SectionHead";
 import { CountUp } from "@/components/shared/CountUp";
 import { SwitchDots } from "@/components/shared/SwitchDots";
+import { useFadeIn } from "@/hooks/useFadeIn";
 import { useShioStore } from "@/stores/shio";
 import { useIdentityStore } from "@/stores/identity";
 import type { ShioSlot } from "@/data/shio-lines";
@@ -28,6 +29,12 @@ export function CharacterSection() {
   const [exprIndex, setExprIndex] = useState(0);
   const active = CHARACTERS.find((c) => c.id === activeId) ?? CHARACTERS[0];
   const isSio = activeId === "sio";
+
+  // 表情切换浮现（WAAPI：主图先起，说明文字 .08s 后浮现；切角色时一并重播）
+  const exprImgRef = useRef<HTMLImageElement | null>(null);
+  const exprCapRef = useRef<HTMLElement | null>(null);
+  useFadeIn(exprImgRef, [active.id, exprIndex]);
+  useFadeIn(exprCapRef, [active.id, exprIndex], 80);
 
   const greeting = useShioStore((s) => s.greeting);
   const slot = useShioStore((s) => s.slot);
@@ -127,20 +134,20 @@ export function CharacterSection() {
             ))}
           </div>
 
-          {/* 角色情绪表情变体（崩坏3式：单主图 + 底部切换条；key 重挂载重置并浮现） */}
-          <div className={styles.exprRow} key={active.id}>
+          {/* 角色情绪表情变体（崩坏3式：单主图 + 底部切换条；切换 WAAPI 浮现） */}
+          <div className={styles.exprRow}>
             <p className={styles.exprLabel}>{active.name}的三种瞬间</p>
             <figure className={styles.exprMain}>
               {active.expressions && active.expressions[exprIndex] && (
                 <>
                   <Image
-                    key={exprIndex}
+                    ref={exprImgRef}
                     src={active.expressions[exprIndex].image}
                     alt={`${active.name} · ${active.expressions[exprIndex].label}`}
                     fill
                     style={{ objectFit: "cover" }}
                   />
-                  <figcaption className={styles.exprCap} key={`cap-${exprIndex}`}>
+                  <figcaption ref={exprCapRef} className={styles.exprCap}>
                     {active.expressions[exprIndex].label}
                   </figcaption>
                 </>

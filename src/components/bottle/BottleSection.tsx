@@ -7,6 +7,7 @@ import { SectionHead } from "@/components/shared/SectionHead";
 import { Reveal } from "@/components/shared/Reveal";
 import { SwitchDots } from "@/components/shared/SwitchDots";
 import { SkinBoat, type SkinVariant } from "@/components/shared/SkinBoat";
+import { useFadeIn } from "@/hooks/useFadeIn";
 import { InboxModal } from "@/components/bottle/InboxModal";
 import { useIdentityStore } from "@/stores/identity";
 import { useBottleStore } from "@/stores/bottle";
@@ -61,6 +62,14 @@ export function BottleSection() {
   const [sceneIndex, setSceneIndex] = useState(0);
   const autoOpenedRef = useRef(false);
 
+  // 切换场景浮现（WAAPI：主图先起，标题 .08s、描述 .16s 依次浮现）
+  const sceneImgRef = useRef<HTMLImageElement | null>(null);
+  const sceneTitleRef = useRef<HTMLSpanElement | null>(null);
+  const sceneDescRef = useRef<HTMLSpanElement | null>(null);
+  useFadeIn(sceneImgRef, [sceneIndex]);
+  useFadeIn(sceneTitleRef, [sceneIndex], 80);
+  useFadeIn(sceneDescRef, [sceneIndex], 160);
+
   // 身份引导 + 收件箱拉取（星海来讯）
   useEffect(() => {
     const cleanup = bootstrap();
@@ -111,21 +120,21 @@ export function BottleSection() {
         <DockCard />
       </Reveal>
 
-      {/* 星海漂流三幕（崩坏3式：单主图 + 底部切换条，切换时图/文慢慢浮现） */}
+      {/* 星海漂流三幕（崩坏3式：单主图 + 底部切换条，切换时图/文 WAAPI 浮现） */}
       <div className={styles.sceneStrip}>
         <figure className={styles.sceneItem}>
           <Image
-            key={sceneIndex}
+            ref={sceneImgRef}
             src={SCENES[sceneIndex].image}
             alt={SCENES[sceneIndex].alt}
             fill
             style={{ objectFit: "cover" }}
           />
           <figcaption className={styles.sceneCap}>
-            <span className={styles.sceneTitle} key={`t-${sceneIndex}`}>
+            <span ref={sceneTitleRef} className={styles.sceneTitle}>
               {SCENES[sceneIndex].title}
             </span>
-            <span className={styles.sceneDesc} key={`d-${sceneIndex}`}>
+            <span ref={sceneDescRef} className={styles.sceneDesc}>
               {SCENES[sceneIndex].desc}
             </span>
           </figcaption>

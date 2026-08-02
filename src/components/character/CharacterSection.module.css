@@ -202,10 +202,7 @@
   background: linear-gradient(160deg, var(--space-2), var(--space));
   box-shadow: 0 14px 28px -16px rgba(251, 114, 153, .35);
 }
-/* 切换浮现：主图先起（.5s），说明文字延迟 .08s（图先字后，慢慢浮现） */
-.exprMain img {
-  animation: var(--kf-rise) .5s cubic-bezier(.22, .61, .36, 1) both;
-}
+/* 切换浮现由 useFadeIn（WAAPI）驱动：主图先起，说明文字 .08s 后浮现 */
 .exprCap {
   position: absolute;
   left: 0;
@@ -219,8 +216,6 @@
   color: #fff;
   text-align: center;
   background: linear-gradient(0deg, rgba(5, 12, 30, .82) 30%, transparent 100%);
-  animation: var(--kf-rise) .5s cubic-bezier(.22, .61, .36, 1) both;
-  animation-delay: .08s;
 }
 
 /* 汐的每日一句（深空卡，与角色卡区隔） */

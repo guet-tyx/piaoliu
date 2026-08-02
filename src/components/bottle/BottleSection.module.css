@@ -526,10 +526,7 @@
   background: linear-gradient(160deg, var(--space-2), var(--space));
   box-shadow: 0 14px 32px -24px rgba(5, 12, 30, .4);
 }
-/* 切换浮现：主图先起（.5s），标题 .08s、描述 .16s 依次浮现 */
-.sceneItem img {
-  animation: var(--kf-rise) .5s cubic-bezier(.22, .61, .36, 1) both;
-}
+/* 切换浮现由 useFadeIn（WAAPI）驱动：主图先起，标题 .08s、描述 .16s 依次浮现 */
 .sceneCap {
   position: absolute;
   left: 0;
@@ -551,15 +548,11 @@
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  animation: var(--kf-rise) .5s cubic-bezier(.22, .61, .36, 1) both;
-  animation-delay: .08s;
 }
 .sceneDesc {
   font-size: .64rem;
   color: rgba(255, 255, 255, .7);
   letter-spacing: .1em;
-  animation: var(--kf-rise) .5s cubic-bezier(.22, .61, .36, 1) both;
-  animation-delay: .16s;
 }
 
 @media (max-width: 960px) {
