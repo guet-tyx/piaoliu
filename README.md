@@ -69,6 +69,7 @@ archive/                   # 旧版单文件原型（引用根目录 images/ aud
 - **配色**：全部 CSS 变量在 `src/app/globals.css` 的 `:root`，沿用原版（`--space` / `--pink` / `--blue` / `--gold` / `--ice` 等），组件内一律 `var(--*)` 引用，不写死色值
 - **字体**：系统字体栈 `--sans`，不引入 Web Font
 - **动效**：米哈游/崩坏3 官网风格滚动动画——全区块内容错落浮现（scroll-driven `view()` 优先 + IntersectionObserver 降级，共享 `Reveal` 组件）+ 轻微视差（标题区/角色图，`scroll(root)` 时间线）；Hero 首屏 exit-scrub 滚动叙事；`prefers-reduced-motion` 全局压制；只动 transform/opacity
+  - **文字扫金 hover**：米哈游官网招牌动效（调研自 `bh3.mihoyo.com` 的 `.lf-to-rt`）——全局工具类 `.sweepGold`，元素加 `data-text="可见文字"` 后金色文字从左到右扫过（`attr(data-text)` 双层文本 + `width 0→100%`，0.3s）；`.sweepGold--left` 变体用于左对齐导航链接；已接入顶栏导航/免费下载胶囊、Hero 双按钮、启航按钮；`:focus-visible` 同样触发（无障碍）
   - **keyframes 约定**：10 个 keyframes 定义在 `globals.css`，同时 `:root` 提供 `--kf-xxx` 别名变量；CSS Module 内统一写 `animation: var(--kf-xxx) …`（Turbopack 会把模块内 animation 名局部化，直接写全局名会产生悬空引用）
 - **断点**：960px（导航隐藏/区块单列）、560px（悬浮组件）、420px（网格单列）
 

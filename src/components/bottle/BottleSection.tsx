@@ -264,10 +264,11 @@ function LaunchCard() {
         </p>
       ) : (
         <button
-          className={styles.launchBtn}
+          className={`${styles.launchBtn} sweepGold`}
           type="button"
           disabled={!canLaunch}
           onClick={onLaunch}
+          data-text={phase === "launching" ? "启航中…" : "启航"}
         >
           {phase === "launching" ? "启航中…" : "启航"}
         </button>

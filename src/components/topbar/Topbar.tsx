@@ -46,13 +46,26 @@ export function Topbar() {
         </a>
         <nav className={styles.navLinks} aria-label="主导航">
           {ANCHORS.map((a) => (
-            <a key={a.href} href={anchor(a.href)}>
+            <a
+              key={a.href}
+              href={anchor(a.href)}
+              className="sweepGold sweepGold--left"
+              data-text={a.label}
+            >
               {a.label}
             </a>
           ))}
-          <a href="/sailor">船员证</a>
-          <a href="/report">周报</a>
-          <a className={styles.navDl} href={anchor("#download")}>
+          <a href="/sailor" className="sweepGold sweepGold--left" data-text="船员证">
+            船员证
+          </a>
+          <a href="/report" className="sweepGold sweepGold--left" data-text="周报">
+            周报
+          </a>
+          <a
+            className={`${styles.navDl} sweepGold sweepGold--left`}
+            href={anchor("#download")}
+            data-text="免费下载"
+          >
             免费下载
           </a>
         </nav>

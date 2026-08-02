@@ -88,10 +88,18 @@ export function Hero() {
             漂向<b>星海深处没人听过的旋律</b>。耳机戴好，船要开了。
           </p>
           <div className={styles.cta}>
-            <a className={`${styles.btn} ${styles.btnPink}`} href="#download">
+            <a
+              className={`${styles.btn} ${styles.btnPink} sweepGold`}
+              href="#download"
+              data-text="免费下载 ↘"
+            >
               免费下载 <span style={{ opacity: 0.85 }}>↘</span>
             </a>
-            <a className={`${styles.btn} ${styles.btnBlue}`} href="#player">
+            <a
+              className={`${styles.btn} ${styles.btnBlue} sweepGold`}
+              href="#player"
+              data-text="听听星海电台"
+            >
               听听星海电台
             </a>
           </div>

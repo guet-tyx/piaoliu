@@ -164,6 +164,37 @@ section[id] { scroll-margin-top: 76px; }
   to { transform: translateY(-36px); }
 }
 
+/* ============ 文字扫金 hover ============
+ * 米哈游招牌动效（调研自 bh3.mihoyo.com 的 .lf-to-rt：双层文本 + attr(data-text)，
+ * 金色文字从左到右扫过原文）。使用方：元素加 data-text="可见文字" + 本类。
+ * 全局类（非 module）无 Turbopack 局部化问题；reduced-motion 由下方全局压制接管
+ */
+.sweepGold { position: relative; }
+.sweepGold::before {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: inherit;
+  color: var(--gold);
+  white-space: nowrap;
+  overflow: hidden;
+  width: 0;
+  pointer-events: none;
+  transition: width .3s cubic-bezier(.22, .61, .36, 1);
+}
+.sweepGold:hover::before,
+.sweepGold:focus-visible::before { width: 100%; }
+/* 禁用态不扫金（disabled 不可聚焦，防样式残留） */
+.sweepGold:disabled::before { display: none; }
+/* 变体：左对齐文字（导航链接等行内元素），padding 继承保证金色与原文同起点 */
+.sweepGold--left::before {
+  justify-content: flex-start;
+  padding: inherit;
+}
+
 /* ============ 动效偏好 ============
  * 全局压制；组件级的彻底禁用（.dm/.record/.eq i 等）放各组件 module
  */
