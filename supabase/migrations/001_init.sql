@@ -23,10 +23,10 @@ create table if not exists public.sailors (
 );
 
 alter table public.sailors enable row level security;
+-- 仅本人可读；写一律走 SECURITY DEFINER RPC（update_nickname / earn_bond），
+-- 不开放 PostgREST 直接 UPDATE（否则可绕过校验篡改 bond_value/level/nickname）
 create policy "sailors_select_own" on public.sailors
   for select using (id = auth.uid());
-create policy "sailors_update_own" on public.sailors
-  for update using (id = auth.uid());
 
 -- ---------- 漂流瓶 ----------
 create table if not exists public.bottles (
@@ -39,6 +39,7 @@ create table if not exists public.bottles (
   status        bottle_status not null default 'drifting',
   picked_by     uuid,                     -- 拾取人（原子 claim 写入，防重复拾取）
   is_system     boolean not null default false, -- 冷启动预热瓶
+  replied_at    timestamptz,              -- 回信时间（星海来讯判定/展示）
   read_at       timestamptz,              -- 星海来讯已读
   expires_at    timestamptz not null default now() + interval '72 hours', -- 沉没时间
   created_at    timestamptz not null default now()
@@ -141,7 +142,7 @@ volatile
 security definer
 set search_path = public
 as $$
-  select '星尘船客·' || upper(substr(md5(random()::text), 1, 4));
+  select '星尘船客·' || upper(substr(md5(random()::text), 1, 8));
 $$;
 
 -- ---------- 获取/创建船员证 ----------
@@ -211,10 +212,11 @@ security definer
 set search_path = public
 as $$
 declare
-  v_uid    uuid := auth.uid();
-  v_day    date := (now() at time zone 'Asia/Shanghai')::date;
-  v_count  int;
-  v_bottle public.bottles;
+  v_uid       uuid := auth.uid();
+  v_day       date := (now() at time zone 'Asia/Shanghai')::date;
+  v_count     int;
+  v_bottle_id uuid;
+  v_bottle    public.bottles;
 begin
   if v_uid is null then raise exception 'not authenticated'; end if;
 
@@ -223,25 +225,45 @@ begin
   where sailor_id = v_uid and action = 'pick' and day = v_day;
   if v_count >= 3 then raise exception 'daily pick limit reached'; end if;
 
-  update public.bottles b
-  set status = 'picked', picked_by = v_uid
-  where b.id = (
-    select id from public.bottles
-    where status = 'drifting' and author_id <> v_uid and expires_at > now()
-    order by random()
-    limit 1
-  )
-  returning * into v_bottle;
+  -- 原子 claim：先锁定一个随机候选行（FOR UPDATE SKIP LOCKED），
+  -- 并发拾瓶人跳过已锁行改选其他瓶，而非误报空池
+  select id into v_bottle_id
+  from public.bottles
+  where status = 'drifting' and author_id <> v_uid and expires_at > now()
+  order by random()
+  limit 1
+  for update skip locked;
 
-  if v_bottle is null then
+  if v_bottle_id is null then
     return null; -- 星海此刻很安静（前端空态）
   end if;
+
+  update public.bottles b
+  set status = 'picked', picked_by = v_uid
+  where b.id = v_bottle_id
+  returning * into v_bottle;
 
   insert into public.action_logs (sailor_id, action, day, meta)
   values (v_uid, 'pick', v_day, jsonb_build_object('bottle_id', v_bottle.id));
 
   return v_bottle;
 end;
+$$;
+
+-- ---------- 今日限额（前端「今日可投 1 / 可拾 3」展示的权威来源） ----------
+create or replace function public.get_daily_limits()
+returns table (launched int, picked int)
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select
+    count(*) filter (where action = 'launch')::int as launched,
+    count(*) filter (where action = 'pick')::int as picked
+  from public.action_logs
+  where sailor_id = auth.uid()
+    and day = (now() at time zone 'Asia/Shanghai')::date;
 $$;
 
 -- ---------- 回信：仅拾瓶人可回，仅原投瓶人可见（RLS 保证） ----------
@@ -262,7 +284,8 @@ begin
   end if;
   if public.has_bad_word(p_text) then raise exception 'bad word'; end if;
 
-  select * into v_bottle from public.bottles where id = p_bottle_id;
+  -- 行锁：并发双回信串行化（后者在锁后重查状态 → 'already replied'）
+  select * into v_bottle from public.bottles where id = p_bottle_id for update;
   if v_bottle is null or v_bottle.picked_by <> v_uid then
     raise exception 'forbidden';
   end if;
@@ -344,17 +367,22 @@ as $$
   where id = p_bottle_id and author_id = auth.uid();
 $$;
 
--- ---------- 举报 ----------
+-- ---------- 举报（NFR-1 治理入口；V1.2 支持瓶子与回信两类目标） ----------
 create or replace function public.report_content(
   p_target_type text,
   p_target_id   uuid,
   p_reason      text
 )
 returns void
-language sql
+language plpgsql
 security definer
 set search_path = public
 as $$
+declare
+  v_uid uuid := auth.uid();
+begin
+  if v_uid is null then raise exception 'not authenticated'; end if;
   insert into public.reports (target_type, target_id, reason, reporter_id)
-  values (p_target_type, p_target_id, p_reason, auth.uid());
+  values (p_target_type, p_target_id, p_reason, v_uid);
+end;
 $$;

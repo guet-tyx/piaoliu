@@ -32,8 +32,10 @@ begin
 end;
 $$;
 
--- ---------- 羁绊累积（FR-8.3：+1 → 等级重算，公式与 data/collection.ts 一致） ----------
-create or replace function public.earn_bond(p_kind text)
+-- ---------- 羁绊累积（FR-8.3：+1 → 等级重算，公式与 data/collection.ts 的 levelOfBond 一致） ----------
+-- p_once_per_day=true 的行为（daily 航行 1 天 / listen 听歌 3 首）每日每种限一次，
+-- 以 action_logs(action='bond', day, meta.kind) 去重——服务端权威，防客户端无限刷羁绊。
+create or replace function public.earn_bond(p_kind text, p_once_per_day boolean default false)
 returns public.sailors
 language plpgsql
 security definer
@@ -41,19 +43,42 @@ set search_path = public
 as $$
 declare
   v_uid    uuid := auth.uid();
+  v_day    date := (now() at time zone 'Asia/Shanghai')::date;
   v_sailor public.sailors;
 begin
   if v_uid is null then raise exception 'not authenticated'; end if;
+  -- 行为白名单（与前端 BondKind 一致）
+  if p_kind not in ('daily', 'launch', 'pick', 'reply', 'listen') then
+    raise exception 'invalid bond kind';
+  end if;
+
+  -- 每日一次行为：当天同 kind 已累计则直接返回（不重复 +1）
+  if p_once_per_day then
+    if exists (
+      select 1 from public.action_logs
+      where sailor_id = v_uid and action = 'bond'
+        and day = v_day and meta ->> 'kind' = p_kind
+    ) then
+      select * into v_sailor from public.sailors where id = v_uid;
+      return v_sailor;
+    end if;
+  end if;
+
+  -- 等级 = 1 + 满足「新羁绊 ≥ T_g」的阈值个数（T_g = g(g+1)/2，g∈[1,9]），封顶 10
   update public.sailors s
   set bond_value = s.bond_value + 1,
       level = least(
         10,
-        (select count(*) from generate_series(1, 10) g
-         where s.bond_value + 1 >= g * (g + 1) / 2)
+        1 + (select count(*) from generate_series(1, 9) g
+             where s.bond_value + 1 >= g * (g + 1) / 2)
       )
   where s.id = v_uid
   returning * into v_sailor;
   if v_sailor is null then raise exception 'sailor not found'; end if;
+
+  insert into public.action_logs (sailor_id, action, day, meta)
+  values (v_uid, 'bond', v_day, jsonb_build_object('kind', p_kind));
+
   return v_sailor;
 end;
 $$;
