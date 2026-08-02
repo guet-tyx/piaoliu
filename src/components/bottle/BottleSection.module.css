@@ -197,6 +197,13 @@
   color: var(--pink-deep);
   letter-spacing: .04em;
 }
+/* 禁用原因提示（柔和不刺眼） */
+.hint {
+  margin-top: 10px;
+  font-size: .74rem;
+  color: var(--ink-3);
+  letter-spacing: .04em;
+}
 .success {
   display: flex;
   align-items: center;

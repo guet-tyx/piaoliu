@@ -57,29 +57,38 @@ export const useBottleStore = create<BottleState>()((set, get) => ({
   launch: async (text, track) => {
     if (get().busy) return { ok: false, reason: "limit" };
     set({ busy: true });
-    const result = await launchBottle(text, track);
-    set({ busy: false, limits: getDailyLimits() });
-    if (result.ok) {
-      // 投出的瓶子进入星海，收件箱不含未回信瓶，无需刷新
+    try {
+      const result = await launchBottle(text, track);
+      set({ limits: getDailyLimits() });
+      return result;
+    } finally {
+      // 无论成败都释放 busy，防止异常导致按钮永久禁用
+      set({ busy: false });
     }
-    return result;
   },
 
   pick: async () => {
     if (get().busy) return { ok: false, reason: "limit" };
     set({ busy: true });
-    const result = await pickBottle();
-    set({ busy: false, limits: getDailyLimits() });
-    return result;
+    try {
+      const result = await pickBottle();
+      set({ limits: getDailyLimits() });
+      return result;
+    } finally {
+      set({ busy: false });
+    }
   },
 
   reply: async (bottleId, text) => {
     if (get().busy) return { ok: false, reason: "limit" };
     set({ busy: true });
-    const result = await replyBottle(bottleId, text);
-    set({ busy: false });
-    if (result.ok) await get().refreshInbox();
-    return result;
+    try {
+      const result = await replyBottle(bottleId, text);
+      if (result.ok) await get().refreshInbox();
+      return result;
+    } finally {
+      set({ busy: false });
+    }
   },
 
   markRead: async (bottleId) => {

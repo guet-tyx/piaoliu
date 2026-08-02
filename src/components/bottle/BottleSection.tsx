@@ -186,6 +186,15 @@ function LaunchCard() {
       {!safe.ok && <p className={styles.error}>瓶里有不能上船的文字。</p>}
       {error && <p className={styles.error}>{error}</p>}
 
+      {/* 禁用原因提示：字数不足时给用户交代（敏感词走红色 error，busy 按钮文字已说明） */}
+      {phase === "idle" && !canLaunch && safe.ok && !error && len < 10 && (
+        <p className={styles.hint}>
+          {len === 0
+            ? "写下至少 10 字，船才能启航。"
+            : `再写 ${10 - len} 字即可启航。`}
+        </p>
+      )}
+
       {phase === "done" ? (
         <p className={styles.success}>
           <BoatIcon className={styles.successBoat} />
