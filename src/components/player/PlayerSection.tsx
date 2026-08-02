@@ -143,6 +143,7 @@ export function PlayerSection() {
                 <span
                   key={dm.id}
                   className={`${styles.dm} ${styles[`dmR${(i % 3) + 1}`]}${dm.variant === "pink" ? ` ${styles.pink}` : ""}${dm.variant === "blue" ? ` ${styles.blue}` : ""}`}
+                  style={{ animationDelay: `-${i * 2.5}s` }}
                 >
                   {dm.text}
                 </span>

@@ -45,7 +45,12 @@ export function HeroDanmaku() {
         <span
           key={dm.id}
           className={`${styles.dm}${dm.variant === "pink" ? ` ${styles.pink}` : ""}${dm.variant === "blue" ? ` ${styles.blue}` : ""}`}
-          style={{ top: DM_TOPS[i % DM_TOPS.length] } as CSSProperties}
+          style={
+            {
+              top: DM_TOPS[i % DM_TOPS.length],
+              animationDelay: `-${i * 2}s`,
+            } as CSSProperties
+          }
         >
           {dm.text}
         </span>

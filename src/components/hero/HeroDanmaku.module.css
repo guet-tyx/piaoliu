@@ -20,8 +20,8 @@
   text-shadow: 0 1px 0 #000, 1px 0 0 #000, 0 -1px 0 #000, -1px 0 0 #000, 0 0 3px rgba(0, 0, 0, .8);
   white-space: nowrap;
   letter-spacing: .04em;
-  /* V1.3 真实弹幕：一次性漂过即消失（非无限循环） */
-  animation: var(--kf-dmFloat) 12s linear forwards;
+  /* 弹幕循环漂移（用户选择）：持续滚动，直到开关关闭/切歌 */
+  animation: var(--kf-dmFloat) 12s linear infinite;
   pointer-events: none;
 }
 .pink {

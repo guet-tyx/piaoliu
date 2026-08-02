@@ -3,13 +3,11 @@ import type { DanmakuMessage } from "@/lib/realtime/types";
 
 /**
  * 弹幕流状态（FR-11 真实弹幕）：同船广播 + 系统事件统一入池
- * - 展示约 10 秒后自动移除（PRD FR-10.2）
- * - 池上限 12 条（防刷屏）
- * - 模块级定时器管理（store 生命周期 = 应用生命周期，随 clear 全量释放）
+ * 弹幕循环漂移（用户选择）：入池后持续显示（CSS 无限循环动画），
+ * 池上限 12 条（满则挤掉最旧），直到弹幕开关关闭（显隐）或切歌（clear）
  */
 
 const MAX_ITEMS = 12;
-const TTL_MS = 10_000;
 
 /** 系统事件弹幕频控：同类型 30s 内最多 1 条（防刷屏） */
 const RATE_LIMIT_MS = 30_000;
@@ -29,22 +27,11 @@ interface DanmakuState {
   clear: () => void;
 }
 
-const timers = new Map<string, number>();
-
-function scheduleRemove(id: string, set: (fn: (s: DanmakuState) => Partial<DanmakuState>) => void) {
-  const t = window.setTimeout(() => {
-    set((s) => ({ items: s.items.filter((m) => m.id !== id) }));
-    timers.delete(id);
-  }, TTL_MS);
-  timers.set(id, t);
-}
-
 export const useDanmakuStore = create<DanmakuState>()((set) => ({
   items: [],
 
   push: (msg) => {
     set((s) => ({ items: [...s.items.slice(-(MAX_ITEMS - 1)), msg] }));
-    scheduleRemove(msg.id, set);
   },
 
   pushSystem: (text, kind, variant) => {
@@ -62,12 +49,9 @@ export const useDanmakuStore = create<DanmakuState>()((set) => ({
       at: now,
     };
     set((s) => ({ items: [...s.items.slice(-(MAX_ITEMS - 1)), msg] }));
-    scheduleRemove(msg.id, set);
   },
 
   clear: () => {
-    timers.forEach((t) => window.clearTimeout(t));
-    timers.clear();
     set({ items: [] });
   },
 }));

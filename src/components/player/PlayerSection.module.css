@@ -77,9 +77,8 @@
 .recordDm.off { opacity: 0; }
 .recordDm .dm {
   font-size: .82rem;
-  /* V1.3 真实弹幕：一次性漂过即消失（非无限循环） */
-  animation: var(--kf-dmFloat) 10s linear forwards;
-  animation-delay: 0s;
+  /* 弹幕循环漂移（用户选择）：持续滚动，直到开关关闭/切歌 */
+  animation: var(--kf-dmFloat) 10s linear infinite;
 }
 .dmR1 { top: 22%; }
 .dmR2 { top: 44%; }
