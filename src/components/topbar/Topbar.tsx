@@ -62,11 +62,7 @@ export function Topbar() {
           <a href="/report" className="sweepGold sweepGold--left" data-text="周报">
             周报
           </a>
-          <a
-            className={`${styles.navDl} sweepGold sweepGold--left`}
-            href={anchor("#download")}
-            data-text="免费下载"
-          >
+          <a className={styles.navDl} href={anchor("#download")}>
             免费下载
           </a>
         </nav>

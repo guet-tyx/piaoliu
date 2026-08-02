@@ -94,7 +94,7 @@ export function PlaylistSection() {
                     <b>{playlist.meta.plays}</b>播放 · <b>{playlist.meta.dms}</b>弹幕 ·{" "}
                     {playlist.meta.time}
                   </p>
-                  <span className={`${styles.pPlayBtn} sweepGold`} data-text="立即播放">
+                  <span className={styles.pPlayBtn}>
                     立即播放 ▶
                   </span>
                 </div>
