@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
-import { CHARACTER } from "@/data/character";
+import { CHARACTERS } from "@/data/character";
 import { SectionHead } from "@/components/shared/SectionHead";
 import { CountUp } from "@/components/shared/CountUp";
 import { useShioStore } from "@/stores/shio";
@@ -18,11 +18,15 @@ const SLOT_LABEL: Record<ShioSlot, string> = {
 };
 
 /**
- * 角色登场（B站式角色卡）：双列 Grid，数据来自 src/data/character.ts
- * 统计数据用 CountUp 滚动增长（进入视口触发）
- * 每日一句（FR-8 最小版）：汐按时段问候，白名单文案库（NFR-2）
+ * 星海守望者（仿崩坏3官网角色切换，2026-08-02）：
+ * 顶部头像列表点击切换角色（汐/流明/朔空/悠），立绘 + 档案 + 表情随切换更新；
+ * 每日一句与行为回应为汐专属（切换其他角色时隐藏）
  */
 export function CharacterSection() {
+  const [activeId, setActiveId] = useState("sio");
+  const active = CHARACTERS.find((c) => c.id === activeId) ?? CHARACTERS[0];
+  const isSio = activeId === "sio";
+
   const greeting = useShioStore((s) => s.greeting);
   const slot = useShioStore((s) => s.slot);
   const ensureDailyGreeting = useShioStore((s) => s.ensureDailyGreeting);
@@ -36,23 +40,52 @@ export function CharacterSection() {
   return (
     <section className="section" id="char">
       <SectionHead
-        tag="NEW CHARACTER"
-        title="星海版首位角色登场"
+        tag="STAR SEA WATCHERS"
+        title="星海守望者"
         subtitle={
           <>
-            她戴着你没有的耳机，坐着一艘不会沉的纸船。
+            四位守望者守着同一片星海：汐领航，流明照灯，朔空放歌，悠占星。
             <br />
-            耳机里在播什么？她也不知道——<b>漂到哪首算哪首</b>。
+            点一盏灯，船就开了——<b>今晚你想听谁的故事？</b>
           </>
         }
       />
 
+      {/* 角色切换头像条（崩坏3式 75px 头像列表） */}
+      <div className={styles.charAvatars} role="group" aria-label="切换角色">
+        {CHARACTERS.map((c) => {
+          const selected = c.id === activeId;
+          return (
+            <button
+              key={c.id}
+              type="button"
+              className={`${styles.avatarBtn}${selected ? ` ${styles.avatarActive}` : ""}`}
+              aria-pressed={selected}
+              aria-label={`切换到${c.name}`}
+              title={c.name}
+              onClick={() => setActiveId(c.id)}
+            >
+              <Image
+                src={c.image}
+                alt=""
+                fill
+                sizes="75px"
+                style={{ objectFit: "cover", objectPosition: "50% 18%" }}
+              />
+              <span className={styles.avatarName}>{c.name}</span>
+            </button>
+          );
+        })}
+      </div>
+
       <div className={styles.charCard}>
         <div className={styles.charPic}>
-          <span className={styles.lv}>{CHARACTER.lv}</span>
+          <span className={styles.lv}>{active.lv}</span>
+          {/* key 重挂载触发切换 fade */}
           <Image
-            src={CHARACTER.image}
-            alt={CHARACTER.imageAlt}
+            key={active.id}
+            src={active.image}
+            alt={active.imageAlt}
             fill
             sizes="(max-width: 960px) 65vw, 33vw"
             style={{ objectFit: "cover" }}
@@ -62,12 +95,12 @@ export function CharacterSection() {
         <div className={styles.charInfo}>
           <div className={styles.charHead}>
             <span className={styles.charName}>
-              {CHARACTER.name} <em>{CHARACTER.en}</em>
+              {active.name} <em>{active.en}</em>
             </span>
           </div>
 
           <div className={styles.charTags}>
-            {CHARACTER.tags.map((tag) => (
+            {active.tags.map((tag) => (
               <span
                 key={tag.label}
                 className={`${styles.ctag}${tag.variant ? ` ${styles[tag.variant]}` : ""}`}
@@ -78,29 +111,29 @@ export function CharacterSection() {
           </div>
 
           <p className={styles.charDesc}>
-            {CHARACTER.desc.map((seg, i) =>
+            {active.desc.map((seg, i) =>
               seg.bold ? <b key={i}>{seg.text}</b> : <span key={i}>{seg.text}</span>,
             )}
           </p>
 
           <div className={styles.charStats}>
-            {CHARACTER.stats.map((stat) => (
+            {active.stats.map((stat) => (
               <div className={styles.cstat} key={stat.label}>
-                <CountUp end={Number(stat.value)} suffix={stat.suffix} />
+                <CountUp key={active.id} end={Number(stat.value)} suffix={stat.suffix} />
                 <small>{stat.label}</small>
               </div>
             ))}
           </div>
 
-          {/* 汐的情绪表情变体（新增） */}
+          {/* 角色情绪表情变体（随角色切换） */}
           <div className={styles.exprRow}>
-            <p className={styles.exprLabel}>汐的三种瞬间</p>
+            <p className={styles.exprLabel}>{active.name}的三种瞬间</p>
             <div className={styles.exprGrid}>
-              {CHARACTER.expressions?.map((expr) => (
+              {active.expressions?.map((expr) => (
                 <figure key={expr.label} className={styles.exprItem}>
                   <Image
                     src={expr.image}
-                    alt={`${CHARACTER.name} · ${expr.label}`}
+                    alt={`${active.name} · ${expr.label}`}
                     fill
                     style={{ objectFit: "cover" }}
                   />
@@ -110,24 +143,26 @@ export function CharacterSection() {
             </div>
           </div>
 
-          {/* 汐的每日一句（FR-8 最小版：时段变化 + 白名单文案） */}
-          <div className={styles.greetCard}>
-            <p className={styles.greetKicker}>
-              汐的今日问候{slot ? ` · ${SLOT_LABEL[slot]}` : ""}
-            </p>
-            <p className={styles.greetText}>
-              {greeting ? `「${greeting.text}」` : "……"}
-            </p>
-            <p className={styles.greetSign}>—— 汐</p>
+          {/* 汐的每日一句（FR-8 最小版）与行为回应——汐专属，切换隐藏 */}
+          {isSio && (
+            <div className={styles.greetCard}>
+              <p className={styles.greetKicker}>
+                汐的今日问候{slot ? ` · ${SLOT_LABEL[slot]}` : ""}
+              </p>
+              <p className={styles.greetText}>
+                {greeting ? `「${greeting.text}」` : "……"}
+              </p>
+              <p className={styles.greetSign}>—— 汐</p>
 
-            {/* 汐的行为回应气泡（FR-8.2：听歌 3 首/收信/首次投瓶） */}
-            {response && (
-              <div className={styles.responseBubble}>
-                <p className={styles.responseText}>「{response.line.text}」</p>
-                <p className={styles.responseSign}>—— 汐 · 刚刚</p>
-              </div>
-            )}
-          </div>
+              {/* 汐的行为回应气泡（FR-8.2：听歌 3 首/收信/首次投瓶） */}
+              {response && (
+                <div className={styles.responseBubble}>
+                  <p className={styles.responseText}>「{response.line.text}」</p>
+                  <p className={styles.responseSign}>—— 汐 · 刚刚</p>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </section>

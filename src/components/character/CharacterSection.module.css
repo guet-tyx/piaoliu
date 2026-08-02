@@ -1,4 +1,50 @@
-/* ============ 角色登场（B站式角色卡） ============ */
+/* ============ 角色登场（崩坏3式角色切换） ============ */
+
+/* 头像切换条（崩坏3官网 75px 头像列表） */
+.charAvatars {
+  display: flex;
+  gap: 16px;
+  margin: 0 0 26px;
+  flex-wrap: wrap;
+}
+.avatarBtn {
+  position: relative;
+  width: 75px;
+  height: 75px;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, .15);
+  background: var(--panel);
+  padding: 0;
+  cursor: pointer;
+  transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+.avatarBtn:hover {
+  transform: translateY(-3px);
+  border-color: rgba(251, 114, 153, .6);
+}
+.avatarActive {
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--pink), var(--blue)) border-box;
+  box-shadow: 0 10px 24px -10px rgba(251, 114, 153, .55);
+  transform: translateY(-3px);
+}
+.avatarName {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  font-size: .6rem;
+  font-weight: 800;
+  letter-spacing: .12em;
+  color: #fff;
+  text-align: center;
+  padding: 2px 0 3px;
+  background: linear-gradient(180deg, transparent, rgba(5, 12, 30, .82));
+  pointer-events: none;
+}
+
 .charCard {
   background: var(--panel);
   color: var(--ink-panel); /* 深卡内浅字（深海配色） */
@@ -19,6 +65,10 @@
 .charPic {
   position: relative;
   min-height: 320px;
+}
+/* 角色切换：立绘 key 重挂载时淡入上浮（rise，只动 transform/opacity） */
+.charPic img {
+  animation: var(--kf-rise) .45s cubic-bezier(.22, .61, .36, 1) both;
 }
 /* 米哈游风格视差：图片随滚动轻微上移（scroll() 时间线，仅 transform；卡片 overflow hidden 裁剪） */
 @supports (animation-timeline: scroll()) {
