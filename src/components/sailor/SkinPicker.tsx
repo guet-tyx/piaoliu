@@ -3,6 +3,7 @@
 import { useIdentityStore } from "@/stores/identity";
 import { SKINS } from "@/data/collection";
 import { SkinBoat } from "@/components/shared/SkinBoat";
+import Image from "next/image";
 import styles from "./SkinPicker.module.css";
 
 /**
@@ -38,6 +39,14 @@ export function SkinPicker() {
               <span className={styles.meta}>
                 <b>{skin.name}</b>
                 <small>{skin.desc}</small>
+              </span>
+              <span className={styles.preview}>
+                <Image
+                  src={skin.image}
+                  alt={`${skin.name}搭配场景`}
+                  fill
+                  style={{ objectFit: "cover" }}
+                />
               </span>
             </button>
           );

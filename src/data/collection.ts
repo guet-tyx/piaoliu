@@ -47,12 +47,13 @@ export interface BoatSkin {
   name: string;
   desc: string;
   unlockLevel: number;
+  image: string; // 皮肤搭配场景插画
 }
 
 export const SKINS: BoatSkin[] = [
-  { id: "paper", name: "纸船", desc: "最初的折纸船，风一吹就会晃。", unlockLevel: 1 },
-  { id: "crane", name: "千纸鹤", desc: "折了 99 次才学会的航线。", unlockLevel: 4 },
-  { id: "star", name: "星船", desc: "用星尘糊成的船，夜里会发光。", unlockLevel: 7 },
+  { id: "paper", name: "纸船", desc: "最初的折纸船，风一吹就会晃。", unlockLevel: 1, image: "/images/boat-paper.png" },
+  { id: "crane", name: "千纸鹤", desc: "折了 99 次才学会的航线。", unlockLevel: 4, image: "/images/boat-crane.png" },
+  { id: "star", name: "星船", desc: "用星尘糊成的船，夜里会发光。", unlockLevel: 7, image: "/images/boat-star.png" },
 ];
 
 /** 行为统计（徽章判定与羁绊数据源；真实模式由 action_logs 聚合） */

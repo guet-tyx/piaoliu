@@ -74,6 +74,19 @@
   border-radius: 999px;
   padding: 2px 7px;
 }
+.preview {
+  margin-left: auto;
+  flex: none;
+  width: 84px;
+  height: 48px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  position: relative;
+}
+.preview img { border-radius: 10px; }
+
 .meta {
   display: flex;
   flex-direction: column;
@@ -88,4 +101,8 @@
   font-size: .7rem;
   color: var(--ink-3);
   line-height: 1.5;
+}
+
+@media (max-width: 960px) {
+  .preview { display: none; }
 }
