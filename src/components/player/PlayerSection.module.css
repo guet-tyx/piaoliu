@@ -72,6 +72,8 @@
   transition: opacity .5s ease;
 }
 .live .recordDm { opacity: 1; }
+/* 弹幕开关关闭态（FR-5：等优先级下靠后定义，压过 .live .recordDm） */
+.recordDm.off { opacity: 0; }
 .recordDm .dm { font-size: .82rem; }
 .dmR1 { top: 22%; }
 .dmR2 { top: 44%; }
@@ -149,23 +151,51 @@
 }
 .eq.live i { animation-play-state: running; }
 
+/* FR-1 可拖动进度条：原生 range，轨道渐变由 --fill 驱动（粉→蓝进度 / 灰底） */
 .progress {
+  -webkit-appearance: none;
+  appearance: none;
+  display: block;
   width: 100%;
+  height: 18px;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.progress::-webkit-slider-runnable-track {
   height: 5px;
   border-radius: 3px;
-  background: var(--panel-2);
-  overflow: hidden;
-  position: relative;
+  background: linear-gradient(90deg, var(--pink), var(--blue) var(--fill, 0%), var(--panel-2) var(--fill, 0%));
 }
-.progress i {
-  display: block;
-  height: 100%;
-  width: 0%;
+.progress::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  margin-top: -4.5px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid var(--pink);
+  box-shadow: 0 2px 8px rgba(251, 114, 153, .55);
+  transition: transform .2s ease;
+}
+.progress::-moz-range-track {
+  height: 5px;
   border-radius: 3px;
-  background: linear-gradient(90deg, var(--pink), var(--blue));
-  box-shadow: 0 0 10px rgba(251, 114, 153, .6);
-  transition: width .2s linear;
+  background: linear-gradient(90deg, var(--pink), var(--blue) var(--fill, 0%), var(--panel-2) var(--fill, 0%));
 }
+.progress::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid var(--pink);
+  box-shadow: 0 2px 8px rgba(251, 114, 153, .55);
+  transition: transform .2s ease;
+}
+.progress:hover::-webkit-slider-thumb,
+.progress:hover::-moz-range-thumb { transform: scale(1.12); }
+.progress:disabled { cursor: default; opacity: .5; }
 .timeRow {
   width: 100%;
   display: flex;
@@ -262,6 +292,89 @@
   background: rgba(0, 174, 236, .06);
 }
 
+/* FR-3 播放模式按钮（与 dmToggle 同款胶囊） */
+.modeBtn {
+  font-size: .68rem;
+  font-weight: 700;
+  color: var(--ink-3);
+  border: 1px solid var(--line);
+  background: var(--panel);
+  border-radius: 999px;
+  padding: 7px 14px;
+  cursor: pointer;
+  letter-spacing: .1em;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: color .2s ease, border-color .2s ease;
+}
+.modeBtn i { font-style: normal; color: var(--pink); }
+.modeBtn:hover { border-color: rgba(251, 114, 153, .5); color: var(--ink-2); }
+
+/* FR-2 音量组：静音按钮 + 滑杆 */
+.volGroup {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.volBtn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1.5px solid var(--line);
+  background: var(--panel);
+  color: var(--ink-2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .2s ease, border-color .2s ease, transform .2s ease;
+}
+.volBtn:hover {
+  background: rgba(251, 114, 153, .08);
+  border-color: var(--pink);
+  transform: scale(1.08);
+}
+.volBtn svg { width: 15px; height: 15px; }
+.vol {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 84px;
+  height: 18px;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.vol::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--pink) var(--fill, 0%), var(--panel-2) var(--fill, 0%));
+}
+.vol::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  margin-top: -4px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid var(--pink);
+  box-shadow: 0 2px 6px rgba(251, 114, 153, .5);
+}
+.vol::-moz-range-track {
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--pink) var(--fill, 0%), var(--panel-2) var(--fill, 0%));
+}
+.vol::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid var(--pink);
+  box-shadow: 0 2px 6px rgba(251, 114, 153, .5);
+}
+
 @media (max-width: 960px) {
   .player {
     grid-template-columns: 1fr;
@@ -271,7 +384,7 @@
   }
   .pNow { width: 100%; }
   .progress { max-width: 480px; margin: 0 auto; }
-  .nowCtrl { justify-content: center; }
+  .nowCtrl { justify-content: center; flex-wrap: wrap; }
   .eq { max-width: 480px; margin-left: auto; margin-right: auto; }
 }
 

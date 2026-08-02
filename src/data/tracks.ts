@@ -6,6 +6,7 @@ import type { Track } from "@/types/music";
  */
 export const TRACKS: Track[] = [
   {
+    id: "t01",
     t: "信风",
     s: "一支你没听过的乐队 · 后摇",
     tag: "后摇",
@@ -17,6 +18,7 @@ export const TRACKS: Track[] = [
     ],
   },
   {
+    id: "t02",
     t: "晚风告别式",
     s: "环境电子 · 深夜电台",
     tag: "环境电子",
@@ -28,6 +30,7 @@ export const TRACKS: Track[] = [
     ],
   },
   {
+    id: "t03",
     t: "凌晨三点半的港",
     s: "爵士嘻哈 · 失眠人士精选",
     tag: "爵士嘻哈",
@@ -38,6 +41,7 @@ export const TRACKS: Track[] = [
     ],
   },
   {
+    id: "t04",
     t: "雨季漂流记",
     s: "氛围 · 下雨天限定",
     tag: "氛围",

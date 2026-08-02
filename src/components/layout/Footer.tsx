@@ -16,10 +16,17 @@ export function Footer() {
           <span className={styles.footName}>漂流 DRIFT · 星海版</span>
           <span className={styles.footSlogan}>在星海里迷路，是一件好事。</span>
         </div>
+        {/* FR-6：暂无真实社交落地页，明确标注「敬请期待」，不再指向 # */}
         <div className={styles.footLinks}>
-          <a href="#">B站</a>
-          <a href="#">小红书</a>
-          <a href="#">关于</a>
+          <span className={styles.soonLink}>
+            B站<em>敬请期待</em>
+          </span>
+          <span className={styles.soonLink}>
+            小红书<em>敬请期待</em>
+          </span>
+          <span className={styles.soonLink}>
+            关于<em>敬请期待</em>
+          </span>
         </div>
       </div>
       <div className={styles.footCopy}>

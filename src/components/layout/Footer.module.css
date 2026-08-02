@@ -46,7 +46,24 @@
   font-size: .86rem;
   color: var(--ink-2);
 }
-.footLinks a:hover { color: var(--pink-deep); }
+/* FR-6 敬请期待态：非交互链接 */
+.soonLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink-2);
+  cursor: default;
+}
+.soonLink em {
+  font-style: normal;
+  font-size: .56rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  color: var(--pink-deep);
+  border: 1px solid rgba(251, 114, 153, .35);
+  border-radius: 999px;
+  padding: 1px 7px;
+}
 
 .footCopy {
   max-width: 1120px;

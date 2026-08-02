@@ -1,5 +1,7 @@
 /** 曲目数据（对应原型 TRACKS 数组） */
 export interface Track {
+  /** 稳定主键（收藏集合/未来 Supabase 曲库引用） */
+  id: string;
   /** 曲名 */
   t: string;
   /** 流派标签 */

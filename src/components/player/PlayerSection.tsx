@@ -1,7 +1,7 @@
 "use client";
 
 import type { CSSProperties } from "react";
-import { usePlayerStore } from "@/stores/player";
+import { usePlayerStore, type PlayMode } from "@/stores/player";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 import { SectionHead } from "@/components/shared/SectionHead";
 import styles from "./PlayerSection.module.css";
@@ -25,6 +25,13 @@ const RECORD_DM: RecordDm[] = [
   { text: "耳机分你一半", row: "dmR3", dur: "8s", delay: "-6s" },
 ];
 
+/** 播放模式展示元数据（FR-3） */
+const MODE_META: Record<PlayMode, { mark: string; label: string; aria: string }> = {
+  order: { mark: "顺", label: "顺序", aria: "播放模式：顺序循环" },
+  loop: { mark: "单", label: "单曲", aria: "播放模式：单曲循环" },
+  shuffle: { mark: "随", label: "随机", aria: "播放模式：随机播放" },
+};
+
 /**
  * 32 条频谱柱：确定性伪随机高度/延迟（SSR 与客户端一致，避免水合冲突）
  * 高度 22-88%，延迟 0 ~ -1.09s
@@ -39,9 +46,25 @@ function formatTime(s: number): string {
   return `${Math.floor(t / 60)}:${String(t % 60).padStart(2, "0")}`;
 }
 
+/** 音量/静音图标（内联 SVG，与按钮文字风格统一） */
+function VolIcon({ muted }: { muted: boolean }) {
+  return muted ? (
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M3 9v6h4l5 5V4L7 9H3z" />
+      <path d="M16 9l6 6M22 9l-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" fill="none" />
+    </svg>
+  ) : (
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M3 9v6h4l5 5V4L7 9H3z" />
+      <path d="M16.5 12a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4z" />
+    </svg>
+  );
+}
+
 /**
  * 星海电台播放器：UI 层完全只读，所有交互只调 store actions；
- * 唱片旋转/弹幕/频谱的类名全部由 isPlaying 派生
+ * 唱片旋转/弹幕/频谱的类名全部由 isPlaying 派生；
+ * 进度条/音量/模式/收藏/弹幕开关为 V1.0.1 体验修补（FR-1~FR-5）
  */
 export function PlayerSection() {
   useAudioPlayer();
@@ -50,8 +73,11 @@ export function PlayerSection() {
   const total = usePlayerStore((s) => s.tracks.length);
   const currentIndex = usePlayerStore((s) => s.currentIndex);
   const isPlaying = usePlayerStore((s) => s.isPlaying);
-  const isLiked = usePlayerStore((s) => s.isLiked);
+  const likedIds = usePlayerStore((s) => s.likedIds);
   const danmakuOn = usePlayerStore((s) => s.danmakuOn);
+  const volume = usePlayerStore((s) => s.volume);
+  const muted = usePlayerStore((s) => s.muted);
+  const playMode = usePlayerStore((s) => s.playMode);
   const progress = usePlayerStore((s) => s.progress);
   const currentTime = usePlayerStore((s) => s.currentTime);
   const duration = usePlayerStore((s) => s.duration);
@@ -62,6 +88,17 @@ export function PlayerSection() {
   const prev = usePlayerStore((s) => s.prev);
   const toggleLike = usePlayerStore((s) => s.toggleLike);
   const toggleDanmaku = usePlayerStore((s) => s.toggleDanmaku);
+  const seekTo = usePlayerStore((s) => s.seekTo);
+  const setVolume = usePlayerStore((s) => s.setVolume);
+  const toggleMute = usePlayerStore((s) => s.toggleMute);
+  const cyclePlayMode = usePlayerStore((s) => s.cyclePlayMode);
+
+  const isLiked = likedIds.includes(track.id);
+  const mode = MODE_META[playMode];
+  /** 进度条范围（duration 未载入时按 1 兜底并禁用） */
+  const progressMax = Math.floor(duration) || 1;
+  const progressValue = Math.min(Math.floor(currentTime), progressMax);
+  const volValue = muted ? 0 : volume;
 
   return (
     <section className="section" id="player">
@@ -84,7 +121,11 @@ export function PlayerSection() {
                 } as CSSProperties
               }
             />
-            <div className={styles.recordDm} aria-hidden="true">
+            {/* 弹幕层受 danmakuOn 控制（FR-5：开关真实生效） */}
+            <div
+              className={`${styles.recordDm}${danmakuOn ? "" : ` ${styles.off}`}`}
+              aria-hidden="true"
+            >
               {RECORD_DM.map((dm, i) => (
                 <span
                   key={i}
@@ -113,9 +154,19 @@ export function PlayerSection() {
               ))}
             </div>
 
-            <div className={styles.progress} aria-hidden="true">
-              <i style={{ width: `${progress}%` }} />
-            </div>
+            {/* FR-1：可拖动进度条（原生 range，键盘可达；--fill 驱动轨道渐变） */}
+            <input
+              className={styles.progress}
+              type="range"
+              min={0}
+              max={progressMax}
+              step={1}
+              value={progressValue}
+              disabled={duration <= 0}
+              aria-label="播放进度"
+              style={{ "--fill": `${progress}%` } as CSSProperties}
+              onChange={(e) => seekTo(Number(e.target.value))}
+            />
             <div className={styles.timeRow}>
               <span>{formatTime(currentTime)}</span>
               <span>{duration > 0 ? formatTime(duration) : "--:--"}</span>
@@ -135,10 +186,43 @@ export function PlayerSection() {
                 className={`${styles.nowHeart}${isLiked ? ` ${styles.liked}` : ""}`}
                 type="button"
                 aria-label="收藏"
-                onClick={toggleLike}
+                aria-pressed={isLiked}
+                onClick={() => toggleLike(track.id)}
               >
                 <i>{isLiked ? "❤" : "♡"}</i>
               </button>
+              {/* FR-3：播放模式循环切换 */}
+              <button
+                className={styles.modeBtn}
+                type="button"
+                aria-label={mode.aria}
+                onClick={cyclePlayMode}
+              >
+                <i>{mode.mark}</i> {mode.label}
+              </button>
+              {/* FR-2：音量滑杆 + 静音 */}
+              <div className={styles.volGroup}>
+                <button
+                  className={styles.volBtn}
+                  type="button"
+                  aria-label={muted ? "取消静音" : "静音"}
+                  aria-pressed={muted}
+                  onClick={toggleMute}
+                >
+                  <VolIcon muted={muted} />
+                </button>
+                <input
+                  className={styles.vol}
+                  type="range"
+                  min={0}
+                  max={1}
+                  step={0.05}
+                  value={volValue}
+                  aria-label="音量"
+                  style={{ "--fill": `${volValue * 100}%` } as CSSProperties}
+                  onChange={(e) => setVolume(Number(e.target.value))}
+                />
+              </div>
               <button
                 className={`${styles.dmToggle}${danmakuOn ? ` ${styles.on}` : ""}`}
                 type="button"
