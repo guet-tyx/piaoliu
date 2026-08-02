@@ -67,6 +67,7 @@ archive/                   # 旧版单文件原型（引用根目录 images/ aud
 > 完整开发指南见 **[STYLE_GUIDE.md](./STYLE_GUIDE.md)**（设计变量分类、`--kf-*` 动效约定、目录职责、"use client" 边界、清理铁律）。
 
 - **配色**：全部 CSS 变量在 `src/app/globals.css` 的 `:root`，沿用原版（`--space` / `--pink` / `--blue` / `--gold` / `--ice` 等），组件内一律 `var(--*)` 引用，不写死色值
+- **深海配色**（DARK_THEME_SPEC.md 全量落地）：深空蓝渐变 body + 白色卡片保留（「深海里的纸船」隐喻）；文字分层——页面级 `--ink*` 浅色系（卡片外）、白色卡片内 `--ink-panel*` 深色系、`--line-panel` 白卡内边框；改动集中在 `globals.css` 变量层 + 三处浅色区块（Topbar 深色毛玻璃 / Footer 深空底 / Hero 波峰衔接色）
 - **字体**：系统字体栈 `--sans`，不引入 Web Font
 - **动效**：米哈游/崩坏3 官网风格滚动动画——全区块内容错落浮现（scroll-driven `view()` 优先 + IntersectionObserver 降级，共享 `Reveal` 组件）+ 轻微视差（标题区/角色图，`scroll(root)` 时间线）；Hero 首屏 exit-scrub 滚动叙事；`prefers-reduced-motion` 全局压制；只动 transform/opacity
   - **文字扫金 hover**：米哈游官网招牌动效（调研自 `bh3.mihoyo.com` 的 `.lf-to-rt`）——全局工具类 `.sweepGold`，元素加 `data-text="可见文字"` 后金色文字从左到右扫过（`attr(data-text)` 双层文本 + `width 0→100%`，0.3s）；`.sweepGold--left` 变体用于左对齐导航链接；已接入顶栏导航/免费下载胶囊、Hero 双按钮、启航按钮；`:focus-visible` 同样触发（无障碍）

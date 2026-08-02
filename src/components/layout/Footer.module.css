@@ -1,8 +1,8 @@
-/* ============ 页脚 ============ */
+/* ============ 页脚（深海配色：最深空底，文字走页面级变量自动翻转） ============ */
 .footer {
   border-top: 1px solid var(--line);
   padding: 42px 24px 38px;
-  background: var(--panel);
+  background: var(--bg-deep);
 }
 .footInner {
   max-width: 1120px;

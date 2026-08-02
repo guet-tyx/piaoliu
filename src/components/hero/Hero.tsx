@@ -116,10 +116,10 @@ export function Hero() {
         SCROLL<i />
       </div>
 
-      {/* 波峰分隔线：深空 → 亮色（透明区露出深空） */}
+      {/* 波峰分隔线：深空 → 深海（透明区露出深空；fill 与 body 渐变顶部同色衔接） */}
       <div className={styles.waveDivider} aria-hidden="true">
         <svg viewBox="0 0 1440 70" preserveAspectRatio="none">
-          <path d="M0 34 Q 120 66 260 50 T 520 44 T 780 52 T 1040 42 T 1300 52 T 1440 40 L 1440 70 L 0 70 Z" fill="#FDF2F7" />
+          <path d="M0 34 Q 120 66 260 50 T 520 44 T 780 52 T 1040 42 T 1300 52 T 1440 40 L 1440 70 L 0 70 Z" fill="#03060F" />
         </svg>
       </div>
     </section>

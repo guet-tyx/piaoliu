@@ -1,7 +1,8 @@
 /* ============ 角色登场（B站式角色卡） ============ */
 .charCard {
   background: var(--panel);
-  border: 1px solid var(--line);
+  color: var(--ink-panel); /* 白卡内深字（深海配色） */
+  border: 1px solid var(--line-panel);
   border-radius: 20px;
   overflow: hidden;
   box-shadow: 0 24px 56px -36px rgba(24, 25, 28, .28), 0 2px 6px rgba(24, 25, 28, .05);
@@ -67,7 +68,7 @@
   font-size: .78rem;
   font-weight: 600;
   letter-spacing: .3em;
-  color: var(--ink-3);
+  color: var(--ink-panel-3);
   margin-left: 6px;
 }
 
@@ -83,8 +84,8 @@
   padding: 4px 10px;
   border-radius: 999px;
   background: var(--panel-2);
-  color: var(--ink-2);
-  border: 1px solid var(--line);
+  color: var(--ink-panel-2);
+  border: 1px solid var(--line-panel);
 }
 .hot {
   background: rgba(251, 114, 153, .1);
@@ -99,11 +100,11 @@
 
 .charDesc {
   font-size: .95rem;
-  color: var(--ink-2);
+  color: var(--ink-panel-2);
   line-height: 1.95;
   margin: 16px 0 22px;
 }
-.charDesc b { color: var(--ink); }
+.charDesc b { color: var(--ink-panel); }
 
 .charStats {
   display: grid;
@@ -112,7 +113,7 @@
   padding: 18px 20px;
   border-radius: 14px;
   background: linear-gradient(135deg, rgba(251, 114, 153, .06), rgba(0, 174, 236, .06));
-  border: 1px solid var(--line);
+  border: 1px solid var(--line-panel);
 }
 .cstat b {
   display: block;
@@ -126,7 +127,7 @@
 }
 .cstat small {
   font-size: .68rem;
-  color: var(--ink-3);
+  color: var(--ink-panel-3);
   letter-spacing: .14em;
 }
 
@@ -138,7 +139,7 @@
   font-size: .64rem;
   font-weight: 800;
   letter-spacing: .22em;
-  color: var(--ink-3);
+  color: var(--ink-panel-3);
   margin: 0 0 10px;
 }
 .exprGrid {
@@ -151,7 +152,7 @@
   border-radius: 14px;
   overflow: hidden;
   aspect-ratio: 9 / 14;
-  border: 1px solid var(--line);
+  border: 1px solid var(--line-panel);
   background: linear-gradient(135deg, #FDF2F7, #E8F4FF);
   transition: transform .25s ease, box-shadow .25s ease;
 }

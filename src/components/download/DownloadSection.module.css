@@ -13,8 +13,8 @@
 }
 .storeBtn {
   background: var(--panel);
-  color: var(--ink);
-  border: 1.5px solid var(--line);
+  color: var(--ink-panel); /* 白卡内深字（深海配色） */
+  border: 1.5px solid var(--line-panel);
   border-radius: 16px;
   padding: 16px 32px;
   display: inline-flex;
@@ -36,7 +36,7 @@
 }
 .storeBtn.soon:hover {
   transform: none;
-  border-color: var(--line);
+  border-color: var(--line-panel);
   box-shadow: 0 14px 30px -20px rgba(24, 25, 28, .25);
 }
 .soonTag {
@@ -74,7 +74,7 @@
 }
 .storeBtn small {
   font-size: .68rem;
-  color: var(--ink-3);
+  color: var(--ink-panel-3);
   letter-spacing: .14em;
   font-weight: 600;
 }

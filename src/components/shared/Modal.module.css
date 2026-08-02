@@ -13,6 +13,7 @@
 }
 .panel {
   background: var(--panel);
+  color: var(--ink-panel); /* 白卡内深色文字基座（深海配色） */
   border-radius: 20px;
   max-width: 560px;
   width: 100%;

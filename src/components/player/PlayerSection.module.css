@@ -11,6 +11,7 @@
   border-radius: 22px;
   padding: 34px 38px;
   background: rgba(255, 255, 255, .92);
+  color: var(--ink-panel); /* 白卡内深字（深海配色） */
   -webkit-backdrop-filter: blur(20px);
   backdrop-filter: blur(20px);
   display: grid;
@@ -125,7 +126,7 @@
 }
 .nowTag {
   font-style: normal;
-  color: var(--ink-3);
+  color: var(--ink-panel-3);
   font-weight: 600;
   font-size: .8rem;
   letter-spacing: .2em;
@@ -133,7 +134,7 @@
 }
 .nowArtist {
   font-size: .84rem;
-  color: var(--ink-2);
+  color: var(--ink-panel-2);
   letter-spacing: .06em;
 }
 
@@ -206,7 +207,7 @@
   display: flex;
   justify-content: space-between;
   font-size: .66rem;
-  color: var(--ink-3);
+  color: var(--ink-panel-3);
   margin-top: 7px;
   letter-spacing: .06em;
 }
@@ -221,9 +222,9 @@
   width: 38px;
   height: 38px;
   border-radius: 50%;
-  border: 1.5px solid var(--line);
+  border: 1.5px solid var(--line-panel);
   background: var(--panel);
-  color: var(--ink-2);
+  color: var(--ink-panel-2);
   font-size: .7rem;
   cursor: pointer;
   display: flex;
@@ -259,14 +260,14 @@
   width: 38px;
   height: 38px;
   border-radius: 50%;
-  border: 1.5px solid var(--line);
+  border: 1.5px solid var(--line-panel);
   background: var(--panel);
   font-size: .85rem;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--ink-3);
+  color: var(--ink-panel-3);
   transition: transform .2s ease, color .2s ease, border-color .2s ease;
 }
 .nowHeart i { font-style: normal; }
@@ -281,8 +282,8 @@
   margin-left: auto;
   font-size: .68rem;
   font-weight: 700;
-  color: var(--ink-3);
-  border: 1px solid var(--line);
+  color: var(--ink-panel-3);
+  border: 1px solid var(--line-panel);
   background: var(--panel);
   border-radius: 999px;
   padding: 7px 14px;
@@ -321,7 +322,7 @@
 .presenceAvatars i:first-child { margin-left: 0; }
 .presenceText {
   font-size: .72rem;
-  color: var(--ink-3);
+  color: var(--ink-panel-3);
   letter-spacing: .08em;
 }
 .presenceText b {
@@ -345,12 +346,12 @@
 }
 .dmInput {
   width: 100%;
-  border: 1.5px solid var(--line);
+  border: 1.5px solid var(--line-panel);
   border-radius: 999px;
   padding: 8px 52px 8px 14px;
   font-size: .8rem;
   font-family: var(--sans);
-  color: var(--ink);
+  color: var(--ink-panel);
   transition: border-color .2s ease;
 }
 .dmInput:focus {
@@ -359,7 +360,7 @@
 }
 .dmInput:disabled {
   background: var(--panel-2);
-  color: var(--ink-3);
+  color: var(--ink-panel-3);
   cursor: not-allowed;
 }
 .dmCount {
@@ -368,7 +369,7 @@
   top: 50%;
   transform: translateY(-50%);
   font-size: .62rem;
-  color: var(--ink-3);
+  color: var(--ink-panel-3);
   letter-spacing: .06em;
   pointer-events: none;
 }
@@ -404,8 +405,8 @@
 .modeBtn {
   font-size: .68rem;
   font-weight: 700;
-  color: var(--ink-3);
-  border: 1px solid var(--line);
+  color: var(--ink-panel-3);
+  border: 1px solid var(--line-panel);
   background: var(--panel);
   border-radius: 999px;
   padding: 7px 14px;
@@ -417,7 +418,7 @@
   transition: color .2s ease, border-color .2s ease;
 }
 .modeBtn i { font-style: normal; color: var(--pink); }
-.modeBtn:hover { border-color: rgba(251, 114, 153, .5); color: var(--ink-2); }
+.modeBtn:hover { border-color: rgba(251, 114, 153, .5); color: var(--ink-panel-2); }
 
 /* FR-2 音量组：静音按钮 + 滑杆 */
 .volGroup {
@@ -429,9 +430,9 @@
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  border: 1.5px solid var(--line);
+  border: 1.5px solid var(--line-panel);
   background: var(--panel);
-  color: var(--ink-2);
+  color: var(--ink-panel-2);
   cursor: pointer;
   display: flex;
   align-items: center;

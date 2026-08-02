@@ -1,7 +1,8 @@
 /* ============ 纸船皮肤选择器 ============ */
 .card {
   background: var(--panel);
-  border: 1px solid var(--line);
+  color: var(--ink-panel); /* 白卡内深字（深海配色） */
+  border: 1px solid var(--line-panel);
   border-radius: 18px;
   padding: 20px 22px;
 }
@@ -13,7 +14,7 @@
 .desc {
   margin-top: 5px;
   font-size: .72rem;
-  color: var(--ink-3);
+  color: var(--ink-panel-3);
   letter-spacing: .04em;
 }
 .list {
@@ -27,7 +28,7 @@
   align-items: center;
   gap: 12px;
   text-align: left;
-  border: 1.5px solid var(--line);
+  border: 1.5px solid var(--line-panel);
   background: var(--panel);
   border-radius: 14px;
   padding: 11px 14px;
@@ -70,7 +71,7 @@
   font-size: .56rem;
   font-weight: 800;
   color: #fff;
-  background: var(--ink-2);
+  background: var(--ink-panel-2);
   border-radius: 999px;
   padding: 2px 7px;
 }
@@ -81,7 +82,7 @@
   height: 48px;
   border-radius: 10px;
   overflow: hidden;
-  border: 1px solid var(--line);
+  border: 1px solid var(--line-panel);
   background: var(--panel-2);
   position: relative;
 }
@@ -99,7 +100,7 @@
 }
 .meta small {
   font-size: .7rem;
-  color: var(--ink-3);
+  color: var(--ink-panel-3);
   line-height: 1.5;
 }
 

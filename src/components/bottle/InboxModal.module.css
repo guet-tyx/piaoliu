@@ -17,7 +17,7 @@
 .close {
   border: none;
   background: none;
-  color: var(--ink-3);
+  color: var(--ink-panel-3);
   font-size: .95rem;
   cursor: pointer;
   width: 34px;
@@ -27,7 +27,7 @@
 }
 .close:hover {
   background: var(--panel-2);
-  color: var(--ink);
+  color: var(--ink-panel);
 }
 
 /* 靠岸动画 + 汐旁白 */
@@ -47,13 +47,13 @@
 }
 .narrate {
   font-size: .8rem;
-  color: var(--ink-2);
+  color: var(--ink-panel-2);
   letter-spacing: .08em;
 }
 .empty {
   padding: 18px 26px 28px;
   font-size: .86rem;
-  color: var(--ink-3);
+  color: var(--ink-panel-3);
   text-align: center;
   line-height: 1.9;
 }
@@ -66,7 +66,7 @@
   gap: 18px;
 }
 .item {
-  border: 1px solid var(--line);
+  border: 1px solid var(--line-panel);
   border-radius: 16px;
   padding: 16px;
   background: var(--panel);
@@ -84,20 +84,20 @@
 }
 .origMark em {
   font-style: normal;
-  color: var(--ink-3);
+  color: var(--ink-panel-3);
   font-weight: 600;
   margin-left: 6px;
 }
 .origText {
   font-size: .88rem;
-  color: var(--ink);
+  color: var(--ink-panel);
   line-height: 1.8;
   margin-top: 7px;
 }
 .origSong {
   margin-top: 8px;
   font-size: .72rem;
-  color: var(--ink-3);
+  color: var(--ink-panel-3);
   letter-spacing: .04em;
 }
 .replies {
@@ -125,7 +125,7 @@
 .reportBtn {
   border: none;
   background: none;
-  color: var(--ink-3);
+  color: var(--ink-panel-3);
   font-size: .62rem;
   letter-spacing: .1em;
   cursor: pointer;
@@ -138,12 +138,12 @@
 .replyText {
   margin-top: 3px;
   font-size: .84rem;
-  color: var(--ink-2);
+  color: var(--ink-panel-2);
   line-height: 1.8;
 }
 .notice {
   margin-top: 8px;
   font-size: .68rem;
-  color: var(--ink-3);
+  color: var(--ink-panel-3);
   letter-spacing: .04em;
 }

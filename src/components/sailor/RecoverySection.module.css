@@ -1,7 +1,8 @@
 /* ============ 跨设备找回 ============ */
 .card {
   background: var(--panel);
-  border: 1px solid var(--line);
+  color: var(--ink-panel); /* 白卡内深字（深海配色） */
+  border: 1px solid var(--line-panel);
   border-radius: 18px;
   padding: 20px 22px;
 }
@@ -13,7 +14,7 @@
 .desc {
   margin-top: 5px;
   font-size: .72rem;
-  color: var(--ink-3);
+  color: var(--ink-panel-3);
   letter-spacing: .04em;
   line-height: 1.6;
 }
@@ -25,9 +26,9 @@
   flex-wrap: wrap;
 }
 .genBtn {
-  border: 1.5px solid var(--line);
+  border: 1.5px solid var(--line-panel);
   background: var(--panel);
-  color: var(--ink-2);
+  color: var(--ink-panel-2);
   border-radius: 999px;
   padding: 8px 16px;
   font-size: .74rem;
@@ -57,13 +58,13 @@
 }
 .input {
   flex: 1;
-  border: 1.5px solid var(--line);
+  border: 1.5px solid var(--line-panel);
   border-radius: 10px;
   padding: 9px 12px;
   font-size: .86rem;
   font-family: var(--sans);
   letter-spacing: .08em;
-  color: var(--ink);
+  color: var(--ink-panel);
   text-transform: uppercase;
 }
 .input:focus {
