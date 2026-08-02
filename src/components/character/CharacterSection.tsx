@@ -49,15 +49,14 @@ export function CharacterSection() {
   }, [ensureDailyGreeting]);
 
   return (
-    <section className="section" id="char">
+    <section className={`section ${styles.charSection}`} id="char">
       <SectionHead
         tag="STAR SEA WATCHERS"
         title="星海守望者"
+        className={styles.charHead}
         subtitle={
           <>
-            四位守望者守着同一片星海：汐领航，流明照灯，朔空放歌，悠占星。
-            <br />
-            点一盏灯，船就开了——<b>今晚你想听谁的故事？</b>
+            汐领航，流明照灯，朔空放歌，悠占星——<b>今晚你想听谁的故事？</b>
           </>
         }
       />
@@ -147,7 +146,7 @@ export function CharacterSection() {
                     src={active.expressions[exprIndex].image}
                     alt={`${active.name} · ${active.expressions[exprIndex].label}`}
                     fill
-                    style={{ objectFit: "cover" }}
+                    style={{ objectFit: "cover", objectPosition: "50% 28%" }}
                   />
                   <figcaption ref={exprCapRef} className={styles.exprCap}>
                     {active.expressions[exprIndex].label}
