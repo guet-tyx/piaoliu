@@ -75,12 +75,8 @@
 }
 html { scroll-behavior: smooth; }
 body {
-  /* 深海配色（DARK_THEME_SPEC 2.2）：顶部 #03060F 与 Hero 视频衔接，
-   * 天顶粉/蓝径向光晕模拟星海天顶光，内容区整页深空蓝 */
-  background:
-    radial-gradient(ellipse 60% 30% at 30% 0%, rgba(251, 114, 153, .08), transparent 70%),
-    radial-gradient(ellipse 60% 30% at 70% 0%, rgba(0, 174, 236, .08), transparent 70%),
-    linear-gradient(180deg, #03060F 0%, #050C1E 120px, #0B1020 280px, #0B1020 100%);
+  /* 纯色兜底：星海背景图与光晕蒙版由 StarSeaBg 固定层承载（body 背景图会随长页拉伸） */
+  background: #0B1020;
   color: var(--ink);
   font-family: var(--sans);
   line-height: 1.7;

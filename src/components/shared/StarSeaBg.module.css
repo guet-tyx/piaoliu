@@ -1,0 +1,14 @@
+/* ============ 星海背景层（AI 生图 + 蒙版压制） ============ */
+.bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  /* 层级（上→下）：天顶粉/青光晕 → 深色蒙版渐变（顶部最深衔接 Hero）→ 星海图 → 纯色兜底 */
+  background:
+    radial-gradient(ellipse 60% 30% at 30% 0%, rgba(251, 114, 153, .08), transparent 70%),
+    radial-gradient(ellipse 60% 30% at 70% 0%, rgba(0, 174, 236, .08), transparent 70%),
+    linear-gradient(180deg, rgba(3, 6, 15, .92) 0%, rgba(5, 12, 30, .55) 160px, rgba(11, 16, 32, .7) 40%, rgba(11, 16, 32, .88) 100%),
+    url("/images/star-sea-bg.webp") center / cover no-repeat,
+    #0B1020;
+}

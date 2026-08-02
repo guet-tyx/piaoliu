@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { Topbar } from "@/components/topbar/Topbar";
 import { Footer } from "@/components/layout/Footer";
 import { ParticleRails } from "@/components/shared/ParticleRails";
+import { StarSeaBg } from "@/components/shared/StarSeaBg";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -15,12 +16,13 @@ export const viewport: Viewport = {
   themeColor: "#050C1E",
 };
 
-/** 根布局：背景粒子层 + 顶栏/页脚全站通用（V1.2 引入多页后仍保持站点骨架一致） */
+/** 根布局：星海背景层 + 点线粒子 + 顶栏/页脚全站通用（V1.2 引入多页后仍保持站点骨架一致） */
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="zh-CN">
       <body>
-        {/* 全站背景点线粒子（z-index 0，内容覆盖其上；aria-hidden 装饰层） */}
+        {/* 全站背景：星海图（下）+ 点线粒子（上），均 z-index 0 + pointer-events none，内容覆盖 */}
+        <StarSeaBg />
         <ParticleRails />
         <Topbar />
         {children}
