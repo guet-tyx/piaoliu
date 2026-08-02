@@ -532,14 +532,13 @@
 }
 
 /* 星海漂流三幕（崩坏3式：单主图 + 底部切换条，切换时图/文慢慢浮现） */
-/* absolute 锚定 DockCard（.card 已 relative）：top 100% 紧贴卡片底边，
-   无视双卡行内高度差（LaunchCard 高于 DockCard）造成的视觉空隙 */
-.sceneStrip {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  margin-top: 2px;
+/* 第二列（dockCol）纵向文档流：拾瓶卡 → 场景条，gap 即卡外框 → 图顶间距（~11px）；
+   保持文档流参与布局——absolute 会让后续区块（下载区）上移重叠 */
+.dockCol {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  min-width: 0;
 }
 .sceneItem {
   position: relative;
@@ -593,7 +592,7 @@
 }
 
 @media (max-width: 960px) {
-  /* 移动端单列：场景条 absolute 已全宽跟随 DockCard（单列即全宽），无需额外规则 */
+  /* 移动端单列：dockCol 全宽，场景条自动跟随拾瓶卡宽度 */
   .sceneItem { aspect-ratio: 21 / 9; }
 }
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { CSSProperties, ReactNode } from "react";
+import type { CSSProperties } from "react";
 import Image from "next/image";
 import { SectionHead } from "@/components/shared/SectionHead";
 import { Reveal } from "@/components/shared/Reveal";
@@ -117,13 +117,14 @@ export function BottleSection() {
         </button>
       </Reveal>
 
-      {/* 投/拾双卡（米哈游风格：进入视口浮现）；星海漂流三幕为 DockCard 子元素——
-          absolute 锚定卡片底边，消除双卡行内高度差（LaunchCard 高于 DockCard）造成的视觉空隙 */}
+      {/* 投/拾双卡（米哈游风格：进入视口浮现）；第二列为拾瓶卡 + 星海漂流三幕纵向排列
+          （文档流布局——absolute 会让场景条脱离文档流，后续区块上移重叠） */}
       <Reveal className={styles.bottleGrid}>
         <LaunchCard />
-        <DockCard>
+        <div className={styles.dockCol}>
+          <DockCard />
           {/* 星海漂流三幕（崩坏3式：单主图 + 底部切换条，切换时图/文 WAAPI 浮现） */}
-          <div className={styles.sceneStrip}>
+          <div>
             <figure className={styles.sceneItem}>
               <Image
                 ref={sceneImgRef}
@@ -149,7 +150,7 @@ export function BottleSection() {
               ariaLabel="切换漂流场景"
             />
           </div>
-        </DockCard>
+        </div>
       </Reveal>
 
       <InboxModal open={inboxOpen} onClose={() => setInboxOpen(false)} />
@@ -309,8 +310,8 @@ function LaunchCard() {
   );
 }
 
-/** 拾瓶池：星海漂流中的纸船（随机拾取，开箱后可见内容）；children 为星海漂流场景条（absolute 锚定卡底） */
-function DockCard({ children }: { children?: ReactNode }) {
+/** 拾瓶池：星海漂流中的纸船（随机拾取，开箱后可见内容） */
+function DockCard() {
   const pick = useBottleStore((s) => s.pick);
   const reply = useBottleStore((s) => s.reply);
   const busy = useBottleStore((s) => s.busy);
@@ -471,7 +472,6 @@ function DockCard({ children }: { children?: ReactNode }) {
         </p>
       )}
       {notice && <p className={styles.notice}>{notice}</p>}
-      {children}
     </div>
   );
 }
