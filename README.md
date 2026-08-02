@@ -55,6 +55,8 @@ archive/                   # 旧版单文件原型（引用根目录 images/ aud
 
 ## 设计规范
 
+> 完整开发指南见 **[STYLE_GUIDE.md](./STYLE_GUIDE.md)**（设计变量分类、`--kf-*` 动效约定、目录职责、"use client" 边界、清理铁律）。
+
 - **配色**：全部 CSS 变量在 `src/app/globals.css` 的 `:root`，沿用原版（`--space` / `--pink` / `--blue` / `--gold` / `--ice` 等），组件内一律 `var(--*)` 引用，不写死色值
 - **字体**：系统字体栈 `--sans`，不引入 Web Font
 - **动效**：米哈游/B站风微交互 + 滚动动效；scroll-driven CSS 优先（`@supports`）、JS 降级；`prefers-reduced-motion` 全局压制；只动 transform/opacity
