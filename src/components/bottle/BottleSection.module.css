@@ -535,7 +535,7 @@
 .sceneStrip {
   /* 与双卡每列等宽（gap 14 → 每列 calc(50% - 7px)），右对齐在「星海漂流中」卡正下方 */
   width: calc(50% - 7px);
-  margin: 10px 0 0 auto;
+  margin: 2px 0 0 auto;
 }
 .sceneItem {
   position: relative;
