@@ -1,0 +1,69 @@
+/* ============ 昵称表单 ============ */
+.card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 20px 22px;
+}
+.title {
+  font-size: .92rem;
+  font-weight: 800;
+  letter-spacing: .1em;
+}
+.desc {
+  margin-top: 5px;
+  font-size: .72rem;
+  color: var(--ink-3);
+  letter-spacing: .04em;
+}
+.row {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+.input {
+  flex: 1;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  padding: 9px 12px;
+  font-size: .86rem;
+  font-family: var(--sans);
+  color: var(--ink);
+  transition: border-color .2s ease;
+}
+.input:focus {
+  outline: none;
+  border-color: var(--blue);
+}
+.btn {
+  border: none;
+  border-radius: 999px;
+  padding: 0 20px;
+  font-size: .78rem;
+  font-weight: 800;
+  letter-spacing: .14em;
+  color: #fff;
+  background: linear-gradient(120deg, var(--pink), var(--pink-deep));
+  cursor: pointer;
+  transition: transform .2s ease, filter .2s ease, opacity .2s ease;
+}
+.btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(1.06);
+}
+.btn:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+.warn {
+  margin-top: 8px;
+  font-size: .72rem;
+  color: var(--pink-deep);
+  letter-spacing: .04em;
+}
+.ok {
+  margin-top: 8px;
+  font-size: .72rem;
+  color: var(--blue-deep);
+  letter-spacing: .04em;
+}

@@ -3,6 +3,7 @@
 import type { CSSProperties } from "react";
 import { usePlayerStore, type PlayMode } from "@/stores/player";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
+import { useBondTracker } from "@/hooks/useBondTracker";
 import { SectionHead } from "@/components/shared/SectionHead";
 import styles from "./PlayerSection.module.css";
 
@@ -68,6 +69,7 @@ function VolIcon({ muted }: { muted: boolean }) {
  */
 export function PlayerSection() {
   useAudioPlayer();
+  useBondTracker();
 
   const track = usePlayerStore((s) => s.tracks[s.currentIndex]);
   const total = usePlayerStore((s) => s.tracks.length);

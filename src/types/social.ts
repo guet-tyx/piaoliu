@@ -56,19 +56,21 @@ export interface Reply {
   createdAt: number;
 }
 
-/** 星尘船员证（对应 supabase.sailors；昵称/羁绊/等级 V1.2 激活，字段预留） */
+/** 星尘船员证（对应 supabase.sailors；V1.2 激活昵称/羁绊/等级/皮肤/徽章） */
 export interface Sailor {
   id: string;
   /** 匿名代号（零注册自动生成） */
   anonMark: string;
-  /** 纸船样式（V1.2 皮肤系统启用） */
+  /** 当前纸船皮肤 id（paper/crane/star，对应 supabase.bottle_style；V1.2 皮肤系统） */
   bottleStyle: string;
-  /** 自定义昵称（V1.2 启用，当前恒为 null） */
+  /** 自定义昵称（1-12 字，敏感词校验；V1.2 启用） */
   nickname: string | null;
-  /** 羁绊值（V1.2 启用，预留） */
+  /** 羁绊值（行为累积，V1.2 启用） */
   bondValue: number;
-  /** 星尘等级（V1.2 启用，预留） */
+  /** 星尘等级（由羁绊值推导，V1.2 启用） */
   level: number;
+  /** 已解锁徽章 id 集合（V1.2 启用） */
+  badges: string[];
   createdAt: number;
 }
 

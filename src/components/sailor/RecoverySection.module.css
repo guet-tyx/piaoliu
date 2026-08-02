@@ -1,0 +1,104 @@
+/* ============ 跨设备找回 ============ */
+.card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 20px 22px;
+}
+.title {
+  font-size: .92rem;
+  font-weight: 800;
+  letter-spacing: .1em;
+}
+.desc {
+  margin-top: 5px;
+  font-size: .72rem;
+  color: var(--ink-3);
+  letter-spacing: .04em;
+  line-height: 1.6;
+}
+.genRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+.genBtn {
+  border: 1.5px solid var(--line);
+  background: var(--panel);
+  color: var(--ink-2);
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-size: .74rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  cursor: pointer;
+  transition: color .2s ease, border-color .2s ease;
+}
+.genBtn:hover {
+  color: var(--pink-deep);
+  border-color: rgba(251, 114, 153, .5);
+}
+.code {
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: .18em;
+  color: var(--pink-deep);
+  background: rgba(251, 114, 153, .08);
+  border: 1px dashed rgba(251, 114, 153, .4);
+  border-radius: 10px;
+  padding: 6px 14px;
+}
+.claimRow {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+.input {
+  flex: 1;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  padding: 9px 12px;
+  font-size: .86rem;
+  font-family: var(--sans);
+  letter-spacing: .08em;
+  color: var(--ink);
+  text-transform: uppercase;
+}
+.input:focus {
+  outline: none;
+  border-color: var(--blue);
+}
+.claimBtn {
+  border: none;
+  border-radius: 999px;
+  padding: 0 18px;
+  font-size: .76rem;
+  font-weight: 800;
+  letter-spacing: .12em;
+  color: #fff;
+  background: linear-gradient(120deg, var(--pink), var(--pink-deep));
+  cursor: pointer;
+  transition: transform .2s ease, filter .2s ease, opacity .2s ease;
+}
+.claimBtn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(1.06);
+}
+.claimBtn:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+.ok {
+  margin-top: 8px;
+  font-size: .72rem;
+  color: var(--blue-deep);
+  letter-spacing: .04em;
+}
+.warn {
+  margin-top: 8px;
+  font-size: .72rem;
+  color: var(--pink-deep);
+  letter-spacing: .04em;
+}

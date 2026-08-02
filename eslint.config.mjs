@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // 测试产物（截图与临时验证脚本，不入库）
+    "gui-test-screenshots/**",
   ]),
 ]);
 

@@ -110,15 +110,40 @@
   border-left: 3px solid rgba(251, 114, 153, .55);
   padding: 4px 0 4px 12px;
 }
+.replyHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
 .replyMark {
   font-size: .68rem;
   font-weight: 800;
   color: var(--pink-deep);
   letter-spacing: .08em;
 }
+.reportBtn {
+  border: none;
+  background: none;
+  color: var(--ink-3);
+  font-size: .62rem;
+  letter-spacing: .1em;
+  cursor: pointer;
+  padding: 1px 3px;
+  transition: color .2s ease;
+}
+.reportBtn:hover {
+  color: var(--pink-deep);
+}
 .replyText {
   margin-top: 3px;
   font-size: .84rem;
   color: var(--ink-2);
   line-height: 1.8;
+}
+.notice {
+  margin-top: 8px;
+  font-size: .68rem;
+  color: var(--ink-3);
+  letter-spacing: .04em;
 }

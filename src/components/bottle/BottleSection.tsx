@@ -4,28 +4,19 @@ import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import Image from "next/image";
 import { SectionHead } from "@/components/shared/SectionHead";
+import { SkinBoat, type SkinVariant } from "@/components/shared/SkinBoat";
 import { InboxModal } from "@/components/bottle/InboxModal";
 import { useIdentityStore } from "@/stores/identity";
 import { useBottleStore } from "@/stores/bottle";
 import { usePlayerStore } from "@/stores/player";
 import { isSafeText } from "@/lib/api/moderation";
+import { reportBottle } from "@/lib/api/bottles";
 import type { Bottle, TrackSnapshot } from "@/types/social";
 import styles from "./BottleSection.module.css";
 
 /** 拾瓶上限（与查询层一致：投 1 / 拾 3） */
 const LAUNCH_LIMIT = 1;
 const PICK_LIMIT = 3;
-
-/** 纸船剪影（与品牌图形同源） */
-function BoatIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
-      <path d="M12 3v11" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-      <path d="M12 4.5 19 11h-7z" fill="currentColor" />
-      <path d="M2.5 13.5Q12 17.5 21.5 13.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  );
-}
 
 /**
  * 纸船漂流（FR-7）：匿名投瓶（绑定当前播放歌曲）+ 随机拾瓶（卡牌开箱）+ 星海来讯入口
@@ -68,7 +59,7 @@ export function BottleSection() {
       {/* 区块工具条：船员证 + 星海来讯 */}
       <div className={styles.toolbar}>
         <p className={styles.sailorLine}>
-          <BoatIcon className={styles.sailorBoat} />
+          <SkinBoat className={styles.sailorBoat} />
           <span>
             船客 <b>{sailor ? sailor.anonMark : "正在启航…"}</b>
           </span>
@@ -101,6 +92,9 @@ function LaunchCard() {
   const track = usePlayerStore((s) => s.tracks[s.currentIndex]);
   const launch = useBottleStore((s) => s.launch);
   const busy = useBottleStore((s) => s.busy);
+  const noteAction = useIdentityStore((s) => s.noteAction);
+  const bond = useIdentityStore((s) => s.bond);
+  const skin = (useIdentityStore((s) => s.sailor?.bottleStyle) ?? "paper") as SkinVariant;
 
   const [text, setText] = useState("");
   const [phase, setPhase] = useState<"idle" | "launching" | "done">("idle");
@@ -137,6 +131,9 @@ function LaunchCard() {
       return;
     }
     setPhase("launching");
+    // 羁绊：投瓶 +1（FR-8.3）；首次投瓶的汐回应在 noteAction 内触发
+    noteAction("launched");
+    bond("launch");
     // 启航动画（1.4s）后进入成功旁白
     window.setTimeout(() => setPhase("done"), 1400);
   };
@@ -197,7 +194,7 @@ function LaunchCard() {
 
       {phase === "done" ? (
         <p className={styles.success}>
-          <BoatIcon className={styles.successBoat} />
+          <SkinBoat variant={skin} className={styles.successBoat} />
           纸船已启航。它会漂向星海深处的某个船客——注意查收「星海来讯」。
         </p>
       ) : (
@@ -214,7 +211,7 @@ function LaunchCard() {
       {/* 启航动画层 */}
       {phase === "launching" && (
         <div className={styles.launchFx} aria-hidden="true">
-          <BoatIcon className={styles.fxBoat} />
+          <SkinBoat variant={skin} className={styles.fxBoat} />
           <span className={styles.fxWave} />
         </div>
       )}
@@ -227,6 +224,9 @@ function DockCard() {
   const pick = useBottleStore((s) => s.pick);
   const reply = useBottleStore((s) => s.reply);
   const busy = useBottleStore((s) => s.busy);
+  const noteAction = useIdentityStore((s) => s.noteAction);
+  const bond = useIdentityStore((s) => s.bond);
+  const skin = (useIdentityStore((s) => s.sailor?.bottleStyle) ?? "paper") as SkinVariant;
 
   const [picked, setPicked] = useState<Bottle | null>(null);
   const [flipped, setFlipped] = useState(false);
@@ -250,6 +250,9 @@ function DockCard() {
     }
     setPicked(result.bottle);
     setEmpty(false);
+    // 羁绊：拾瓶 +1（FR-8.3）
+    noteAction("picked");
+    bond("pick");
     // 卡牌翻转开箱（0.6s 后显示内容）
     window.setTimeout(() => setFlipped(true), 150);
   };
@@ -268,6 +271,9 @@ function DockCard() {
       return;
     }
     setNotice("回信已沿原航线靠岸。愿它抵达该抵达的人。");
+    // 羁绊：回信 +1（FR-8.3）
+    noteAction("replied");
+    bond("reply");
     setPicked(null);
     setFlipped(false);
     setReplyText("");
@@ -285,7 +291,7 @@ function DockCard() {
             <div className={`${styles.flipCard}${flipped ? ` ${styles.opened}` : ""}`}>
               {/* 背面：未开箱纸船 */}
               <div className={styles.flipBack}>
-                <BoatIcon className={styles.dockBoat} />
+                <SkinBoat variant={skin} className={styles.dockBoat} />
                 <span>一艘纸船靠岸了…</span>
               </div>
               {/* 正面：开箱内容 */}
@@ -298,27 +304,41 @@ function DockCard() {
                 <p className={styles.dockSong}>
                   🎵 {picked.track.t} · {picked.track.s}
                 </p>
-                {picked.repliedAt === null && (
-                  <div className={styles.replyBox}>
-                    <textarea
-                      className={styles.replyInput}
-                      value={replyText}
-                      maxLength={200}
-                      rows={3}
-                      placeholder="回信（10-200 字）：沿原航线靠岸，只有投瓶人能看见。"
-                      aria-label="回信内容"
-                      onChange={(e) => setReplyText(e.target.value)}
-                    />
-                    <button
-                      className={styles.replyBtn}
-                      type="button"
-                      disabled={busy || replyText.trim().length < 10}
-                      onClick={onReply}
-                    >
-                      回信
-                    </button>
-                  </div>
-                )}
+                <div className={styles.frontRow}>
+                  {picked.repliedAt === null && (
+                    <div className={styles.replyBox}>
+                      <textarea
+                        className={styles.replyInput}
+                        value={replyText}
+                        maxLength={200}
+                        rows={3}
+                        placeholder="回信（10-200 字）：沿原航线靠岸，只有投瓶人能看见。"
+                        aria-label="回信内容"
+                        onChange={(e) => setReplyText(e.target.value)}
+                      />
+                      <button
+                        className={styles.replyBtn}
+                        type="button"
+                        disabled={busy || replyText.trim().length < 10}
+                        onClick={onReply}
+                      >
+                        回信
+                      </button>
+                    </div>
+                  )}
+                  {/* 举报入口（NFR-1） */}
+                  <button
+                    className={styles.reportBtn}
+                    type="button"
+                    aria-label="举报这艘纸船"
+                    onClick={async () => {
+                      const ok = await reportBottle(picked.id, "内容不适");
+                      setNotice(ok ? "举报已记录，星海会核实处理。" : "举报提交失败。");
+                    }}
+                  >
+                    举报
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -334,7 +354,7 @@ function DockCard() {
                 onClick={onPick}
                 style={{ "--dly": `${i * 0.4}s` } as CSSProperties}
               >
-                <BoatIcon className={styles.dockBoat} />
+                <SkinBoat variant={skin} className={styles.dockBoat} />
               </button>
             ))}
             <p className={styles.dockHint}>拾起一艘，看看星海今天漂来了什么。</p>

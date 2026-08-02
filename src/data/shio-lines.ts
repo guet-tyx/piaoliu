@@ -43,3 +43,32 @@ export function shioSlotOf(hour: number): ShioSlot {
   if (hour < 12) return "morning";
   return "day";
 }
+
+/**
+ * 汐的行为回应（FR-8.2，V1.2 启用）：4 类触发，每条 7 天内不重复
+ * 触发点：连续听歌 3 首 / 收到回信 / 首次投瓶 / 拾瓶
+ */
+export type ShioResponseKind = "listen3" | "reply-received" | "first-launch" | "pick";
+
+export const SHIO_RESPONSES: Record<ShioResponseKind, ShioLine[]> = {
+  listen3: [
+    { id: "r-l1", text: "三首歌连成一条航线了。你今晚想漂远一点吗？" },
+    { id: "r-l2", text: "听歌的样子很专注，像在给星海写信。" },
+    { id: "r-l3", text: "第三首了。汐帮你看过航线——前方还有好听的。" },
+  ],
+  "reply-received": [
+    { id: "r-r1", text: "有船靠岸了。你的心事，被某人接住了。" },
+    { id: "r-r2", text: "回信顺着航线漂回来了。星海没有辜负你。" },
+    { id: "r-r3", text: "有人读懂了你的瓶子。这大概就是漂流的意义。" },
+  ],
+  "first-launch": [
+    { id: "r-f1", text: "第一艘船，祝你顺风。" },
+    { id: "r-f2", text: "纸船入海了。从此星海里有一艘，写着你的心情。" },
+    { id: "r-f3", text: "第一次启航总是最难忘的。汐会记得这一天。" },
+  ],
+  pick: [
+    { id: "r-p1", text: "拾到一艘别人的心事。温柔地打开它吧。" },
+    { id: "r-p2", text: "星海把一艘船推到了你面前。缘分有时候就是这么漂来的。" },
+    { id: "r-p3", text: "打开瓶子的时候，别忘了它曾经漂过很长的夜。" },
+  ],
+};

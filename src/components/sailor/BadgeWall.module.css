@@ -1,0 +1,89 @@
+/* ============ 徽章墙 ============ */
+.card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 20px 22px;
+}
+.title {
+  font-size: .92rem;
+  font-weight: 800;
+  letter-spacing: .1em;
+}
+.desc {
+  margin-top: 5px;
+  font-size: .72rem;
+  color: var(--ink-3);
+  letter-spacing: .04em;
+}
+.list {
+  list-style: none;
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+}
+.unlocked {
+  background: linear-gradient(135deg, rgba(251, 114, 153, .07), rgba(0, 174, 236, .07));
+  border-color: rgba(251, 114, 153, .35);
+}
+.locked {
+  opacity: .55;
+}
+.icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .9rem;
+}
+.unlocked .icon {
+  background: linear-gradient(120deg, var(--pink), var(--blue));
+  color: #fff;
+  box-shadow: 0 6px 14px -6px rgba(251, 114, 153, .7);
+}
+.locked .icon {
+  background: var(--panel-2);
+  color: var(--ink-3);
+}
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.meta b {
+  font-size: .78rem;
+  letter-spacing: .04em;
+}
+.meta small {
+  font-size: .64rem;
+  color: var(--ink-3);
+  line-height: 1.45;
+}
+.got {
+  margin-left: auto;
+  flex: none;
+  font-style: normal;
+  font-size: .58rem;
+  font-weight: 800;
+  letter-spacing: .1em;
+  color: var(--blue-deep);
+  border: 1px solid rgba(0, 174, 236, .35);
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+@media (max-width: 560px) {
+  .list { grid-template-columns: 1fr; }
+}

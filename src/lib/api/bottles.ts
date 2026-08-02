@@ -295,22 +295,25 @@ export async function markInboxRead(bottleId: string): Promise<void> {
   await sb.rpc("mark_inbox_read", { p_bottle_id: bottleId });
 }
 
-/** 举报（NFR-1 治理入口） */
-export async function reportBottle(bottleId: string, reason: string): Promise<boolean> {
+/** 举报（NFR-1 治理入口；V1.2 支持瓶子与回信两类目标） */
+export async function reportBottle(
+  targetId: string,
+  reason: string,
+  targetType: "bottle" | "reply" = "bottle",
+): Promise<boolean> {
   if (!isSupabaseReady()) {
-    const reports = readJson<{ id: string; bottleId: string; reason: string; at: number }[]>(
-      REPORTS_KEY,
-      [],
-    );
-    reports.push({ id: genId(), bottleId, reason, at: Date.now() });
+    const reports = readJson<
+      { id: string; targetType: string; targetId: string; reason: string; at: number }[]
+    >(REPORTS_KEY, []);
+    reports.push({ id: genId(), targetType, targetId, reason, at: Date.now() });
     writeJson(REPORTS_KEY, reports);
     return true;
   }
   const sb = getSupabase();
   if (!sb) return false;
   const { error } = await sb.rpc("report_content", {
-    p_target_type: "bottle",
-    p_target_id: bottleId,
+    p_target_type: targetType,
+    p_target_id: targetId,
     p_reason: reason,
   });
   return !error;

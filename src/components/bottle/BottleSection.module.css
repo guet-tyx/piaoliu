@@ -395,6 +395,27 @@
   color: var(--ink-3);
   letter-spacing: .04em;
 }
+/* 开箱正面操作行：回信 + 举报 */
+.frontRow {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.reportBtn {
+  align-self: flex-start;
+  border: none;
+  background: none;
+  color: var(--ink-3);
+  font-size: .66rem;
+  letter-spacing: .12em;
+  cursor: pointer;
+  padding: 2px 4px;
+  transition: color .2s ease;
+}
+.reportBtn:hover {
+  color: var(--pink-deep);
+}
 .replyBox {
   width: 100%;
   display: flex;

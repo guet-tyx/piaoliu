@@ -153,6 +153,27 @@
   text-align: right;
 }
 
+/* 汐的行为回应气泡（V1.2 羁绊） */
+.responseBubble {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed rgba(123, 177, 255, .28);
+  animation: var(--kf-rise) .4s cubic-bezier(.22, .61, .36, 1);
+}
+.responseText {
+  font-size: .86rem;
+  color: var(--ice);
+  line-height: 1.8;
+  letter-spacing: .04em;
+}
+.responseSign {
+  margin-top: 6px;
+  font-size: .68rem;
+  color: rgba(255, 255, 255, .42);
+  letter-spacing: .16em;
+  text-align: right;
+}
+
 /* 滚动揭示：进入视口淡入上浮（view() 时间线，不支持时静态可见）
  * 注：section-head 的 revealUp 已在共享组件 SectionHead.module.css 中 */
 .charCard {

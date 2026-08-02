@@ -6,6 +6,7 @@ import { CHARACTER } from "@/data/character";
 import { SectionHead } from "@/components/shared/SectionHead";
 import { CountUp } from "@/components/shared/CountUp";
 import { useShioStore } from "@/stores/shio";
+import { useIdentityStore } from "@/stores/identity";
 import type { ShioSlot } from "@/data/shio-lines";
 import styles from "./CharacterSection.module.css";
 
@@ -25,6 +26,7 @@ export function CharacterSection() {
   const greeting = useShioStore((s) => s.greeting);
   const slot = useShioStore((s) => s.slot);
   const ensureDailyGreeting = useShioStore((s) => s.ensureDailyGreeting);
+  const response = useIdentityStore((s) => s.response);
 
   // 每日首次挂载：按时段选句（客户端专属，effect 内读取 localStorage）
   useEffect(() => {
@@ -99,6 +101,14 @@ export function CharacterSection() {
               {greeting ? `「${greeting.text}」` : "……"}
             </p>
             <p className={styles.greetSign}>—— 汐</p>
+
+            {/* 汐的行为回应气泡（FR-8.2：听歌 3 首/收信/首次投瓶） */}
+            {response && (
+              <div className={styles.responseBubble}>
+                <p className={styles.responseText}>「{response.line.text}」</p>
+                <p className={styles.responseSign}>—— 汐 · 刚刚</p>
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -1,0 +1,113 @@
+/* ============ 船员证核心卡 ============ */
+.card {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(160deg, var(--space-2), var(--space));
+  border: 1px solid rgba(123, 177, 255, .25);
+  border-radius: 24px;
+  padding: 30px 28px 24px;
+  color: #fff;
+  box-shadow: 0 30px 70px -34px rgba(5, 12, 30, .7);
+}
+/* 星点装饰（确定性位置，纯装饰） */
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(1.5px 1.5px at 12% 22%, rgba(255, 255, 255, .7), transparent),
+    radial-gradient(1px 1px at 78% 14%, rgba(123, 177, 255, .9), transparent),
+    radial-gradient(1.5px 1.5px at 64% 74%, rgba(255, 255, 255, .5), transparent),
+    radial-gradient(1px 1px at 28% 86%, rgba(123, 177, 255, .7), transparent),
+    radial-gradient(1px 1px at 88% 52%, rgba(255, 255, 255, .45), transparent);
+  pointer-events: none;
+}
+
+.head {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.levelBadge {
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .12em;
+  color: #fff;
+  background: linear-gradient(120deg, var(--gold), #E7C98A);
+  padding: 5px 12px;
+  border-radius: 999px;
+  box-shadow: 0 8px 18px -8px rgba(201, 160, 99, .8);
+}
+.titleBadge {
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .14em;
+  color: var(--ice);
+  border: 1px solid rgba(123, 177, 255, .4);
+  border-radius: 999px;
+  padding: 5px 14px;
+}
+
+.name {
+  margin-top: 22px;
+  font-size: 1.7rem;
+  font-weight: 800;
+  letter-spacing: .06em;
+}
+.name em {
+  font-style: normal;
+  font-size: .78rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, .55);
+  letter-spacing: .14em;
+  margin-left: 10px;
+}
+.slogan {
+  margin-top: 10px;
+  font-size: .8rem;
+  color: rgba(255, 255, 255, .5);
+  letter-spacing: .1em;
+}
+
+.bondBox {
+  margin-top: 24px;
+  background: rgba(255, 255, 255, .06);
+  border-radius: 14px;
+  padding: 14px 16px;
+}
+.bondHead {
+  display: flex;
+  justify-content: space-between;
+  font-size: .74rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  color: rgba(255, 255, 255, .75);
+}
+.bondTrack {
+  margin-top: 9px;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, .12);
+  overflow: hidden;
+}
+.bondTrack i {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--pink), var(--blue));
+  transition: width .5s ease;
+}
+.bondHint {
+  margin-top: 8px;
+  font-size: .68rem;
+  color: rgba(255, 255, 255, .45);
+  letter-spacing: .06em;
+}
+
+.foot {
+  margin-top: 20px;
+  font-size: .64rem;
+  color: rgba(255, 255, 255, .32);
+  letter-spacing: .1em;
+  text-align: center;
+}

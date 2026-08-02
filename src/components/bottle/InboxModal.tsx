@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Modal } from "@/components/shared/Modal";
 import { BottleCard } from "@/components/bottle/BottleCard";
 import { useBottleStore, type InboxItem } from "@/stores/bottle";
+import { useIdentityStore } from "@/stores/identity";
+import { reportBottle } from "@/lib/api/bottles";
 import styles from "./InboxModal.module.css";
 
 /**
@@ -15,14 +17,23 @@ import styles from "./InboxModal.module.css";
 export function InboxModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const inbox = useBottleStore((s) => s.inbox);
   const markRead = useBottleStore((s) => s.markRead);
+  const respond = useIdentityStore((s) => s.respond);
+  const respondedRef = useRef(false);
 
-  // 打开时全部标为已读（星海来讯已阅）
+  // 打开时全部标为已读（星海来讯已阅）；有新回信时触发汐回应「有船靠岸了」（FR-8.2）
   useEffect(() => {
     if (!open) return;
-    inbox.forEach((item) => {
-      if (item.bottle.readAt === null) markRead(item.bottle.id);
-    });
-  }, [open, inbox, markRead]);
+    const hasUnread = inbox.some((item) => item.bottle.readAt === null);
+    if (hasUnread) {
+      inbox.forEach((item) => {
+        if (item.bottle.readAt === null) markRead(item.bottle.id);
+      });
+      if (!respondedRef.current) {
+        respondedRef.current = true;
+        respond("reply-received");
+      }
+    }
+  }, [open, inbox, markRead, respond]);
 
   return (
     <Modal open={open} onClose={onClose} labelledBy="inbox-title">
@@ -63,6 +74,7 @@ export function InboxModal({ open, onClose }: { open: boolean; onClose: () => vo
 /** 单封收信：原文 + 回信 + 瓶面卡 */
 function InboxItemView({ item }: { item: InboxItem }) {
   const { bottle, replies } = item;
+  const [notice, setNotice] = useState<string | null>(null);
   return (
     <li className={styles.item}>
       <div className={styles.orig}>
@@ -78,11 +90,26 @@ function InboxItemView({ item }: { item: InboxItem }) {
       <div className={styles.replies}>
         {replies.map((r) => (
           <div key={r.id} className={styles.reply}>
-            <p className={styles.replyMark}>{r.anonMark} 的回信</p>
+            <div className={styles.replyHead}>
+              <p className={styles.replyMark}>{r.anonMark} 的回信</p>
+              {/* 举报回信（NFR-1） */}
+              <button
+                className={styles.reportBtn}
+                type="button"
+                aria-label="举报这条回信"
+                onClick={async () => {
+                  const ok = await reportBottle(r.id, "内容不适", "reply");
+                  setNotice(ok ? "举报已记录，星海会核实处理。" : "举报提交失败。");
+                }}
+              >
+                举报
+              </button>
+            </div>
             <p className={styles.replyText}>{r.text}</p>
           </div>
         ))}
       </div>
+      {notice && <p className={styles.notice}>{notice}</p>}
 
       <BottleCard bottle={bottle} replies={replies} />
     </li>
