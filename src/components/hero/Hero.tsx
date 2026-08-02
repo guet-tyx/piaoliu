@@ -55,6 +55,18 @@ export function Hero() {
 
   return (
     <section ref={heroRef} className={`${styles.hero} ${styles.heroScrub}`} aria-label="首屏">
+      {/* 临时功能：汐.mp4 视频背景（autoplay 需 muted；aria-hidden 装饰层） */}
+      <video
+        className={styles.heroVideo}
+        src="/汐.mp4"
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="auto"
+        aria-hidden="true"
+        tabIndex={-1}
+      />
       <StarField />
       <HeroDanmaku />
 

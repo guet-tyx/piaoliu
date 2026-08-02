@@ -21,6 +21,30 @@
   background-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72'%3E%3Cpath d='M0 72 72 0 M-18 18 18 -18 M54 90 90 54' stroke='%237BB1FF' stroke-opacity='.055' stroke-width='1'/%3E%3C/svg%3E");
 }
 
+/* 临时功能：汐.mp4 视频背景（覆盖原静态背景图；压暗保证白字可读） */
+.heroVideo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: .6;
+  pointer-events: none;
+}
+/* 视频暗化遮罩（文字侧更深；内容 z-index 2 位于其上） */
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    rgba(5, 12, 30, .82) 0%,
+    rgba(5, 12, 30, .38) 48%,
+    rgba(5, 12, 30, .58) 100%
+  );
+}
+
 /* 四角括号 HUD */
 .hudCorner {
   position: absolute;
