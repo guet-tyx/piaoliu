@@ -63,6 +63,8 @@
   --kf-bottleWave: bottleWave;
   --kf-bottleLand: bottleLand;
   --kf-parallax: parallax;
+  --kf-railDot: railDot;
+  --kf-railLine: railLine;
 }
 
 /* ============ 基础 ============ */
@@ -182,6 +184,16 @@ section[id] { scroll-margin-top: 76px; }
 @keyframes parallax {
   from { transform: translateY(0); }
   to { transform: translateY(-36px); }
+}
+/* 背景点线粒子（调研自 bh3.mihoyo.com .line-dot-ani）：圆点沿线缓慢漂移 */
+@keyframes railDot {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(46px); }
+}
+/* 背景点线粒子：竖线透明度呼吸闪烁 */
+@keyframes railLine {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .45; }
 }
 
 /* ============ 文字扫金 hover ============

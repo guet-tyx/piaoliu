@@ -1,0 +1,32 @@
+/* ============ 背景点线粒子（崩坏3官网 line-dot-ani 风格） ============ */
+.rails {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.rail {
+  position: absolute;
+  width: 1px;
+  background: rgba(255, 255, 255, .05); /* 暗组（米哈游实测 .05） */
+  animation: var(--kf-railLine) 7s ease-in-out infinite;
+}
+.railBright {
+  background: rgba(255, 255, 255, .25); /* 亮组（米哈游实测 .25） */
+}
+
+.dot {
+  position: absolute;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  margin-left: -2.5px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .15); /* 暗组点（米哈游实测 .15） */
+  animation: var(--kf-railDot) 15s ease-in-out infinite;
+}
+.dotBright {
+  background: rgba(255, 255, 255, .35); /* 亮组点（米哈游实测 .35） */
+}
