@@ -9,6 +9,11 @@
 - **Zustand** — 状态管理（`src/stores/`）
 - **Supabase** — BaaS（客户端 `src/lib/supabase/client.ts`，尚未接入真实后端）
 
+## 版本状态
+
+- **V1.0.1（体验修补，已完成）**：进度条可拖动、音量/静音、三种播放模式、收藏持久化、弹幕开关真实接线、下载/社交链接真实化（FR-1~FR-6）
+- **V1.1（纸船漂流 + 汐的陪伴）**：架构蓝图见 [ARCHITECTURE.md](./ARCHITECTURE.md)，实现另起阶段
+
 ## 开发命令
 
 ```bash
