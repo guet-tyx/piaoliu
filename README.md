@@ -32,34 +32,44 @@ npm run lint    # ESLint
 ```
 src/
 ├─ app/                    # App Router
-│  ├─ layout.tsx           # 全局 metadata（标题/描述/theme-color #050C1E）
-│  ├─ page.tsx             # 首页：Topbar + Hero
+│  ├─ layout.tsx           # 根布局：星海背景层 + 粒子 + Topbar/Footer + ScrollChrome
+│  ├─ page.tsx             # 首页：Hero → 跑马灯 → 角色 → 歌单 → 播放器 → 漂流 → 下载
+│  ├─ sailor/page.tsx      # 船员证页（/sailor）
+│  ├─ report/page.tsx      # 星海周报页（/report）
 │  └─ globals.css          # 设计变量 + 基础样式 + 共享 keyframes
-├─ components/
-│  ├─ topbar/              # 顶栏（B站式亮色毛玻璃）
-│  └─ hero/                # 首屏（深空压轴，星空/弹幕待接入）
-├─ data/tracks.ts          # 星海电台曲目（多源音频降级）
-├─ lib/supabase/client.ts  # Supabase 懒加载客户端
-├─ stores/player.ts        # 播放器 Zustand store（骨架）
-└─ types/music.ts          # Track 类型
+├─ components/             # 各区块组件 + 同名 *.module.css（交互组件 "use client"）
+│  ├─ shared/              # 跨区块复用（SectionHead / Reveal / Modal / SkinBoat / StarSeaBg…）
+│  └─ topbar|hero|marquee|character|playlist|player|bottle|download|sailor|report|layout/
+├─ data/                   # 静态内容数据（tracks / playlists / character / events / shio-lines…）
+├─ hooks/                  # 浏览器 API 封装（useAudioPlayer / useReveal / usePresence…）
+├─ lib/                    # api 查询层（isSupabaseReady 分支）+ realtime + supabase 客户端
+├─ stores/                 # Zustand 状态中枢（player / identity / bottle / danmaku / shio）
+└─ types/                  # 共享 TS 类型（music.ts / social.ts）
 public/
-├─ images/                 # 封面与 hero 背景
-└─ audio/                  # 本地试听音频
-archive/                   # 旧版单文件原型（引用根目录 images/ audio/）
+├─ images/                 # 正式引用的封面/立绘/皮肤资源（webp + png）
+├─ audio/                  # 本地试听音频
+└─ 汐.mp4                  # Hero 视频背景
+archive/                   # 历史归档（不参与构建）
+├─ *.html / *.mp3          # 旧版单文件原型（对照物）
+├─ docs/                   # 已落地的历史规格（ARCHITECTURE / DARK_THEME_SPEC / animation-spec）
+├─ generated/              # AI 生图原始素材（正式版已在 public/images/）
+└─ media/                  # 原型媒体 + public 未引用 png 源图
+scripts/                   # 工具脚本（gen-star-sea-bg.sh 星海背景图生成）
+supabase/                  # SQL 迁移（001~004）+ 种子，待配置联调
 ```
 
-## 迁移地图（原型 → 组件）
+## 迁移地图（原型 → 组件，已全部完成）
 
 | 原型区块（archive/anime-style.html） | 新位置 | 状态 |
 |---|---|---|
-| 顶栏 `.topbar` | `src/components/topbar/` | ✅ 第一步（静态壳） |
-| 首屏 `.hero` | `src/components/hero/` | ✅ 第一步（静态壳，星空 canvas/弹幕待接入） |
-| 跑马灯 `.marquee` | — | ⏳ 待迁移 |
-| 角色登场 `#char` | — | ⏳ 待迁移 |
-| 歌单 `#playlist` | — | ⏳ 待迁移 |
-| 播放器 `#player` | — | ⏳ 待迁移（store 已就绪） |
-| 下载 `#download` | — | ⏳ 待迁移 |
-| 页脚 `footer` | — | ⏳ 待迁移 |
+| 顶栏 `.topbar` | `src/components/topbar/` | ✅ |
+| 首屏 `.hero` | `src/components/hero/` | ✅（含星空 canvas + 弹幕层） |
+| 跑马灯 `.marquee` | `src/components/marquee/` | ✅ |
+| 角色登场 `#char` | `src/components/character/` | ✅（多角色切换版） |
+| 歌单 `#playlist` | `src/components/playlist/` | ✅（米哈游焦点横排版） |
+| 播放器 `#player` | `src/components/player/` | ✅（V1.0.1 全量体验） |
+| 下载 `#download` | `src/components/download/` | ✅ |
+| 页脚 `footer` | `src/components/layout/Footer` | ✅ |
 | 视图切换器 `.view-switch` | — | 原型专有，重构后废弃 |
 
 ## 设计规范
@@ -67,8 +77,8 @@ archive/                   # 旧版单文件原型（引用根目录 images/ aud
 > 完整开发指南见 **[STYLE_GUIDE.md](./STYLE_GUIDE.md)**（设计变量分类、`--kf-*` 动效约定、目录职责、"use client" 边界、清理铁律）。
 
 - **配色**：全部 CSS 变量在 `src/app/globals.css` 的 `:root`，沿用原版（`--space` / `--pink` / `--blue` / `--gold` / `--ice` 等），组件内一律 `var(--*)` 引用，不写死色值
-- **深海配色**（DARK_THEME_SPEC.md 全量落地 + 崩坏3官网配色二期）：深空蓝渐变 body + **半透明深蓝玻璃卡**（`--panel: rgba(17,26,51,.72)` + `rgba(255,255,255,.15)` 浅描边，参考 bh3.mihoyo.com 实测，无白色实心块）；全站浅色文字统一 `--ink*` 系列（`--ink-panel*` 同值保留分层）；卡片阴影为深空晕影 + 粉/青品牌辉光；输入框覆盖 UA 白底为玻璃色
-- **AI 生图背景**：`StarSeaBg` 固定背景层（AI 生成星海氛围图 `public/images/star-sea-bg.webp`，sensenova-u1-fast，24KB）+ 深色蒙版渐变压制亮度（顶部最深衔接 Hero）；与 `ParticleRails` 同层（图在下粒子在上），body 保留纯色兜底；生成脚本可参考 `gui-test-screenshots/gen-star-sea-bg.sh`
+- **深海配色**（[archive/docs/DARK_THEME_SPEC.md](./archive/docs/DARK_THEME_SPEC.md) 已全量落地 + 崩坏3官网配色二期）：深空蓝渐变 body + **半透明深蓝玻璃卡**（`--panel: rgba(17,26,51,.72)` + `rgba(255,255,255,.15)` 浅描边，参考 bh3.mihoyo.com 实测，无白色实心块）；全站浅色文字统一 `--ink*` 系列（`--ink-panel*` 同值保留分层）；卡片阴影为深空晕影 + 粉/青品牌辉光；输入框覆盖 UA 白底为玻璃色
+- **AI 生图背景**：`StarSeaBg` 固定背景层（AI 生成星海氛围图 `public/images/star-sea-bg.webp`，sensenova-u1-fast，24KB）+ 深色蒙版渐变压制亮度（顶部最深衔接 Hero）；与 `ParticleRails` 同层（图在下粒子在上），body 保留纯色兜底；生成脚本可参考 `scripts/gen-star-sea-bg.sh`
 - **角色切换页**：`CharacterSection` 仿崩坏3官网角色板块（调研自 `bh3.mihoyo.com` 的 75px 头像切换列表）——四位星海守望者（汐 SIO / 流明 LUMEN / 朔空 SOKU / 悠 YOE，同画师立绘 `public/images/`）：头像点击切换立绘 + 档案（名称/标签/描述/统计/表情），立绘切换淡入（`--kf-rise`）；每日一句与行为回应为汐专属（切换隐藏）；`CHARACTERS` 数据在 `src/data/character.ts`
 - **字体**：系统字体栈 `--sans`，不引入 Web Font
 - **动效**：米哈游/崩坏3 官网风格滚动动画——全区块内容错落浮现（scroll-driven `view()` 优先 + IntersectionObserver 降级，共享 `Reveal` 组件）+ 轻微视差（标题区/角色图，`scroll(root)` 时间线）；Hero 首屏 exit-scrub 滚动叙事；`prefers-reduced-motion` 全局压制；只动 transform/opacity
