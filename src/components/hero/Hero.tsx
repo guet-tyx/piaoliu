@@ -54,7 +54,12 @@ export function Hero() {
   }, []);
 
   return (
-    <section ref={heroRef} className={`${styles.hero} ${styles.heroScrub}`} aria-label="首屏">
+    <section
+      ref={heroRef}
+      id="top"
+      className={`${styles.hero} ${styles.heroScrub}`}
+      aria-label="首屏"
+    >
       {/* 临时功能：汐.mp4 视频背景（autoplay 需 muted；aria-hidden 装饰层） */}
       <video
         className={styles.heroVideo}
