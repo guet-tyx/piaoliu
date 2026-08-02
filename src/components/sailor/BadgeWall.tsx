@@ -2,6 +2,7 @@
 
 import { useIdentityStore } from "@/stores/identity";
 import { BADGES } from "@/data/collection";
+import Image from "next/image";
 import styles from "./BadgeWall.module.css";
 
 /**
@@ -23,7 +24,12 @@ export function BadgeWall() {
               className={`${styles.item}${unlocked ? ` ${styles.unlocked}` : ` ${styles.locked}`}`}
             >
               <span className={styles.icon} aria-hidden="true">
-                {unlocked ? "✦" : "·"}
+                <Image
+                  src={b.image}
+                  alt={b.name}
+                  fill
+                  style={{ objectFit: "cover" }}
+                />
               </span>
               <span className={styles.meta}>
                 <b>{b.name}</b>

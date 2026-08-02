@@ -75,14 +75,15 @@ export interface BadgeDef {
   id: string;
   name: string;
   desc: string;
+  image: string; // 徽章插画
   check: (stats: SailorStats) => boolean;
 }
 
 export const BADGES: BadgeDef[] = [
-  { id: "first-launch", name: "第一艘船", desc: "启航你的第一艘纸船", check: (s) => s.launched >= 1 },
-  { id: "first-reply", name: "有船靠岸", desc: "送出第一封回信", check: (s) => s.replied >= 1 },
-  { id: "pick-10", name: "拾贝十人", desc: "拾起 10 艘漂流中的纸船", check: (s) => s.picked >= 10 },
-  { id: "listen-3", name: "夜航三曲", desc: "一口气连续听完 3 首歌", check: (s) => s.maxListenStreak >= 3 },
+  { id: "first-launch", name: "第一艘船", desc: "启航你的第一艘纸船", image: "/images/badge-first-launch.png", check: (s) => s.launched >= 1 },
+  { id: "first-reply", name: "有船靠岸", desc: "送出第一封回信", image: "/images/badge-first-reply.png", check: (s) => s.replied >= 1 },
+  { id: "pick-10", name: "拾贝十人", desc: "拾起 10 艘漂流中的纸船", image: "/images/badge-pick-10.png", check: (s) => s.picked >= 10 },
+  { id: "listen-3", name: "夜航三曲", desc: "一口气连续听完 3 首歌", image: "/images/badge-listen-3.png", check: (s) => s.maxListenStreak >= 3 },
 ];
 
 /** 已达成但未解锁的徽章列表 */
