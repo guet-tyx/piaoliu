@@ -265,19 +265,21 @@ export function PlayerSection() {
 
             {/* 发弹幕（FR-10.2）：同曲频道广播，1-50 字，敏感词拦截 */}
             <div className={styles.dmSend}>
-              <input
-                className={styles.dmInput}
-                value={dmText}
-                maxLength={50}
-                placeholder={danmakuOn ? "发条同船弹幕（1-50 字）…" : "弹幕已关，先打开弹幕"}
-                aria-label="发送弹幕"
-                disabled={!danmakuOn}
-                onChange={(e) => {
-                  setDmText(e.target.value);
-                  setDmErr(null);
-                }}
-              />
-              <span className={styles.dmCount}>{dmText.length}/50</span>
+              <div className={styles.dmInputWrap}>
+                <input
+                  className={styles.dmInput}
+                  value={dmText}
+                  maxLength={50}
+                  placeholder={danmakuOn ? "发条同船弹幕（1-50 字）…" : "弹幕已关，先打开弹幕"}
+                  aria-label="发送弹幕"
+                  disabled={!danmakuOn}
+                  onChange={(e) => {
+                    setDmText(e.target.value);
+                    setDmErr(null);
+                  }}
+                />
+                <span className={styles.dmCount}>{dmText.length}/50</span>
+              </div>
               <button
                 className={styles.dmSendBtn}
                 type="button"

@@ -68,11 +68,12 @@
   border-radius: 50%;
   overflow: hidden;
   pointer-events: none;
-  opacity: 0;
+  /* 真实弹幕：默认可见（显隐由弹幕开关控制，不依赖播放状态——
+     否则未播放时发弹幕会「发了看不见」） */
+  opacity: 1;
   transition: opacity .5s ease;
 }
-.live .recordDm { opacity: 1; }
-/* 弹幕开关关闭态（FR-5：等优先级下靠后定义，压过 .live .recordDm） */
+/* 弹幕开关关闭态（FR-5/FR-10.2） */
 .recordDm.off { opacity: 0; }
 .recordDm .dm {
   font-size: .82rem;
@@ -332,17 +333,22 @@
 
 /* ---- 发弹幕（FR-10.2）：同曲频道广播 ---- */
 .dmSend {
-  position: relative;
   display: flex;
   align-items: center;
   gap: 10px;
   margin-top: 12px;
 }
-.dmInput {
+/* 输入框容器：计数锚定在输入框内右侧，不与「发」按钮重叠 */
+.dmInputWrap {
+  position: relative;
   flex: 1;
+  min-width: 0;
+}
+.dmInput {
+  width: 100%;
   border: 1.5px solid var(--line);
   border-radius: 999px;
-  padding: 8px 46px 8px 14px;
+  padding: 8px 52px 8px 14px;
   font-size: .8rem;
   font-family: var(--sans);
   color: var(--ink);
@@ -359,7 +365,9 @@
 }
 .dmCount {
   position: absolute;
-  right: 54px;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
   font-size: .62rem;
   color: var(--ink-3);
   letter-spacing: .06em;
