@@ -4,6 +4,7 @@ import { Topbar } from "@/components/topbar/Topbar";
 import { Footer } from "@/components/layout/Footer";
 import { ParticleRails } from "@/components/shared/ParticleRails";
 import { StarSeaBg } from "@/components/shared/StarSeaBg";
+import { ScrollChrome } from "@/components/shared/ScrollChrome";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -24,6 +25,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         {/* 全站背景：星海图（下）+ 点线粒子（上），均 z-index 0 + pointer-events none，内容覆盖 */}
         <StarSeaBg />
         <ParticleRails />
+        {/* 滚动叙事：顶部进度条 + 返回顶部（fixed 层） */}
+        <ScrollChrome />
         <Topbar />
         {children}
         <Footer />

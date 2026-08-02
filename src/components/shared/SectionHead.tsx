@@ -13,15 +13,23 @@ interface SectionHeadProps {
   className?: string;
 }
 
-/** 通用段落头：发光圆点角标 + H2 + 副标题（角色/歌单/播放器/下载区块共用） */
+/** 通用段落头：发光圆点角标 + H2（逐字浮现）+ 副标题（角色/歌单/播放器/下载区块共用） */
 export function SectionHead({ tag, title, subtitle, centered, className }: SectionHeadProps) {
+  // 逐字拆分为独立 span：进入视口时负 delay 错落上浮（米哈游标题手感）
+  const chars = Array.from(title);
   return (
     <div className={`${styles.sectionHead}${centered ? ` ${styles.centered}` : ""}${className ? ` ${className}` : ""}`}>
       <span className={styles.tagDot}>
         <i />
         {tag}
       </span>
-      <h2>{title}</h2>
+      <h2>
+        {chars.map((ch, i) => (
+          <span key={i} className={styles.char} style={{ animationDelay: `-${i * 0.05}s` }}>
+            {ch}
+          </span>
+        ))}
+      </h2>
       {subtitle && <p className={styles.secSub}>{subtitle}</p>}
     </div>
   );

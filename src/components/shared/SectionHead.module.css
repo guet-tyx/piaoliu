@@ -16,6 +16,13 @@
   margin: 14px 0;
   letter-spacing: .02em;
 }
+/* 标题逐字浮现：进入视口时字符依次上浮（view() 时间线 + 负 delay 错落） */
+.char {
+  display: inline-block;
+  animation: var(--kf-rise) .8s cubic-bezier(.22, .61, .36, 1) both;
+  animation-timeline: view();
+  animation-range: entry 8% cover 26%;
+}
 .secSub {
   color: var(--ink-2);
   line-height: 1.95;
@@ -54,9 +61,10 @@
   margin-right: auto;
 }
 
-/* 动效偏好：标题区/副标题无滚动动画（直接可见） */
+/* 动效偏好：标题区/逐字/副标题无滚动动画（直接可见） */
 @media (prefers-reduced-motion: reduce) {
   .sectionHead,
+  .char,
   .secSub {
     animation: none;
   }
