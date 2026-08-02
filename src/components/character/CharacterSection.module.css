@@ -173,7 +173,7 @@
   line-height: 1.7;
   margin: 8px 0 12px;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -217,7 +217,8 @@
 }
 .exprMain {
   position: relative;
-  height: 120px; /* 压缩：固定高（原 4/5 比例 ~480px），cover 显示中部 */
+  height: 190px; /* 加大：脸部清晰（原 120px 太小），限宽保持竖版构图 */
+  max-width: 300px;
   border-radius: 14px;
   overflow: hidden;
   border: 1px solid var(--line-panel);

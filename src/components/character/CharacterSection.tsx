@@ -91,14 +91,15 @@ export function CharacterSection() {
       <div className={styles.charCard}>
         <div className={styles.charPic}>
           <span className={styles.lv}>{active.lv}</span>
-          {/* key 重挂载触发切换 fade；objectPosition 偏上保证脸部完整（竖图 cover 居中会裁掉头部） */}
+          {/* key 重挂载触发切换 fade；objectPosition 0% = 图顶部对齐（竖图脸在顶部，
+           * 百分比 y 会让图上部被裁——0% 保证脸部完整） */}
           <Image
             key={active.id}
             src={active.image}
             alt={active.imageAlt}
             fill
             sizes="(max-width: 960px) 65vw, 33vw"
-            style={{ objectFit: "cover", objectPosition: "50% 18%" }}
+            style={{ objectFit: "cover", objectPosition: "50% 0%" }}
           />
         </div>
 
@@ -146,7 +147,7 @@ export function CharacterSection() {
                     src={active.expressions[exprIndex].image}
                     alt={`${active.name} · ${active.expressions[exprIndex].label}`}
                     fill
-                    style={{ objectFit: "cover", objectPosition: "50% 28%" }}
+                    style={{ objectFit: "cover", objectPosition: "50% 0%" }}
                   />
                   <figcaption ref={exprCapRef} className={styles.exprCap}>
                     {active.expressions[exprIndex].label}
