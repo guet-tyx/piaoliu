@@ -94,7 +94,9 @@ supabase/                  # SQL 迁移（001~004）+ 种子，待配置联调
 cp .env.example .env.local   # 填入 Supabase URL 与 anon key
 ```
 
-未配置时 `getSupabase()` 返回 `null`，页面照常运行。
+未配置时 `getSupabase()` 返回 `null`，页面照常运行（本地模拟池）。
+
+> **从本地模拟切到真实 Supabase 后端**：完整步骤见 **[SUPABASE_SETUP.md](./SUPABASE_SETUP.md)**（建项目 → 启用匿名登录 → 执行迁移 → `npm run verify:real` 冒烟验证）。SQL 迁移 `supabase/migrations/001~004 + seed.sql` 已就绪待执行。
 
 ## 音乐版权
 

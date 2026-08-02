@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Node 工具脚本（不入 eslint）
+    "scripts/**",
   ]),
 ]);
 

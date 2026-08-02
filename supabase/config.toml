@@ -1,0 +1,25 @@
+# Supabase CLI 项目配置（可选）
+# 浏览器手动流程（SUPABASE_SETUP.md 第 1-5 步）用不到本文件；
+# 将来想用 CLI 自动化（supabase db push / gen types）时启用：
+#   1) 把 project_id 改成你的项目 ref（项目 URL 里 supabase.co 前的那段）
+#   2) npx supabase login && npx supabase link --project-ref <ref>
+#   3) npx supabase db push && npx supabase db seed && npx supabase gen types typescript --project-id <ref> > src/types/database.ts
+project_id = "your-project-ref"  # 占位：改为真实 project ref
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public"]
+
+[db]
+port = 54322
+major_version = 15
+
+# 匿名登录（FR-9 身份底座必需；Dashboard 手动开启与此等效）
+[auth]
+enabled = true
+enable_anonymous_sign_ins = true
+
+# Realtime（同船弹幕 broadcast 频道依赖；postgres_changes 需另行在 Replication 订阅表）
+[realtime]
+enabled = true
