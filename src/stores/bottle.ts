@@ -34,7 +34,7 @@ interface BottleState {
   /** 提交中（防连点） */
   busy: boolean;
   refreshInbox: () => Promise<void>;
-  launch: (text: string, track: TrackSnapshot) => Promise<LaunchResult>;
+  launch: (text: string, track: TrackSnapshot, style?: string) => Promise<LaunchResult>;
   pick: () => Promise<PickResult>;
   reply: (bottleId: string, text: string) => Promise<ReplyResult>;
   markRead: (bottleId: string) => Promise<void>;
@@ -54,11 +54,11 @@ export const useBottleStore = create<BottleState>()((set, get) => ({
     });
   },
 
-  launch: async (text, track) => {
+  launch: async (text, track, style) => {
     if (get().busy) return { ok: false, reason: "limit" };
     set({ busy: true });
     try {
-      const result = await launchBottle(text, track);
+      const result = await launchBottle(text, track, style);
       set({ limits: getDailyLimits() });
       return result;
     } finally {

@@ -111,3 +111,31 @@
   letter-spacing: .1em;
   text-align: center;
 }
+
+/* 最近航行小结（V2.0） */
+.weekBox {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .05);
+  border: 1px solid rgba(123, 177, 255, .18);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.weekLabel {
+  font-size: .62rem;
+  font-weight: 800;
+  letter-spacing: .2em;
+  color: var(--ice);
+}
+.weekStats {
+  font-size: .76rem;
+  color: rgba(255, 255, 255, .72);
+  letter-spacing: .04em;
+  line-height: 1.6;
+}
+.weekStats b {
+  color: var(--pink-bright);
+  font-weight: 800;
+}

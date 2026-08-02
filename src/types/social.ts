@@ -84,6 +84,16 @@ export interface DailyLimits {
   picked: number;
 }
 
+/** 按天行为活动（V2.0 周报「本周」统计源；真实模式由 action_logs 聚合） */
+export interface DailyActivity {
+  /** 本地日期 YYYY-MM-DD */
+  date: string;
+  launched: number;
+  picked: number;
+  replied: number;
+  listenCount: number;
+}
+
 /** 投瓶结果 */
 export type LaunchResult =
   | { ok: true; bottle: Bottle }

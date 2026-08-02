@@ -7,7 +7,7 @@ import {
   genRecoveryCode,
   getLocalSailorSync,
   getOrCreateSailor,
-  pushListenStreak,
+  pushListen,
   resetListenStreak,
   updateNickname,
   type BondKind,
@@ -96,8 +96,8 @@ interface IdentityState {
   respond: (kind: ShioResponseKind) => void;
   /** 行为计数 + 徽章刷新（投瓶/拾瓶/回信后调用） */
   noteAction: (kind: "launched" | "picked" | "replied") => void;
-  /** 连续听歌推进（useBondTracker 调用；每满 3 首触发羁绊+回应） */
-  noteListen: () => void;
+  /** 听歌记录 + 连续听歌推进（useBondTracker 调用；每满 3 首触发羁绊+回应；周报收听数据源） */
+  noteListen: (trackId: string) => void;
   /** 听歌中断重置 */
   resetListen: () => void;
   /** 生成找回码 */
@@ -155,8 +155,17 @@ export const useIdentityStore = create<IdentityState>()((set, get) => ({
   },
 
   bond: async (kind, oncePerDay = false) => {
+    const prev = get().sailor?.bondValue ?? 0;
     const sailor = await earnBond(kind, oncePerDay);
-    if (sailor) set({ sailor, title: titleOf(sailor.level) });
+    if (sailor) {
+      set({ sailor, title: titleOf(sailor.level) });
+      // 羁绊里程碑（V2.0）：跨过 10/20/30 触发汐专属回应（7 天去重复用现有机制）
+      for (const milestone of [10, 20, 30]) {
+        if (prev < milestone && sailor.bondValue >= milestone) {
+          get().respond(`bond-${milestone}` as ShioResponseKind);
+        }
+      }
+    }
   },
 
   respond: (kind) => {
@@ -183,11 +192,11 @@ export const useIdentityStore = create<IdentityState>()((set, get) => ({
     }
   },
 
-  noteListen: () => {
+  noteListen: (trackId) => {
     const sailor = get().sailor;
     if (!sailor) return;
-    const stats = pushListenStreak();
-    // 每满 3 首：羁绊 + 回应 + 重置计数
+    const stats = pushListen(trackId);
+    // 每满 3 首：羁绊 + 回应 + 重置计数（周报收听计数与羁绊解耦，pushListen 已独立记录）
     if (stats.listenStreak >= 3) {
       get().bond("listen", true);
       get().respond("listen3");

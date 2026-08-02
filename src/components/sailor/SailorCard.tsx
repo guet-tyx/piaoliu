@@ -1,16 +1,32 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useIdentityStore } from "@/stores/identity";
 import { nextLevelBond, TITLE_TIERS } from "@/data/collection";
+import { computeWeeklyReport } from "@/lib/api/report";
 import styles from "./SailorCard.module.css";
 
 /**
  * 船员证核心卡：匿名代号/昵称 + 等级徽标 + 称号 + 羁绊进度条
  * 等级 → 称号映射见 data/collection.ts（FR-9.2）
+ * V2.0：最近航行小结（本周行为，与周报数据互通）
  */
 export function SailorCard() {
   const sailor = useIdentityStore((s) => s.sailor);
   const title = useIdentityStore((s) => s.title);
+  // 本周航行小结（客户端专属数据，effect 后计算避免水合冲突）
+  const [week, setWeek] = useState<{
+    listens: number;
+    launched: number;
+    picked: number;
+    replied: number;
+  } | null>(null);
+  useEffect(() => {
+    const r = computeWeeklyReport();
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage 外部源初始化（SSR 空态安全，水合后更新）
+    setWeek({ ...r.week });
+  }, []);
+
   if (!sailor) return null;
 
   const nextBond = nextLevelBond(sailor.bondValue);
@@ -52,6 +68,23 @@ export function SailorCard() {
       </div>
 
       <p className={styles.foot}>匿名 · 不采集任何身份信息 · 可随时更换昵称</p>
+
+      {/* 最近航行小结（V2.0：本周行为，与周报数据互通） */}
+      {week && (
+        <div className={styles.weekBox}>
+          <span className={styles.weekLabel}>最近航行 · 本周</span>
+          <span className={styles.weekStats}>
+            {week.listens > 0 || week.launched > 0 || week.picked > 0 || week.replied > 0 ? (
+              <>
+                听歌 <b>{week.listens}</b> 首 · 启航 <b>{week.launched}</b> 艘 · 拾瓶{" "}
+                <b>{week.picked}</b> 艘 · 回信 <b>{week.replied}</b> 封
+              </>
+            ) : (
+              "本周还没有航行记录"
+            )}
+          </span>
+        </div>
+      )}
     </div>
   );
 }

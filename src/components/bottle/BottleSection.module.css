@@ -160,6 +160,32 @@
   padding: 3px 10px;
 }
 
+/* 节日活动提示（FR-14）：限定瓶面 + 活动语汇 */
+.eventBanner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding: 9px 14px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(251, 114, 153, .1), rgba(0, 174, 236, .08));
+  border: 1px dashed rgba(251, 114, 153, .4);
+  font-size: .74rem;
+  color: var(--ink-2);
+  letter-spacing: .04em;
+}
+.eventBanner em {
+  flex: none;
+  font-style: normal;
+  font-weight: 800;
+  font-size: .68rem;
+  letter-spacing: .1em;
+  color: #fff;
+  background: linear-gradient(120deg, var(--pink), var(--pink-deep));
+  border-radius: 999px;
+  padding: 3px 10px;
+}
+
 /* ---- 投瓶：输入 ---- */
 .textWrap {
   position: relative;
@@ -380,6 +406,15 @@
   font-size: .6rem;
   color: var(--gold);
   border: 1px solid rgba(201, 160, 99, .5);
+  border-radius: 999px;
+  padding: 1px 8px;
+}
+/* 活动限定瓶徽标（FR-14） */
+.festTag {
+  font-style: normal;
+  font-size: .6rem;
+  color: #fff;
+  background: linear-gradient(120deg, var(--pink), var(--pink-deep));
   border-radius: 999px;
   padding: 1px 8px;
 }

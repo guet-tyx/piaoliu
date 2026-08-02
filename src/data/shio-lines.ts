@@ -47,8 +47,16 @@ export function shioSlotOf(hour: number): ShioSlot {
 /**
  * 汐的行为回应（FR-8.2，V1.2 启用）：4 类触发，每条 7 天内不重复
  * 触发点：连续听歌 3 首 / 收到回信 / 首次投瓶 / 拾瓶
+ * V2.0 增羁绊里程碑回应（bond-10/20/30：羁绊值跨过阈值时触发）
  */
-export type ShioResponseKind = "listen3" | "reply-received" | "first-launch" | "pick";
+export type ShioResponseKind =
+  | "listen3"
+  | "reply-received"
+  | "first-launch"
+  | "pick"
+  | "bond-10"
+  | "bond-20"
+  | "bond-30";
 
 export const SHIO_RESPONSES: Record<ShioResponseKind, ShioLine[]> = {
   listen3: [
@@ -70,5 +78,17 @@ export const SHIO_RESPONSES: Record<ShioResponseKind, ShioLine[]> = {
     { id: "r-p1", text: "拾到一艘别人的心事。温柔地打开它吧。" },
     { id: "r-p2", text: "星海把一艘船推到了你面前。缘分有时候就是这么漂来的。" },
     { id: "r-p3", text: "打开瓶子的时候，别忘了它曾经漂过很长的夜。" },
+  ],
+  "bond-10": [
+    { id: "r-b1", text: "羁绊值到 10 了。星海记得你每一个航行的夜晚。" },
+    { id: "r-b2", text: "十点羁绊——汐已经把你当成老船客了。" },
+  ],
+  "bond-20": [
+    { id: "r-b3", text: "二十点羁绊。这条航线，汐陪你走了很久。" },
+    { id: "r-b4", text: "羁绊渐深。你听过的每一首歌，星海都替你记得。" },
+  ],
+  "bond-30": [
+    { id: "r-b5", text: "三十点羁绊。灯塔守望者的路上，汐一直在。" },
+    { id: "r-b6", text: "三十个夜晚的陪伴。有些船，漂着漂着就成了归处。" },
   ],
 };

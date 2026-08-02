@@ -7,7 +7,7 @@ import {
   pendingBadges,
   type SailorStats,
 } from "@/data/collection";
-import type { Sailor } from "@/types/social";
+import type { DailyActivity, Sailor } from "@/types/social";
 
 /** 本地游客 id（本地模拟池的身份标识） */
 export const GUEST_ID = "local-guest";
@@ -17,13 +17,19 @@ export const SYSTEM_ID = "system";
 const SAILOR_KEY = "drift-sailor";
 /** 行为统计（徽章判定/羁绊数据源；真实模式由 action_logs 聚合） */
 const STATS_KEY = "drift-stats";
+/** 按天行为活动（V2.0 周报「本周」统计源） */
+const DAILY_KEY = "drift-daily-activity";
 /** 找回码映射（本地模拟；真实模式以 recovery_hash 服务端校验） */
 const RECOVERY_KEY = "drift-recovery";
 /** 每日一次的行为去重记录（航行 1 天/听歌 3 首等） */
 const DAILY_BOND_KEY = "drift-bond-daily";
 
 export interface SailorStatsState extends SailorStats {
-  /** 最近一次启航日期 YYYY-MM-DD（投瓶每日限 1，统计按次即可） */
+  /** 每首歌播放次数（V2.0 周报热门航线源） */
+  trackCounts: Record<string, number>;
+  /** 按天播放次数（V2.0 周报收听星图源） */
+  listenByDay: Record<string, number>;
+  /** 最近一次行为时间戳 */
   updatedAt: number;
 }
 
@@ -153,18 +159,50 @@ export async function updateNickname(nickname: string): Promise<RenameResult> {
 /* ---------- 行为统计（drift-stats） ---------- */
 
 export function readStats(): SailorStatsState {
-  return readJson<SailorStatsState>(STATS_KEY, {
-    launched: 0,
-    picked: 0,
-    replied: 0,
-    listenStreak: 0,
-    maxListenStreak: 0,
-    updatedAt: 0,
-  });
+  // 兼容旧结构（V2.0 前无 trackCounts/listenByDay）：缺省字段合并默认值
+  const raw = readJson<Partial<SailorStatsState>>(STATS_KEY, {});
+  return {
+    launched: raw.launched ?? 0,
+    picked: raw.picked ?? 0,
+    replied: raw.replied ?? 0,
+    listenStreak: raw.listenStreak ?? 0,
+    maxListenStreak: raw.maxListenStreak ?? 0,
+    trackCounts: raw.trackCounts ?? {},
+    listenByDay: raw.listenByDay ?? {},
+    updatedAt: raw.updatedAt ?? 0,
+  };
 }
 
 function writeStats(s: SailorStatsState) {
   writeJson(STATS_KEY, s);
+}
+
+/** 按天活动记录（周报「本周」聚合源） */
+export function readDailyActivity(): DailyActivity[] {
+  return readJson<DailyActivity[]>(DAILY_KEY, []);
+}
+
+function bumpDaily(kind: "launched" | "picked" | "replied" | "listen") {
+  const today = localDate();
+  const list = readDailyActivity();
+  const existing = list.find((d) => d.date === today);
+  const cur = existing ?? {
+    date: today,
+    launched: 0,
+    picked: 0,
+    replied: 0,
+    listenCount: 0,
+  };
+  if (kind === "launched") cur.launched += 1;
+  else if (kind === "picked") cur.picked += 1;
+  else if (kind === "replied") cur.replied += 1;
+  else cur.listenCount += 1;
+  // 今天已有条目则更新，否则追加新条目（首写不丢失）
+  const next = existing
+    ? list.map((d) => (d.date === today ? cur : d))
+    : [...list, cur];
+  // 只保留最近 60 天（防无限增长）
+  writeJson(DAILY_KEY, next.slice(-60));
 }
 
 /** 行为计数（投瓶/拾瓶/回信），返回最新统计 */
@@ -173,18 +211,23 @@ export function bumpStat(kind: "launched" | "picked" | "replied"): SailorStatsSt
   stats[kind] += 1;
   stats.updatedAt = Date.now();
   writeStats(stats);
+  bumpDaily(kind);
   return stats;
 }
 
-/** 连续听歌推进（听歌 3 首触发 listen_3）：返回最新统计 */
-export function pushListenStreak(): SailorStatsState {
+/** 听歌记录（周报源 + 连续计数）：trackCounts/listenByDay 与羁绊 listen3 解耦，每次切歌记录 */
+export function pushListen(trackId: string): SailorStatsState {
   const stats = readStats();
   stats.listenStreak += 1;
   if (stats.listenStreak > stats.maxListenStreak) {
     stats.maxListenStreak = stats.listenStreak;
   }
+  stats.trackCounts[trackId] = (stats.trackCounts[trackId] ?? 0) + 1;
+  const today = localDate();
+  stats.listenByDay[today] = (stats.listenByDay[today] ?? 0) + 1;
   stats.updatedAt = Date.now();
   writeStats(stats);
+  bumpDaily("listen");
   return stats;
 }
 

@@ -111,7 +111,7 @@ function genId(): string {
     : `b-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
-function readPool(): Bottle[] {
+export function readPool(): Bottle[] {
   const pool = readJson<Bottle[]>(POOL_KEY, []);
   if (pool.length > 0) return pool;
   // 首次：植入系统预热瓶
@@ -157,8 +157,12 @@ export function getDailyLimits(): DailyLimits {
 
 /* ---------- 公开接口 ---------- */
 
-/** 投瓶（FR-7）：限每日 1 个；内容 10-200 字 + 绑定当前播放歌曲快照 */
-export async function launchBottle(text: string, track: TrackSnapshot): Promise<LaunchResult> {
+/** 投瓶（FR-7）：限每日 1 个；内容 10-200 字 + 绑定当前播放歌曲快照；style 为瓶面样式（默认纸船，活动期间传限定样式） */
+export async function launchBottle(
+  text: string,
+  track: TrackSnapshot,
+  style?: string,
+): Promise<LaunchResult> {
   const trimmed = text.trim();
   if (trimmed.length < 10) return { ok: false, reason: "too-short" };
   if (trimmed.length > 200) return { ok: false, reason: "too-long" };
@@ -172,7 +176,7 @@ export async function launchBottle(text: string, track: TrackSnapshot): Promise<
       authorId: GUEST_ID,
       text: trimmed,
       track,
-      bottleStyle: "paper",
+      bottleStyle: style ?? "paper",
       anonMark: "你的纸船", // 展示用占位，实际代号由船员证提供
       status: "drifting",
       pickedBy: null,
@@ -190,7 +194,11 @@ export async function launchBottle(text: string, track: TrackSnapshot): Promise<
 
   const sb = getSupabase();
   if (!sb) return { ok: false, reason: "offline" };
-  const { data, error } = await sb.rpc("launch_bottle", { p_text: trimmed, p_track: track });
+  const { data, error } = await sb.rpc("launch_bottle", {
+    p_text: trimmed,
+    p_track: track,
+    p_style: style ?? "paper",
+  });
   if (error || !data) return { ok: false, reason: "offline" };
   return { ok: true, bottle: mapBottleRow(data) };
 }

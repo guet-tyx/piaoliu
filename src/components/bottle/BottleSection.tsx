@@ -12,6 +12,8 @@ import { usePlayerStore } from "@/stores/player";
 import { useDanmakuStore } from "@/stores/danmaku";
 import { isSafeText } from "@/lib/api/moderation";
 import { reportBottle } from "@/lib/api/bottles";
+import { eventOfStyle, getActiveEvent, getEventForTest } from "@/data/events";
+import type { DriftEvent } from "@/data/events";
 import type { Bottle, TrackSnapshot } from "@/types/social";
 import styles from "./BottleSection.module.css";
 
@@ -140,6 +142,13 @@ function LaunchCard() {
   const [text, setText] = useState("");
   const [phase, setPhase] = useState<"idle" | "launching" | "done">("idle");
   const [error, setError] = useState<string | null>(null);
+  // 节日活动（FR-14）：URL 测试开关优先，否则按日期自动生效
+  const [event, setEvent] = useState<DriftEvent | null>(null);
+  useEffect(() => {
+    const param = new URLSearchParams(window.location.search).get("event");
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- URL/日期外部源初始化（SSR 空态安全，水合后更新）
+    setEvent(getEventForTest(param) ?? getActiveEvent());
+  }, []);
 
   const len = text.trim().length;
   const safe = isSafeText(text);
@@ -156,7 +165,8 @@ function LaunchCard() {
   const onLaunch = async () => {
     if (!canLaunch) return;
     setError(null);
-    const result = await launch(text, snapshot);
+    // 活动期间投瓶使用限定瓶面样式（FR-14）
+    const result = await launch(text, snapshot, event ? event.bottleStyle : skin);
     if (!result.ok) {
       const msg =
         result.reason === "limit"
@@ -205,6 +215,14 @@ function LaunchCard() {
         <span className={styles.nowTag}>随船出发</span>
       </div>
 
+      {/* 节日活动提示（FR-14）：限定瓶面 + 活动语汇 */}
+      {event && (
+        <div className={styles.eventBanner}>
+          <em>{event.name}限定</em>
+          <span>{event.tagline}</span>
+        </div>
+      )}
+
       <div className={styles.textWrap}>
         <textarea
           className={styles.input}
@@ -238,7 +256,9 @@ function LaunchCard() {
       {phase === "done" ? (
         <p className={styles.success}>
           <SkinBoat variant={skin} className={styles.successBoat} />
-          纸船已启航。它会漂向星海深处的某个船客——注意查收「星海来讯」。
+          {event
+            ? event.shioLine
+            : "纸船已启航。它会漂向星海深处的某个船客——注意查收「星海来讯」。"}
         </p>
       ) : (
         <button
@@ -276,6 +296,12 @@ function DockCard() {
   const [replyText, setReplyText] = useState("");
   const [notice, setNotice] = useState<string | null>(null);
   const [empty, setEmpty] = useState(false);
+
+  // 拾到的瓶子按自身样式渲染（活动限定瓶显示活动徽标；不再用拾瓶人皮肤渲染他人瓶子）
+  const pickedEvent = picked ? eventOfStyle(picked.bottleStyle) : null;
+  const pickedVariant = pickedEvent
+    ? "paper"
+    : ((picked?.bottleStyle ?? "paper") as SkinVariant);
 
   const onPick = async () => {
     setNotice(null);
@@ -338,7 +364,7 @@ function DockCard() {
             <div className={`${styles.flipCard}${flipped ? ` ${styles.opened}` : ""}`}>
               {/* 背面：未开箱纸船 */}
               <div className={styles.flipBack}>
-                <SkinBoat variant={skin} className={styles.dockBoat} />
+                <SkinBoat variant={pickedVariant} className={styles.dockBoat} />
                 <span>一艘纸船靠岸了…</span>
               </div>
               {/* 正面：开箱内容 */}
@@ -346,6 +372,9 @@ function DockCard() {
                 <p className={styles.dockMark}>
                   {picked.anonMark}
                   {picked.isSystem && <em className={styles.sysTag}>星海信使</em>}
+                  {pickedEvent && (
+                    <em className={styles.festTag}>{pickedEvent.name}限定</em>
+                  )}
                 </p>
                 <p className={styles.dockText}>{picked.text}</p>
                 <p className={styles.dockSong}>

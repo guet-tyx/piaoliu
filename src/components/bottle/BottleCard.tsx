@@ -8,10 +8,11 @@ import styles from "./BottleCard.module.css";
 export const CARD_W = 1080;
 export const CARD_H = 1440;
 
-const FONT = "'PingFang SC', 'HarmonyOS Sans SC', 'Microsoft YaHei', sans-serif";
+/** 分享图画布共用字体（瓶面卡/周报卡） */
+export const SHARE_FONT = "'PingFang SC', 'HarmonyOS Sans SC', 'Microsoft YaHei', sans-serif";
 
-/** 按宽度换行（canvas 排版） */
-function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
+/** 按宽度换行（canvas 排版；瓶面卡/周报卡共用） */
+export function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
   const lines: string[] = [];
   let line = "";
   for (const ch of text) {
@@ -26,8 +27,8 @@ function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number)
   return lines;
 }
 
-/** 纸船剪影（三角帆 + 弧线船身，与品牌图形同源） */
-function drawBoat(ctx: CanvasRenderingContext2D, cx: number, cy: number, size: number, color: string) {
+/** 纸船剪影（三角帆 + 弧线船身，与品牌图形同源；瓶面卡/周报卡共用） */
+export function drawBoat(ctx: CanvasRenderingContext2D, cx: number, cy: number, size: number, color: string) {
   ctx.save();
   ctx.strokeStyle = color;
   ctx.fillStyle = color;
@@ -77,7 +78,7 @@ function drawBottleCard(ctx: CanvasRenderingContext2D, bottle: Bottle, replies: 
 
   // 品牌行
   ctx.fillStyle = "rgba(123,177,255,.85)";
-  ctx.font = `600 30px ${FONT}`;
+  ctx.font = `600 30px ${SHARE_FONT}`;
   ctx.fillText("漂流 DRIFT · 星海版", W / 2, 88);
 
   // 纸船
@@ -85,12 +86,12 @@ function drawBottleCard(ctx: CanvasRenderingContext2D, bottle: Bottle, replies: 
 
   // 匿名代号
   ctx.fillStyle = "rgba(255,255,255,.72)";
-  ctx.font = `500 30px ${FONT}`;
+  ctx.font = `500 30px ${SHARE_FONT}`;
   ctx.fillText(bottle.anonMark, W / 2, 452);
 
   // 瓶中信（最多 8 行）
   ctx.fillStyle = "#fff";
-  ctx.font = `500 44px ${FONT}`;
+  ctx.font = `500 44px ${SHARE_FONT}`;
   const lines = wrapText(ctx, bottle.text, 800);
   const shown = lines.slice(0, 8);
   shown.forEach((line, i) => {
@@ -98,7 +99,7 @@ function drawBottleCard(ctx: CanvasRenderingContext2D, bottle: Bottle, replies: 
   });
   if (lines.length > 8) {
     ctx.fillStyle = "rgba(255,255,255,.5)";
-    ctx.font = `400 30px ${FONT}`;
+    ctx.font = `400 30px ${SHARE_FONT}`;
     ctx.fillText("…", W / 2, 620 + 8 * 70);
   }
 
@@ -113,19 +114,19 @@ function drawBottleCard(ctx: CanvasRenderingContext2D, bottle: Bottle, replies: 
 
   // 歌曲信息
   ctx.fillStyle = "rgba(255,255,255,.88)";
-  ctx.font = `600 40px ${FONT}`;
+  ctx.font = `600 40px ${SHARE_FONT}`;
   ctx.fillText(`「${bottle.track.t}」 ${bottle.track.tag}`, W / 2, sepY + 70);
   ctx.fillStyle = "rgba(255,255,255,.55)";
-  ctx.font = `400 30px ${FONT}`;
+  ctx.font = `400 30px ${SHARE_FONT}`;
   ctx.fillText(bottle.track.s, W / 2, sepY + 122);
 
   // 回信（首条摘录）
   if (replies.length > 0) {
     ctx.fillStyle = "rgba(251,114,153,.9)";
-    ctx.font = `600 28px ${FONT}`;
+    ctx.font = `600 28px ${SHARE_FONT}`;
     ctx.fillText("— 来自星海深处的回信 —", W / 2, sepY + 200);
     ctx.fillStyle = "rgba(255,255,255,.8)";
-    ctx.font = `400 34px ${FONT}`;
+    ctx.font = `400 34px ${SHARE_FONT}`;
     const rLines = wrapText(ctx, replies[0].text, 760).slice(0, 3);
     rLines.forEach((l, i) => {
       ctx.fillText(l, W / 2, sepY + 260 + i * 52);
@@ -134,7 +135,7 @@ function drawBottleCard(ctx: CanvasRenderingContext2D, bottle: Bottle, replies: 
 
   // 底部水印
   ctx.fillStyle = "rgba(255,255,255,.26)";
-  ctx.font = `400 26px ${FONT}`;
+  ctx.font = `400 26px ${SHARE_FONT}`;
   ctx.fillText("匿名 · 治愈 · 星海漂流", W / 2, H - 64);
 }
 

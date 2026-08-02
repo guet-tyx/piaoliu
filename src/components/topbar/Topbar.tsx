@@ -51,6 +51,7 @@ export function Topbar() {
             </a>
           ))}
           <a href="/sailor">船员证</a>
+          <a href="/report">周报</a>
           <a className={styles.navDl} href={anchor("#download")}>
             免费下载
           </a>
