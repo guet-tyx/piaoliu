@@ -3,7 +3,6 @@
   position: relative;
   background:
     linear-gradient(90deg, rgba(5, 12, 30, .92) 0%, rgba(5, 12, 30, .55) 42%, rgba(5, 12, 30, .18) 72%, rgba(5, 12, 30, .3) 100%),
-    url("/images/anime-hero.png") center / cover no-repeat,
     linear-gradient(160deg, var(--space) 0%, var(--space-2) 60%, #0A1230 100%);
   color: #F1EDE3;
   min-height: 100vh;
