@@ -512,12 +512,10 @@
   letter-spacing: .04em;
 }
 
-/* 星海漂流三幕场景条 */
+/* 星海漂流三幕（崩坏3式：单主图 + 底部切换条，切换时图/文慢慢浮现） */
 .sceneStrip {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  margin-top: 28px;
+  max-width: 720px;
+  margin: 28px auto 0;
 }
 .sceneItem {
   position: relative;
@@ -527,11 +525,10 @@
   border: 1px solid var(--line);
   background: linear-gradient(160deg, var(--space-2), var(--space));
   box-shadow: 0 14px 32px -24px rgba(5, 12, 30, .4);
-  transition: transform .25s ease, box-shadow .25s ease;
 }
-.sceneItem:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 22px 44px -24px rgba(251, 114, 153, .5);
+/* 切换浮现：主图先起（.5s），标题 .08s、描述 .16s 依次浮现 */
+.sceneItem img {
+  animation: var(--kf-rise) .5s cubic-bezier(.22, .61, .36, 1) both;
 }
 .sceneCap {
   position: absolute;
@@ -554,15 +551,18 @@
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+  animation: var(--kf-rise) .5s cubic-bezier(.22, .61, .36, 1) both;
+  animation-delay: .08s;
 }
 .sceneDesc {
   font-size: .64rem;
   color: rgba(255, 255, 255, .7);
   letter-spacing: .1em;
+  animation: var(--kf-rise) .5s cubic-bezier(.22, .61, .36, 1) both;
+  animation-delay: .16s;
 }
 
 @media (max-width: 960px) {
-  .sceneStrip { grid-template-columns: 1fr; }
   .sceneItem { aspect-ratio: 21 / 9; }
 }
 

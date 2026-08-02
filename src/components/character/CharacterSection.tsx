@@ -5,6 +5,7 @@ import Image from "next/image";
 import { CHARACTERS } from "@/data/character";
 import { SectionHead } from "@/components/shared/SectionHead";
 import { CountUp } from "@/components/shared/CountUp";
+import { SwitchDots } from "@/components/shared/SwitchDots";
 import { useShioStore } from "@/stores/shio";
 import { useIdentityStore } from "@/stores/identity";
 import type { ShioSlot } from "@/data/shio-lines";
@@ -24,6 +25,7 @@ const SLOT_LABEL: Record<ShioSlot, string> = {
  */
 export function CharacterSection() {
   const [activeId, setActiveId] = useState("sio");
+  const [exprIndex, setExprIndex] = useState(0);
   const active = CHARACTERS.find((c) => c.id === activeId) ?? CHARACTERS[0];
   const isSio = activeId === "sio";
 
@@ -125,22 +127,33 @@ export function CharacterSection() {
             ))}
           </div>
 
-          {/* 角色情绪表情变体（随角色切换） */}
-          <div className={styles.exprRow}>
+          {/* 角色情绪表情变体（崩坏3式：单主图 + 底部切换条；key 重挂载重置并浮现） */}
+          <div className={styles.exprRow} key={active.id}>
             <p className={styles.exprLabel}>{active.name}的三种瞬间</p>
-            <div className={styles.exprGrid}>
-              {active.expressions?.map((expr) => (
-                <figure key={expr.label} className={styles.exprItem}>
+            <figure className={styles.exprMain}>
+              {active.expressions && active.expressions[exprIndex] && (
+                <>
                   <Image
-                    src={expr.image}
-                    alt={`${active.name} · ${expr.label}`}
+                    key={exprIndex}
+                    src={active.expressions[exprIndex].image}
+                    alt={`${active.name} · ${active.expressions[exprIndex].label}`}
                     fill
                     style={{ objectFit: "cover" }}
                   />
-                  <figcaption className={styles.exprCap}>{expr.label}</figcaption>
-                </figure>
-              ))}
-            </div>
+                  <figcaption className={styles.exprCap} key={`cap-${exprIndex}`}>
+                    {active.expressions[exprIndex].label}
+                  </figcaption>
+                </>
+              )}
+            </figure>
+            {active.expressions && active.expressions.length > 1 && (
+              <SwitchDots
+                count={active.expressions.length}
+                active={exprIndex}
+                onChange={setExprIndex}
+                ariaLabel={`切换${active.name}的表情`}
+              />
+            )}
           </div>
 
           {/* 汐的每日一句（FR-8 最小版）与行为回应——汐专属，切换隐藏 */}

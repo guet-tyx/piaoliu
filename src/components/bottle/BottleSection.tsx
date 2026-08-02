@@ -5,6 +5,7 @@ import type { CSSProperties } from "react";
 import Image from "next/image";
 import { SectionHead } from "@/components/shared/SectionHead";
 import { Reveal } from "@/components/shared/Reveal";
+import { SwitchDots } from "@/components/shared/SwitchDots";
 import { SkinBoat, type SkinVariant } from "@/components/shared/SkinBoat";
 import { InboxModal } from "@/components/bottle/InboxModal";
 import { useIdentityStore } from "@/stores/identity";
@@ -22,6 +23,28 @@ import styles from "./BottleSection.module.css";
 const LAUNCH_LIMIT = 1;
 const PICK_LIMIT = 3;
 
+/** 星海漂流三幕（崩坏3式底部切换条展示） */
+const SCENES = [
+  {
+    image: "/images/bottle-launch.png",
+    alt: "汐·启航：将漂流瓶投向星海",
+    title: "启航",
+    desc: "装下心情，漂向星海",
+  },
+  {
+    image: "/images/bottle-dock.png",
+    alt: "汐·靠岸：拾起漂来的信",
+    title: "靠岸",
+    desc: "邂逅陌生的回响",
+  },
+  {
+    image: "/images/bottle-reply.png",
+    alt: "汐·回信：在纸船上写下回应",
+    title: "回信",
+    desc: "沿原航线，靠岸",
+  },
+];
+
 /**
  * 纸船漂流（FR-7）：匿名投瓶（绑定当前播放歌曲）+ 随机拾瓶（卡牌开箱）+ 星海来讯入口
  * - 语汇遵循 PRD §3：启航/靠岸/回信/船客
@@ -35,6 +58,7 @@ export function BottleSection() {
   const unreadCount = useBottleStore((s) => s.unreadCount);
 
   const [inboxOpen, setInboxOpen] = useState(false);
+  const [sceneIndex, setSceneIndex] = useState(0);
   const autoOpenedRef = useRef(false);
 
   // 身份引导 + 收件箱拉取（星海来讯）
@@ -87,44 +111,31 @@ export function BottleSection() {
         <DockCard />
       </Reveal>
 
-      {/* 星海漂流三幕场景条 */}
+      {/* 星海漂流三幕（崩坏3式：单主图 + 底部切换条，切换时图/文慢慢浮现） */}
       <div className={styles.sceneStrip}>
         <figure className={styles.sceneItem}>
           <Image
-            src="/images/bottle-launch.png"
-            alt="汐·启航：将漂流瓶投向星海"
+            key={sceneIndex}
+            src={SCENES[sceneIndex].image}
+            alt={SCENES[sceneIndex].alt}
             fill
             style={{ objectFit: "cover" }}
           />
           <figcaption className={styles.sceneCap}>
-            <span className={styles.sceneTitle}>启航</span>
-            <span className={styles.sceneDesc}>装下心情，漂向星海</span>
+            <span className={styles.sceneTitle} key={`t-${sceneIndex}`}>
+              {SCENES[sceneIndex].title}
+            </span>
+            <span className={styles.sceneDesc} key={`d-${sceneIndex}`}>
+              {SCENES[sceneIndex].desc}
+            </span>
           </figcaption>
         </figure>
-        <figure className={styles.sceneItem}>
-          <Image
-            src="/images/bottle-dock.png"
-            alt="汐·靠岸：拾起漂来的信"
-            fill
-            style={{ objectFit: "cover" }}
-          />
-          <figcaption className={styles.sceneCap}>
-            <span className={styles.sceneTitle}>靠岸</span>
-            <span className={styles.sceneDesc}>邂逅陌生的回响</span>
-          </figcaption>
-        </figure>
-        <figure className={styles.sceneItem}>
-          <Image
-            src="/images/bottle-reply.png"
-            alt="汐·回信：在纸船上写下回应"
-            fill
-            style={{ objectFit: "cover" }}
-          />
-          <figcaption className={styles.sceneCap}>
-            <span className={styles.sceneTitle}>回信</span>
-            <span className={styles.sceneDesc}>沿原航线，靠岸</span>
-          </figcaption>
-        </figure>
+        <SwitchDots
+          count={SCENES.length}
+          active={sceneIndex}
+          onChange={setSceneIndex}
+          ariaLabel="切换漂流场景"
+        />
       </div>
 
       <InboxModal open={inboxOpen} onClose={() => setInboxOpen(false)} />

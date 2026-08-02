@@ -1,0 +1,27 @@
+/* ============ 底部切换条（崩坏3官网 news-pagination 风格） ============ */
+.dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: none;
+  padding: 0;
+  background: rgba(255, 255, 255, .3); /* 未激活（崩坏3实测 rgba(255,255,255,.5) 略压） */
+  cursor: pointer;
+  transition: transform .2s ease, background .2s ease, box-shadow .2s ease;
+}
+.dot:hover {
+  background: rgba(255, 255, 255, .6);
+  transform: scale(1.15);
+}
+.dotActive {
+  background: #55E7FF; /* 激活亮青（崩坏3实测 rgb(55,231,255)） */
+  box-shadow: 0 0 10px rgba(85, 231, 255, .65);
+  transform: scale(1.25);
+}
