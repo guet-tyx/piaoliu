@@ -27,19 +27,19 @@ const PICK_LIMIT = 3;
 /** 星海漂流三幕（崩坏3式底部切换条展示） */
 const SCENES = [
   {
-    image: "/images/bottle-launch.png",
+    image: "/images/bottle-launch-crop.webp",
     alt: "汐·启航：将漂流瓶投向星海",
     title: "启航",
     desc: "装下心情，漂向星海",
   },
   {
-    image: "/images/bottle-dock.png",
+    image: "/images/bottle-dock-crop.webp",
     alt: "汐·靠岸：拾起漂来的信",
     title: "靠岸",
     desc: "邂逅陌生的回响",
   },
   {
-    image: "/images/bottle-reply.png",
+    image: "/images/bottle-reply-crop.webp",
     alt: "汐·回信：在纸船上写下回应",
     title: "回信",
     desc: "沿原航线，靠岸",
