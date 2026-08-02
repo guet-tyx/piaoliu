@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useRef } from "react";
 import { StarField } from "./StarField";
 import { HeroDanmaku } from "./HeroDanmaku";
 import styles from "./Hero.module.css";
@@ -5,10 +8,53 @@ import styles from "./Hero.module.css";
 /**
  * 首屏：深空压轴（米哈游质感）
  * 层级：星尘 canvas → 弹幕带 → 内容（z-index 2），均位于深空背景之上
+ * 滚动动效：支持 scroll-driven 的浏览器走 CSS（@supports 块），
+ * 不支持的旧浏览器由本组件 JS 降级（数值与 CSS 版完全对应）
  */
 export function Hero() {
+  const heroRef = useRef<HTMLElement | null>(null);
+  const copyRef = useRef<HTMLDivElement | null>(null);
+
+  // 苹果风格滚动降级：不支持 scroll-driven 时 JS 实现 hero exit-scrub
+  useEffect(() => {
+    if (typeof CSS === "undefined" || !CSS.supports || CSS.supports("animation-timeline", "scroll()")) {
+      return; // CSS 路线接管
+    }
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    let ticking = false;
+    const update = () => {
+      ticking = false;
+      const hero = heroRef.current;
+      const copy = copyRef.current;
+      if (!hero || !copy) return;
+      const vh = window.innerHeight;
+      const r = hero.getBoundingClientRect();
+      // 0 = 页面顶部，1 = 完全滚出
+      const p = Math.min(Math.max((vh - r.top) / (vh * 1.1), 0), 1);
+      copy.style.opacity = String(1 - p * 0.95);
+      copy.style.translate = `0 ${p * -90}px`;
+      hero.style.opacity = String(1 - p * 0.75);
+      hero.style.transform = `scale(${1 + p * 0.06}) translateY(${p * 40}px)`;
+    };
+    const onScroll = () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(update);
+      }
+    };
+
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, []);
+
   return (
-    <section className={`${styles.hero} ${styles.heroScrub}`} aria-label="首屏">
+    <section ref={heroRef} className={`${styles.hero} ${styles.heroScrub}`} aria-label="首屏">
       <StarField />
       <HeroDanmaku />
 
@@ -16,7 +62,7 @@ export function Hero() {
       <span className={`${styles.hudCorner} ${styles.hudBr}`} aria-hidden="true" />
 
       <div className={styles.heroInner}>
-        <div className={styles.heroCopy}>
+        <div ref={copyRef} className={styles.heroCopy}>
           <p className={styles.eyebrow}>
             DRIFT × STAR SEA <span className={styles.en}>星海版限定</span>
           </p>

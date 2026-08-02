@@ -97,4 +97,39 @@ export function useAudioPlayer() {
       audio.pause();
     }
   }, [isPlaying]);
+
+  // 播放状态持久化：挂载后恢复曲目（不自动播放），变更时写回 localStorage
+  useEffect(() => {
+    const KEY = "drift-player-state";
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (raw) {
+        const saved = JSON.parse(raw) as { currentIndex?: number };
+        const { tracks: list } = usePlayerStore.getState();
+        if (
+          typeof saved.currentIndex === "number" &&
+          saved.currentIndex >= 0 &&
+          saved.currentIndex < list.length
+        ) {
+          // 只恢复 UI 状态；isPlaying 强制 false，避免浏览器拦截自动播放
+          usePlayerStore.setState({ currentIndex: saved.currentIndex, isPlaying: false });
+        }
+      }
+    } catch {
+      // 损坏数据忽略
+    }
+    const unsubscribe = usePlayerStore.subscribe((state, prev) => {
+      // 仅曲目/播放态变化时写入（避免 setProgress 高频触发）
+      if (state.currentIndex === prev.currentIndex && state.isPlaying === prev.isPlaying) return;
+      try {
+        localStorage.setItem(
+          KEY,
+          JSON.stringify({ currentIndex: state.currentIndex, isPlaying: state.isPlaying }),
+        );
+      } catch {
+        // 隐私模式等场景忽略写入失败
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 }

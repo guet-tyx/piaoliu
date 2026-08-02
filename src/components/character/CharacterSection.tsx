@@ -1,11 +1,14 @@
+"use client";
+
 import Image from "next/image";
 import { CHARACTER } from "@/data/character";
 import { SectionHead } from "@/components/shared/SectionHead";
+import { CountUp } from "@/components/shared/CountUp";
 import styles from "./CharacterSection.module.css";
 
 /**
  * 角色登场（B站式角色卡）：双列 Grid，数据来自 src/data/character.ts
- * 统计数据当前静态渲染，数字滚动动画后续统一封装
+ * 统计数据用 CountUp 滚动增长（进入视口触发）
  */
 export function CharacterSection() {
   return (
@@ -61,10 +64,7 @@ export function CharacterSection() {
           <div className={styles.charStats}>
             {CHARACTER.stats.map((stat) => (
               <div className={styles.cstat} key={stat.label}>
-                <b data-count={stat.value} data-suffix={stat.suffix}>
-                  {stat.value}
-                  {stat.suffix}
-                </b>
+                <CountUp end={Number(stat.value)} suffix={stat.suffix} />
                 <small>{stat.label}</small>
               </div>
             ))}
