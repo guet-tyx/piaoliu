@@ -115,7 +115,7 @@
   color: var(--ink-panel); /* 深卡内浅字（深海配色） */
   border: 1px solid var(--line-panel);
   border-radius: 18px;
-  padding: 16px 18px 14px;
+  padding: 16px 18px 8px;
   /* 深空晕影 + 青辉光（深底上黑阴影不可见，改品牌辉光分层） */
   box-shadow: 0 18px 40px -26px rgba(0, 0, 0, .8), 0 0 32px -10px rgba(0, 174, 236, .08);
 }
