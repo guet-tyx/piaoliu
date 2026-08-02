@@ -83,6 +83,46 @@ export function BottleSection() {
         <DockCard />
       </div>
 
+      {/* 星海漂流三幕场景条 */}
+      <div className={styles.sceneStrip}>
+        <figure className={styles.sceneItem}>
+          <Image
+            src="/images/bottle-launch.png"
+            alt="汐·启航：将漂流瓶投向星海"
+            fill
+            style={{ objectFit: "cover" }}
+          />
+          <figcaption className={styles.sceneCap}>
+            <span className={styles.sceneTitle}>启航</span>
+            <span className={styles.sceneDesc}>装下心情，漂向星海</span>
+          </figcaption>
+        </figure>
+        <figure className={styles.sceneItem}>
+          <Image
+            src="/images/bottle-dock.png"
+            alt="汐·靠岸：拾起漂来的信"
+            fill
+            style={{ objectFit: "cover" }}
+          />
+          <figcaption className={styles.sceneCap}>
+            <span className={styles.sceneTitle}>靠岸</span>
+            <span className={styles.sceneDesc}>邂逅陌生的回响</span>
+          </figcaption>
+        </figure>
+        <figure className={styles.sceneItem}>
+          <Image
+            src="/images/bottle-reply.png"
+            alt="汐·回信：在纸船上写下回应"
+            fill
+            style={{ objectFit: "cover" }}
+          />
+          <figcaption className={styles.sceneCap}>
+            <span className={styles.sceneTitle}>回信</span>
+            <span className={styles.sceneDesc}>沿原航线，靠岸</span>
+          </figcaption>
+        </figure>
+      </div>
+
       <InboxModal open={inboxOpen} onClose={() => setInboxOpen(false)} />
     </section>
   );

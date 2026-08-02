@@ -475,6 +475,60 @@
   letter-spacing: .04em;
 }
 
+/* 星海漂流三幕场景条 */
+.sceneStrip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 28px;
+}
+.sceneItem {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  border: 1px solid var(--line);
+  background: linear-gradient(160deg, var(--space-2), var(--space));
+  box-shadow: 0 14px 32px -24px rgba(5, 12, 30, .4);
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+.sceneItem:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 22px 44px -24px rgba(251, 114, 153, .5);
+}
+.sceneCap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  padding: 14px 14px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: linear-gradient(0deg, rgba(5, 12, 30, .86) 35%, transparent 100%);
+}
+.sceneTitle {
+  font-size: .82rem;
+  font-weight: 800;
+  letter-spacing: .16em;
+  color: #fff;
+  background: linear-gradient(120deg, var(--pink), var(--blue));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.sceneDesc {
+  font-size: .64rem;
+  color: rgba(255, 255, 255, .7);
+  letter-spacing: .1em;
+}
+
+@media (max-width: 960px) {
+  .sceneStrip { grid-template-columns: 1fr; }
+  .sceneItem { aspect-ratio: 21 / 9; }
+}
+
 /* 动效偏好：启航/开箱动画在 reduce 时直接呈现终态 */
 @media (prefers-reduced-motion: reduce) {
   .dockSlot,
