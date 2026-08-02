@@ -30,6 +30,7 @@
   font-size: .86rem;
   font-family: var(--sans);
   color: var(--ink-panel);
+  background: var(--panel); /* 覆盖 UA 白底，深蓝玻璃输入框 */
   transition: border-color .2s ease;
 }
 .input:focus {

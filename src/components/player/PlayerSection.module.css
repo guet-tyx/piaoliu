@@ -10,8 +10,8 @@
   position: relative;
   border-radius: 22px;
   padding: 34px 38px;
-  background: rgba(255, 255, 255, .92);
-  color: var(--ink-panel); /* 白卡内深字（深海配色） */
+  background: rgba(17, 26, 51, .78); /* 深蓝玻璃（崩坏3官网配色，原白玻璃） */
+  color: var(--ink-panel); /* 深卡内浅字 */
   -webkit-backdrop-filter: blur(20px);
   backdrop-filter: blur(20px);
   display: grid;
@@ -352,6 +352,7 @@
   font-size: .8rem;
   font-family: var(--sans);
   color: var(--ink-panel);
+  background: var(--panel); /* 覆盖 UA 白底，深蓝玻璃输入框 */
   transition: border-color .2s ease;
 }
 .dmInput:focus {

@@ -1,11 +1,12 @@
 /* ============ 角色登场（B站式角色卡） ============ */
 .charCard {
   background: var(--panel);
-  color: var(--ink-panel); /* 白卡内深字（深海配色） */
+  color: var(--ink-panel); /* 深卡内浅字（深海配色） */
   border: 1px solid var(--line-panel);
   border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 24px 56px -36px rgba(24, 25, 28, .28), 0 2px 6px rgba(24, 25, 28, .05);
+  /* 深空晕影 + 粉辉光（深底上黑阴影不可见，改品牌辉光分层） */
+  box-shadow: 0 24px 56px -36px rgba(0, 0, 0, .8), 0 0 32px -8px rgba(251, 114, 153, .08);
   display: grid;
   grid-template-columns: minmax(280px, .9fr) 1.1fr;
   transition: transform .25s ease, box-shadow .25s ease;
@@ -31,7 +32,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, transparent 55%, rgba(255, 255, 255, .92) 100%);
+  background: linear-gradient(90deg, transparent 55%, rgba(13, 21, 40, .92) 100%); /* 深蓝玻璃衔接（原白遮罩） */
   pointer-events: none;
 }
 .lv {
@@ -153,7 +154,7 @@
   overflow: hidden;
   aspect-ratio: 9 / 14;
   border: 1px solid var(--line-panel);
-  background: linear-gradient(135deg, #FDF2F7, #E8F4FF);
+  background: linear-gradient(160deg, var(--space-2), var(--space)); /* 深空渐变（原浅粉蓝） */
   transition: transform .25s ease, box-shadow .25s ease;
 }
 .exprItem:hover {
@@ -242,7 +243,7 @@
   .charCard { grid-template-columns: 1fr; }
   .charPic { min-height: 240px; }
   .charPic::after {
-    background: linear-gradient(180deg, transparent 60%, rgba(255, 255, 255, .95) 100%);
+    background: linear-gradient(180deg, transparent 60%, rgba(13, 21, 40, .95) 100%);
   }
 }
 

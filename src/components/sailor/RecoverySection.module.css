@@ -65,6 +65,7 @@
   font-family: var(--sans);
   letter-spacing: .08em;
   color: var(--ink-panel);
+  background: var(--panel); /* 覆盖 UA 白底，深蓝玻璃输入框 */
   text-transform: uppercase;
 }
 .input:focus {
