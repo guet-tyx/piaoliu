@@ -91,14 +91,6 @@ a:focus-visible, button:focus-visible {
 }
 section[id] { scroll-margin-top: 76px; }
 
-/* 滚动吸附（2026-08-02）：向下滚动时逐区块平滑对齐（proximity 柔和吸附，
- * 不打断滚动；配合各区块进入视口浮现动画形成"平滑过渡"节奏） */
-html { scroll-snap-type: y proximity; }
-.section,
-.footer {
-  scroll-snap-align: start;
-}
-
 /* 共享布局原语：通用段落容器（角色/歌单/播放器/下载等区块共用） */
 .section {
   position: relative;

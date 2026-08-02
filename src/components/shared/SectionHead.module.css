@@ -16,12 +16,11 @@
   margin: 14px 0;
   letter-spacing: .02em;
 }
-/* 标题逐字浮现：进入视口时字符依次上浮（view() 时间线 + 负 delay 错落） */
-.char {
+/* 标题逐字浮现：IO 触发后字符依次上浮（一次性动画 + delay 错落，非 scroll-driven）。
+ * 默认可见（无 JS/未触发时标题正常显示），触发后动画从 opacity 0 开始（fill both 无闪帧） */
+.headIn .char {
   display: inline-block;
   animation: var(--kf-rise) .8s cubic-bezier(.22, .61, .36, 1) both;
-  animation-timeline: view();
-  animation-range: entry 8% cover 26%;
 }
 .secSub {
   color: var(--ink-2);
