@@ -532,10 +532,14 @@
 }
 
 /* 星海漂流三幕（崩坏3式：单主图 + 底部切换条，切换时图/文慢慢浮现） */
+/* absolute 锚定 DockCard（.card 已 relative）：top 100% 紧贴卡片底边，
+   无视双卡行内高度差（LaunchCard 高于 DockCard）造成的视觉空隙 */
 .sceneStrip {
-  /* 与双卡每列等宽（gap 14 → 每列 calc(50% - 7px)），右对齐在「星海漂流中」卡正下方 */
-  width: calc(50% - 7px);
-  margin: 2px 0 0 auto;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 2px;
 }
 .sceneItem {
   position: relative;
@@ -589,12 +593,7 @@
 }
 
 @media (max-width: 960px) {
-  /* 移动端单列：场景主图恢复全宽居中 */
-  .sceneStrip {
-    width: 100%;
-    max-width: 520px;
-    margin: 18px auto 0;
-  }
+  /* 移动端单列：场景条 absolute 已全宽跟随 DockCard（单列即全宽），无需额外规则 */
   .sceneItem { aspect-ratio: 21 / 9; }
 }
 

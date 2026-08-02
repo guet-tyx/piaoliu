@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import Image from "next/image";
 import { SectionHead } from "@/components/shared/SectionHead";
 import { Reveal } from "@/components/shared/Reveal";
@@ -117,39 +117,40 @@ export function BottleSection() {
         </button>
       </Reveal>
 
-      {/* 投/拾双卡（米哈游风格：进入视口浮现） */}
+      {/* 投/拾双卡（米哈游风格：进入视口浮现）；星海漂流三幕为 DockCard 子元素——
+          absolute 锚定卡片底边，消除双卡行内高度差（LaunchCard 高于 DockCard）造成的视觉空隙 */}
       <Reveal className={styles.bottleGrid}>
         <LaunchCard />
-        <DockCard />
+        <DockCard>
+          {/* 星海漂流三幕（崩坏3式：单主图 + 底部切换条，切换时图/文 WAAPI 浮现） */}
+          <div className={styles.sceneStrip}>
+            <figure className={styles.sceneItem}>
+              <Image
+                ref={sceneImgRef}
+                src={SCENES[sceneIndex].image}
+                alt={SCENES[sceneIndex].alt}
+                fill
+                /* 完整显示（图比例与容器接近，cover 垂直无裁切）；顶部深色带与背景融合 */
+                style={{ objectFit: "cover" }}
+              />
+              <figcaption className={styles.sceneCap}>
+                <span ref={sceneTitleRef} className={styles.sceneTitle}>
+                  {SCENES[sceneIndex].title}
+                </span>
+                <span ref={sceneDescRef} className={styles.sceneDesc}>
+                  {SCENES[sceneIndex].desc}
+                </span>
+              </figcaption>
+            </figure>
+            <SwitchDots
+              count={SCENES.length}
+              active={sceneIndex}
+              onChange={setSceneIndex}
+              ariaLabel="切换漂流场景"
+            />
+          </div>
+        </DockCard>
       </Reveal>
-
-      {/* 星海漂流三幕（崩坏3式：单主图 + 底部切换条，切换时图/文 WAAPI 浮现） */}
-      <div className={styles.sceneStrip}>
-        <figure className={styles.sceneItem}>
-          <Image
-            ref={sceneImgRef}
-            src={SCENES[sceneIndex].image}
-            alt={SCENES[sceneIndex].alt}
-            fill
-            /* 完整显示（图比例与容器接近，cover 垂直无裁切）；顶部深色带与背景融合 */
-            style={{ objectFit: "cover" }}
-          />
-          <figcaption className={styles.sceneCap}>
-            <span ref={sceneTitleRef} className={styles.sceneTitle}>
-              {SCENES[sceneIndex].title}
-            </span>
-            <span ref={sceneDescRef} className={styles.sceneDesc}>
-              {SCENES[sceneIndex].desc}
-            </span>
-          </figcaption>
-        </figure>
-        <SwitchDots
-          count={SCENES.length}
-          active={sceneIndex}
-          onChange={setSceneIndex}
-          ariaLabel="切换漂流场景"
-        />
-      </div>
 
       <InboxModal open={inboxOpen} onClose={() => setInboxOpen(false)} />
     </section>
@@ -308,8 +309,8 @@ function LaunchCard() {
   );
 }
 
-/** 拾瓶池：星海漂流中的纸船（随机拾取，开箱后可见内容） */
-function DockCard() {
+/** 拾瓶池：星海漂流中的纸船（随机拾取，开箱后可见内容）；children 为星海漂流场景条（absolute 锚定卡底） */
+function DockCard({ children }: { children?: ReactNode }) {
   const pick = useBottleStore((s) => s.pick);
   const reply = useBottleStore((s) => s.reply);
   const busy = useBottleStore((s) => s.busy);
@@ -470,6 +471,7 @@ function DockCard() {
         </p>
       )}
       {notice && <p className={styles.notice}>{notice}</p>}
+      {children}
     </div>
   );
 }
