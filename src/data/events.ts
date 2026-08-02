@@ -20,7 +20,7 @@ export interface DriftEvent {
   shioLine: string;
 }
 
-export const EVENTS: DriftEvent[] = [
+const EVENTS: DriftEvent[] = [
   {
     id: "summer-fest",
     name: "夏日漂流祭",

@@ -5,7 +5,7 @@ export interface PlaylistRibbon {
   gold?: boolean;
 }
 
-export interface Playlist {
+interface Playlist {
   name: string;
   cover: string;
   alt: string;

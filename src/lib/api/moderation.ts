@@ -1,6 +1,6 @@
 import { BAD_WORDS } from "@/data/bad-words";
 
-export interface SafetyResult {
+interface SafetyResult {
   ok: boolean;
   /** 命中的词（用于提示，不展示原文） */
   word?: string;

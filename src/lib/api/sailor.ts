@@ -24,7 +24,7 @@ const RECOVERY_KEY = "drift-recovery";
 /** 每日一次的行为去重记录（航行 1 天/听歌 3 首等） */
 const DAILY_BOND_KEY = "drift-bond-daily";
 
-export interface SailorStatsState extends SailorStats {
+interface SailorStatsState extends SailorStats {
   /** 每首歌播放次数（V2.0 周报热门航线源） */
   trackCounts: Record<string, number>;
   /** 按天播放次数（V2.0 周报收听星图源） */
@@ -126,7 +126,7 @@ export async function getOrCreateSailor(): Promise<Sailor | null> {
 
 /* ---------- 昵称（FR-9.1：1-12 字 + 敏感词过滤） ---------- */
 
-export type RenameResult =
+type RenameResult =
   | { ok: true; sailor: Sailor }
   | { ok: false; reason: "length" | "bad-word" | "offline" };
 
@@ -285,7 +285,7 @@ export async function earnBond(kind: BondKind, oncePerDay = false): Promise<Sail
 
 /* ---------- 跨设备找回（FR-9.3 渐进：本地模拟可演示；真实模式联调后生效） ---------- */
 
-export interface RecoveryRecord {
+interface RecoveryRecord {
   code: string;
   sailor: Sailor;
   createdAt: number;
@@ -312,7 +312,7 @@ export function genRecoveryCode(): string | null {
   return code;
 }
 
-export type ClaimResult =
+type ClaimResult =
   | { ok: true; sailor: Sailor }
   | { ok: false; reason: "invalid" | "offline" };
 
@@ -329,9 +329,4 @@ export async function claimRecoveryCode(code: string): Promise<ClaimResult> {
   }
   // 真实模式：claim_recovery RPC 联调后启用（002_collection.sql 注释预留）
   return { ok: false, reason: "offline" };
-}
-
-/** 当前找回码（展示用） */
-export function getRecoveryCodes(): RecoveryRecord[] {
-  return readJson<RecoveryRecord[]>(RECOVERY_KEY, []);
 }

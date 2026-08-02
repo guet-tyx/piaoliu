@@ -4,7 +4,7 @@
  */
 
 /** 称号体系：等级区间 → 称号（4 级起步可扩展） */
-export interface TitleTier {
+interface TitleTier {
   minLevel: number;
   title: string;
 }
@@ -16,7 +16,7 @@ export const TITLE_TIERS: TitleTier[] = [
   { minLevel: 10, title: "灯塔守望者" },
 ];
 
-export const MAX_LEVEL = 10;
+const MAX_LEVEL = 10;
 
 /** 等级 → 称号 */
 export function titleOf(level: number): string {
@@ -42,7 +42,7 @@ export function nextLevelBond(bond: number): number | null {
 }
 
 /** 纸船皮肤（FR-12）：随等级解锁；id 与 sailors.bottle_style 对齐 */
-export interface BoatSkin {
+interface BoatSkin {
   id: string;
   name: string;
   desc: string;
@@ -71,7 +71,7 @@ export interface SailorStats {
 }
 
 /** 徽章定义（FR-12）：条件基于行为统计，达成后写入 sailor.badges */
-export interface BadgeDef {
+interface BadgeDef {
   id: string;
   name: string;
   desc: string;

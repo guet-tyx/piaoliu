@@ -10,7 +10,7 @@ import type { DanmakuMessage } from "./types";
  * 订阅返回取消函数（close channel + 全量解绑，STYLE_GUIDE 清理铁律）
  */
 
-export type DanmakuListener = (msg: DanmakuMessage) => void;
+type DanmakuListener = (msg: DanmakuMessage) => void;
 
 /** 本标签页订阅者（按曲目频道分组，隔离不同曲目的弹幕） */
 const localListeners = new Map<string, Set<DanmakuListener>>();

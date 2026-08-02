@@ -12,7 +12,7 @@ export const CARD_H = 1440;
 export const SHARE_FONT = "'PingFang SC', 'HarmonyOS Sans SC', 'Microsoft YaHei', sans-serif";
 
 /** 按宽度换行（canvas 排版；瓶面卡/周报卡共用） */
-export function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
+function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
   const lines: string[] = [];
   let line = "";
   for (const ch of text) {

@@ -5,7 +5,7 @@
  */
 
 /** 漂流瓶状态机：漂流 → 被拾 → 已回信 / 沉没 */
-export type BottleStatus = "drifting" | "picked" | "replied" | "sunk";
+type BottleStatus = "drifting" | "picked" | "replied" | "sunk";
 
 /** 曲目快照：投瓶时冻结歌曲信息，防曲库变更后展示失真 */
 export interface TrackSnapshot {

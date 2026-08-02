@@ -3,7 +3,7 @@
  * 生成「晚风船客·A7F3」风格代号；词库人工维护
  */
 
-export const MARK_ADJ = [
+const MARK_ADJ = [
   "晚风",
   "薄雾",
   "纸鹤",
@@ -16,7 +16,7 @@ export const MARK_ADJ = [
   "萤火",
 ];
 
-export const MARK_NOUN = [
+const MARK_NOUN = [
   "船客",
   "水手",
   "灯塔",

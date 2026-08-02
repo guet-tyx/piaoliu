@@ -21,7 +21,7 @@ export interface CharacterStat {
   label: string;
 }
 
-export interface Character {
+interface Character {
   /** 唯一 id（头像切换状态用） */
   id: string;
   name: string;
