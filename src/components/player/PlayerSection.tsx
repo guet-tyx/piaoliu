@@ -1,30 +1,18 @@
 "use client";
 
+import { useState } from "react";
 import type { CSSProperties } from "react";
 import { usePlayerStore, type PlayMode } from "@/stores/player";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 import { useBondTracker } from "@/hooks/useBondTracker";
+import { useTrackDanmaku } from "@/hooks/useTrackDanmaku";
+import { usePresence } from "@/hooks/usePresence";
+import { useDanmakuStore } from "@/stores/danmaku";
+import { publishDanmaku } from "@/lib/realtime/danmakuChannel";
+import { avatarColor } from "@/lib/realtime/types";
+import { isSafeText } from "@/lib/api/moderation";
 import { SectionHead } from "@/components/shared/SectionHead";
 import styles from "./PlayerSection.module.css";
-
-/** 唱片弹幕项：行内 --dmdur/--dmdelay 控制速度与相位（负延迟使弹幕进入时已在中途） */
-interface RecordDm {
-  text: string;
-  row: "dmR1" | "dmR2" | "dmR3";
-  dur: string;
-  delay: string;
-  pink?: boolean;
-  blue?: boolean;
-}
-
-const RECORD_DM: RecordDm[] = [
-  { text: "这艘船 好安静", row: "dmR1", dur: "6s", delay: "-1s" },
-  { text: "下一首 会是什么", row: "dmR2", dur: "7s", delay: "-4s", pink: true },
-  { text: "晚安 星海", row: "dmR3", dur: "6.5s", delay: "-2.5s", blue: true },
-  { text: "后摇接说唱 也可以", row: "dmR1", dur: "7.5s", delay: "-5s" },
-  { text: "21:47 漂到这里", row: "dmR2", dur: "6.2s", delay: "-3.2s", pink: true },
-  { text: "耳机分你一半", row: "dmR3", dur: "8s", delay: "-6s" },
-];
 
 /** 播放模式展示元数据（FR-3） */
 const MODE_META: Record<PlayMode, { mark: string; label: string; aria: string }> = {
@@ -64,12 +52,14 @@ function VolIcon({ muted }: { muted: boolean }) {
 
 /**
  * 星海电台播放器：UI 层完全只读，所有交互只调 store actions；
- * 唱片旋转/弹幕/频谱的类名全部由 isPlaying 派生；
- * 进度条/音量/模式/收藏/弹幕开关为 V1.0.1 体验修补（FR-1~FR-5）
+ * V1.3 真实弹幕（FR-11）：唱片弹幕 = 同船实时弹幕（假数据已移除）；
+ * 同船共听（FR-10）：在线人数 + 匿名头像流 + 发弹幕入口
  */
 export function PlayerSection() {
   useAudioPlayer();
   useBondTracker();
+  useTrackDanmaku();
+  const peers = usePresence();
 
   const track = usePlayerStore((s) => s.tracks[s.currentIndex]);
   const total = usePlayerStore((s) => s.tracks.length);
@@ -95,6 +85,27 @@ export function PlayerSection() {
   const toggleMute = usePlayerStore((s) => s.toggleMute);
   const cyclePlayMode = usePlayerStore((s) => s.cyclePlayMode);
 
+  // 同船弹幕（当前曲目频道的用户弹幕）
+  const danmakuItems = useDanmakuStore((s) => s.items);
+  const trackDm = danmakuItems.filter((m) => m.trackId === track.id).slice(-6);
+
+  // 发弹幕（FR-10.2）
+  const [dmText, setDmText] = useState("");
+  const [dmErr, setDmErr] = useState<string | null>(null);
+  const onSendDm = () => {
+    const ok = publishDanmaku(track.id, dmText);
+    if (ok) {
+      setDmText("");
+      setDmErr(null);
+    } else if (dmText.trim().length === 0) {
+      setDmErr("先写点内容再发。");
+    } else if (!isSafeText(dmText).ok) {
+      setDmErr("弹幕里有不能上船的文字。");
+    } else {
+      setDmErr("弹幕最多 50 字。");
+    }
+  };
+
   const isLiked = likedIds.includes(track.id);
   const mode = MODE_META[playMode];
   /** 进度条范围（duration 未载入时按 1 兜底并禁用） */
@@ -112,7 +123,7 @@ export function PlayerSection() {
 
       <div className={styles.playerWrap}>
         <div className={styles.player}>
-          {/* 唱片 + 弹幕层 */}
+          {/* 唱片 + 同船弹幕层（V1.3 实时弹幕，假数据已移除） */}
           <div className={`${styles.recordBox}${isPlaying ? ` ${styles.live}` : ""}`}>
             <div
               className={`${styles.record}${isPlaying ? ` ${styles.playing}` : ""}`}
@@ -123,16 +134,15 @@ export function PlayerSection() {
                 } as CSSProperties
               }
             />
-            {/* 弹幕层受 danmakuOn 控制（FR-5：开关真实生效） */}
+            {/* 弹幕层受 danmakuOn 控制（FR-5/FR-10.2 开关真实生效） */}
             <div
               className={`${styles.recordDm}${danmakuOn ? "" : ` ${styles.off}`}`}
               aria-hidden="true"
             >
-              {RECORD_DM.map((dm, i) => (
+              {trackDm.map((dm, i) => (
                 <span
-                  key={i}
-                  className={`${styles.dm} ${styles[dm.row]}${dm.pink ? ` ${styles.pink}` : ""}${dm.blue ? ` ${styles.blue}` : ""}`}
-                  style={{ "--dmdur": dm.dur, "--dmdelay": dm.delay } as CSSProperties}
+                  key={dm.id}
+                  className={`${styles.dm} ${styles[`dmR${(i % 3) + 1}`]}${dm.variant === "pink" ? ` ${styles.pink}` : ""}${dm.variant === "blue" ? ` ${styles.blue}` : ""}`}
                 >
                   {dm.text}
                 </span>
@@ -149,6 +159,24 @@ export function PlayerSection() {
               「{track.t}」<em className={styles.nowTag}>{track.tag}</em>
             </h3>
             <p className={styles.nowArtist}>{track.s}</p>
+
+            {/* 同船的人（FR-10.1）：同曲在线人数 + 匿名头像流（无身份信息） */}
+            <div className={styles.presenceRow}>
+              {peers.length > 0 ? (
+                <>
+                  <span className={styles.presenceAvatars} aria-hidden="true">
+                    {peers.slice(0, 6).map((p) => (
+                      <i key={p.id} style={{ background: avatarColor(p.id) }} />
+                    ))}
+                  </span>
+                  <span className={styles.presenceText}>
+                    同船 <b>{peers.length}</b> 人在听
+                  </span>
+                </>
+              ) : (
+                <span className={styles.presenceText}>星海此刻很安静，汐在听</span>
+              )}
+            </div>
 
             <div className={`${styles.eq}${isPlaying ? ` ${styles.live}` : ""}`} aria-hidden="true">
               {EQ_BARS.map((bar, i) => (
@@ -234,6 +262,32 @@ export function PlayerSection() {
                 <i>弹</i> {danmakuOn ? "弹幕开" : "弹幕关"}
               </button>
             </div>
+
+            {/* 发弹幕（FR-10.2）：同曲频道广播，1-50 字，敏感词拦截 */}
+            <div className={styles.dmSend}>
+              <input
+                className={styles.dmInput}
+                value={dmText}
+                maxLength={50}
+                placeholder={danmakuOn ? "发条同船弹幕（1-50 字）…" : "弹幕已关，先打开弹幕"}
+                aria-label="发送弹幕"
+                disabled={!danmakuOn}
+                onChange={(e) => {
+                  setDmText(e.target.value);
+                  setDmErr(null);
+                }}
+              />
+              <span className={styles.dmCount}>{dmText.length}/50</span>
+              <button
+                className={styles.dmSendBtn}
+                type="button"
+                disabled={!danmakuOn || dmText.trim().length === 0}
+                onClick={onSendDm}
+              >
+                发
+              </button>
+            </div>
+            {dmErr && <p className={styles.dmErr}>{dmErr}</p>}
           </div>
         </div>
       </div>

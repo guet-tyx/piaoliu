@@ -13,6 +13,7 @@ import {
   type BondKind,
 } from "@/lib/api/sailor";
 import { ensureAnonSession } from "@/lib/supabase/anon";
+import { useDanmakuStore } from "@/stores/danmaku";
 import { SKINS, titleOf } from "@/data/collection";
 import {
   SHIO_RESPONSES,
@@ -191,6 +192,8 @@ export const useIdentityStore = create<IdentityState>()((set, get) => ({
       get().bond("listen", true);
       get().respond("listen3");
       resetListenStreak();
+      // 系统事件弹幕（FR-11）
+      useDanmakuStore.getState().pushSystem("有人一口气听完了三首歌", "listen", "pink");
     }
     const fresh = checkBadges(stats, sailor.badges);
     if (fresh.length > 0) {

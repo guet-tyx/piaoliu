@@ -74,7 +74,12 @@
 .live .recordDm { opacity: 1; }
 /* 弹幕开关关闭态（FR-5：等优先级下靠后定义，压过 .live .recordDm） */
 .recordDm.off { opacity: 0; }
-.recordDm .dm { font-size: .82rem; }
+.recordDm .dm {
+  font-size: .82rem;
+  /* V1.3 真实弹幕：一次性漂过即消失（非无限循环） */
+  animation: var(--kf-dmFloat) 10s linear forwards;
+  animation-delay: 0s;
+}
 .dmR1 { top: 22%; }
 .dmR2 { top: 44%; }
 .dmR3 { top: 66%; }
@@ -290,6 +295,102 @@
   color: var(--blue-deep);
   border-color: rgba(0, 174, 236, .45);
   background: rgba(0, 174, 236, .06);
+}
+
+/* ---- 同船共听（FR-10.1）：在线人数 + 匿名头像流 ---- */
+.presenceRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+  min-height: 24px;
+}
+.presenceAvatars {
+  display: flex;
+  align-items: center;
+}
+.presenceAvatars i {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 6px rgba(24, 25, 28, .18);
+  margin-left: -6px;
+  flex: none;
+}
+.presenceAvatars i:first-child { margin-left: 0; }
+.presenceText {
+  font-size: .72rem;
+  color: var(--ink-3);
+  letter-spacing: .08em;
+}
+.presenceText b {
+  color: var(--pink-deep);
+  font-size: .86rem;
+  font-weight: 800;
+}
+
+/* ---- 发弹幕（FR-10.2）：同曲频道广播 ---- */
+.dmSend {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+.dmInput {
+  flex: 1;
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  padding: 8px 46px 8px 14px;
+  font-size: .8rem;
+  font-family: var(--sans);
+  color: var(--ink);
+  transition: border-color .2s ease;
+}
+.dmInput:focus {
+  outline: none;
+  border-color: var(--blue);
+}
+.dmInput:disabled {
+  background: var(--panel-2);
+  color: var(--ink-3);
+  cursor: not-allowed;
+}
+.dmCount {
+  position: absolute;
+  right: 54px;
+  font-size: .62rem;
+  color: var(--ink-3);
+  letter-spacing: .06em;
+  pointer-events: none;
+}
+.dmSendBtn {
+  flex: none;
+  border: none;
+  border-radius: 999px;
+  padding: 8px 20px;
+  font-size: .78rem;
+  font-weight: 800;
+  letter-spacing: .14em;
+  color: #fff;
+  background: linear-gradient(120deg, var(--pink), var(--pink-deep));
+  cursor: pointer;
+  transition: transform .2s ease, filter .2s ease, opacity .2s ease;
+}
+.dmSendBtn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(1.06);
+}
+.dmSendBtn:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+.dmErr {
+  margin-top: 8px;
+  font-size: .72rem;
+  color: var(--pink-deep);
+  letter-spacing: .04em;
 }
 
 /* FR-3 播放模式按钮（与 dmToggle 同款胶囊） */

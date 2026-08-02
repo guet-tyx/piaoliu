@@ -20,8 +20,8 @@
   text-shadow: 0 1px 0 #000, 1px 0 0 #000, 0 -1px 0 #000, -1px 0 0 #000, 0 0 3px rgba(0, 0, 0, .8);
   white-space: nowrap;
   letter-spacing: .04em;
-  animation: var(--kf-dmFloat) var(--dmdur, 10s) linear infinite;
-  animation-delay: var(--dmdelay, 0s);
+  /* V1.3 真实弹幕：一次性漂过即消失（非无限循环） */
+  animation: var(--kf-dmFloat) 12s linear forwards;
   pointer-events: none;
 }
 .pink {

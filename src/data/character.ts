@@ -27,17 +27,29 @@ export interface Character {
   lv: string;
   image: string;
   imageAlt: string;
+  expressions?: CharacterExpression[];
   tags: CharacterTag[];
   desc: CharacterDescSegment[];
   stats: CharacterStat[];
+}
+
+/** 角色情绪表情变体 */
+export interface CharacterExpression {
+  label: string; // 表情描述
+  image: string; // 表情图路径
 }
 
 export const CHARACTER: Character = {
   name: "汐",
   en: "SIO",
   lv: "★ 星海版限定",
-  image: "/images/anime-hero.png",
-  imageAlt: "漂流少女「汐」：戴耳机坐在纸船上，漂在星海之间",
+  image: "/images/character-main.png",
+  imageAlt: "星海漂流少女「汐」：深紫短发，戴白色头戴式耳机，白上衣蓝裙，自带极光",
+  expressions: [
+    { label: "微笑", image: "/images/char-expr-smile.png" },
+    { label: "聆听", image: "/images/char-expr-listen.png" },
+    { label: "感受", image: "/images/char-expr-feel.png" },
+  ],
   tags: [
     { label: "# 星海导游", variant: "hot" },
     { label: "# 纸船船长", variant: "blue" },

@@ -5,6 +5,7 @@ import { Modal } from "@/components/shared/Modal";
 import { BottleCard } from "@/components/bottle/BottleCard";
 import { useBottleStore, type InboxItem } from "@/stores/bottle";
 import { useIdentityStore } from "@/stores/identity";
+import { useDanmakuStore } from "@/stores/danmaku";
 import { reportBottle } from "@/lib/api/bottles";
 import styles from "./InboxModal.module.css";
 
@@ -31,6 +32,8 @@ export function InboxModal({ open, onClose }: { open: boolean; onClose: () => vo
       if (!respondedRef.current) {
         respondedRef.current = true;
         respond("reply-received");
+        // 系统事件弹幕（FR-11）
+        useDanmakuStore.getState().pushSystem("有船靠岸了 ☾", "reply-received", "blue");
       }
     }
   }, [open, inbox, markRead, respond]);

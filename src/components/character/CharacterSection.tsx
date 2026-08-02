@@ -54,7 +54,7 @@ export function CharacterSection() {
             src={CHARACTER.image}
             alt={CHARACTER.imageAlt}
             fill
-            sizes="(max-width: 960px) 100vw, 50vw"
+            sizes="(max-width: 960px) 65vw, 33vw"
             style={{ objectFit: "cover" }}
           />
         </div>
@@ -90,6 +90,24 @@ export function CharacterSection() {
                 <small>{stat.label}</small>
               </div>
             ))}
+          </div>
+
+          {/* 汐的情绪表情变体（新增） */}
+          <div className={styles.exprRow}>
+            <p className={styles.exprLabel}>汐的三种瞬间</p>
+            <div className={styles.exprGrid}>
+              {CHARACTER.expressions?.map((expr) => (
+                <figure key={expr.label} className={styles.exprItem}>
+                  <Image
+                    src={expr.image}
+                    alt={`${CHARACTER.name} · ${expr.label}`}
+                    fill
+                    style={{ objectFit: "cover" }}
+                  />
+                  <figcaption className={styles.exprCap}>{expr.label}</figcaption>
+                </figure>
+              ))}
+            </div>
           </div>
 
           {/* 汐的每日一句（FR-8 最小版：时段变化 + 白名单文案） */}

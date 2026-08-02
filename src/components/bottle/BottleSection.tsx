@@ -9,6 +9,7 @@ import { InboxModal } from "@/components/bottle/InboxModal";
 import { useIdentityStore } from "@/stores/identity";
 import { useBottleStore } from "@/stores/bottle";
 import { usePlayerStore } from "@/stores/player";
+import { useDanmakuStore } from "@/stores/danmaku";
 import { isSafeText } from "@/lib/api/moderation";
 import { reportBottle } from "@/lib/api/bottles";
 import type { Bottle, TrackSnapshot } from "@/types/social";
@@ -134,6 +135,8 @@ function LaunchCard() {
     // 羁绊：投瓶 +1（FR-8.3）；首次投瓶的汐回应在 noteAction 内触发
     noteAction("launched");
     bond("launch");
+    // 系统事件弹幕（FR-11：事件驱动，30s 频控）
+    useDanmakuStore.getState().pushSystem("有船启航了 ✦", "launch", "pink");
     // 启航动画（1.4s）后进入成功旁白
     window.setTimeout(() => setPhase("done"), 1400);
   };
@@ -253,6 +256,8 @@ function DockCard() {
     // 羁绊：拾瓶 +1（FR-8.3）
     noteAction("picked");
     bond("pick");
+    // 系统事件弹幕（FR-11）
+    useDanmakuStore.getState().pushSystem("星海漂来一艘纸船", "pick", "blue");
     // 卡牌翻转开箱（0.6s 后显示内容）
     window.setTimeout(() => setFlipped(true), 150);
   };
@@ -274,6 +279,8 @@ function DockCard() {
     // 羁绊：回信 +1（FR-8.3）
     noteAction("replied");
     bond("reply");
+    // 系统事件弹幕（FR-11）
+    useDanmakuStore.getState().pushSystem("一封回信沿航线靠岸", "reply");
     setPicked(null);
     setFlipped(false);
     setReplyText("");
