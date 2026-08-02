@@ -18,7 +18,7 @@ import type {
  * 纸船漂流查询层（FR-7）：统一接口，isSupabaseReady() 分支
  * - 真实模式：调用 Supabase RPC（launch_bottle / pick_bottle / reply_bottle / fetch_inbox …）
  * - 本地模拟：localStorage 模拟池（冷启动预热瓶 + 限额 + 回信），全流程本地可玩
- * 行为契约（限额/防重复拾取/回信可见性）与 ARCHITECTURE.md §5 一致。
+ * 行为契约（限额/防重复拾取/回信可见性）与 archive/docs/ARCHITECTURE.md §5 一致。
  */
 
 const POOL_KEY = "drift-bottles-pool";
