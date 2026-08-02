@@ -131,6 +131,7 @@ export function BottleSection() {
             src={SCENES[sceneIndex].image}
             alt={SCENES[sceneIndex].alt}
             fill
+            /* 完整显示（图比例与容器接近，cover 垂直无裁切）；顶部深色带与背景融合 */
             style={{ objectFit: "cover" }}
           />
           <figcaption className={styles.sceneCap}>
