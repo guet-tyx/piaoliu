@@ -58,7 +58,10 @@
 }
 html { scroll-behavior: smooth; }
 body {
-  background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg) 320px, var(--bg) 100%);
+  /* 方案A：顶部深空过渡带（280px）→ 浅粉星海雾霭 → 内容区浅灰 */
+  background:
+    radial-gradient(ellipse 80% 40% at 50% 0%, rgba(123, 177, 255, 0.14), transparent 70%),
+    linear-gradient(180deg, var(--space) 0%, var(--space-2) 160px, #1A2340 300px, #FDF2F7 440px, var(--bg) 560px, var(--bg) 100%);
   color: var(--ink);
   font-family: var(--sans);
   line-height: 1.7;
