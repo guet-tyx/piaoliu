@@ -13,13 +13,23 @@ create table if not exists public.listeners (
 );
 
 alter table public.listeners enable row level security;
--- 读：全量可读但仅脱敏字段（RLS 按列暴露——查询侧只 select anon_key/track_id/updated_at）
-create policy "listeners_read" on public.listeners
-  for select using (true);
--- 写：仅本人心跳 upsert
+-- 写：仅本人心跳 upsert。读不直接开放——RLS 是行级而非列级，
+-- 开放全量 SELECT 会连同 user_id（真实 auth uid）一起泄漏；
+-- 脱敏读取走下方 online_listeners 视图（只暴露匿名展示字段）。
 create policy "listeners_upsert_own" on public.listeners
   for all using (user_id = auth.uid())
   with check (user_id = auth.uid());
+
+-- 在线脱敏视图：仅暴露 anon_key/track_id/updated_at 三列，user_id 不出视图；
+-- 视图按 owner 权限执行，表 RLS 不影响，但列面已脱敏
+create or replace view public.online_listeners as
+  select anon_key, track_id, updated_at
+  from public.listeners
+  where updated_at > now() - interval '60 seconds';
+grant select on public.online_listeners to anon, authenticated;
+
+create index if not exists listeners_updated_at_idx
+  on public.listeners (updated_at);
 
 -- 联调说明（待 Supabase 项目接入后执行）：
 -- 1) Realtime 启用：Supabase Dashboard → Database → Replication 中订阅 public.listeners

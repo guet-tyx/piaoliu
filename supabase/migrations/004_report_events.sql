@@ -50,13 +50,18 @@ $$;
 -- 写入方式：RPC record_listen(p_track_id text)（联调阶段启用）
 create or replace function public.record_listen(p_track_id text)
 returns void
-language sql
+language plpgsql
 security definer
 set search_path = public
 as $$
+declare
+  v_uid uuid := auth.uid();
+begin
+  if v_uid is null then raise exception 'not authenticated'; end if;
   insert into public.action_logs (sailor_id, action, day, meta)
-  values (auth.uid(), 'listen', (now() at time zone 'Asia/Shanghai')::date,
+  values (v_uid, 'listen', (now() at time zone 'Asia/Shanghai')::date,
           jsonb_build_object('track_id', p_track_id));
+end;
 $$;
 
 -- ---------- 周报聚合（FR-13 真实模式） ----------
