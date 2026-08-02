@@ -1,25 +1,43 @@
-/* ============ 歌单（B站首页式卡片） ============ */
-.pGrid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 18px;
+/* ============ 歌单（米哈游舞台式焦点横排，2026-08-02 改造） ============
+ * 桌面端：1 张大卡 + 3 张小卡横排，hover/聚焦切换焦点（flex-basis 过渡）；
+ * <960px 降级为原有网格布局（无 hover 焦点概念）
+ */
+.pRail {
+  display: flex;
+  gap: 16px;
+  align-items: stretch;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  scrollbar-width: none; /* Firefox 隐藏滚动条 */
 }
+.pRail::-webkit-scrollbar { display: none; }
+
 .pCard {
+  flex: 0 0 220px;
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 16px;
   padding: 12px;
   cursor: pointer;
-  transition: transform .22s ease, box-shadow .22s ease;
+  /* 破例：flex-basis 布局过渡还原米哈游舞台的宽度变化（4 卡低频切换，
+   * layout 开销可忽略；STYLE_GUIDE 的 transform/opacity 铁律针对高频动效） */
+  transition: flex-basis .5s cubic-bezier(.22, .61, .36, 1),
+    border-color .22s ease, box-shadow .22s ease;
 }
+/* hover 不用 transform：revealUp 入场动画（fill both）会接管 transform */
 .pCard:hover {
-  transform: translateY(-5px);
+  border-color: rgba(251, 114, 153, .45);
+  box-shadow: 0 22px 44px -26px rgba(251, 114, 153, .5);
+}
+.pActive {
+  flex-basis: 480px;
+  border-color: rgba(251, 114, 153, .45);
   box-shadow: 0 22px 44px -26px rgba(251, 114, 153, .5);
 }
 
 .pCover {
   position: relative;
-  aspect-ratio: 1;
+  height: 240px;
   border-radius: 10px;
   overflow: hidden;
   background: var(--panel-2);
@@ -53,7 +71,7 @@
   color: #3A2B08;
 }
 
-/* 播放角标：hover 浮现 */
+/* 播放角标：hover/focus 浮现 */
 .pPlay {
   position: absolute;
   right: 10px;
@@ -73,25 +91,51 @@
   box-shadow: 0 8px 18px -8px rgba(251, 114, 153, .9);
   pointer-events: none;
 }
-.pCard:hover .pPlay {
-  opacity: 1;
-  transform: translateY(0);
-}
+.pCard:hover .pPlay,
 .pCard:focus-visible .pPlay {
   opacity: 1;
   transform: translateY(0);
 }
 
+/* 编号（米哈游舞台式 [NO.XX]） */
+.pNo {
+  margin: 11px 4px 0;
+  font-size: .64rem;
+  font-weight: 800;
+  letter-spacing: .18em;
+  color: var(--ink-3);
+}
+
 .pName {
   font-size: .9rem;
   font-weight: 700;
-  margin: 11px 4px 2px;
+  margin: 3px 4px 0;
   line-height: 1.5;
+}
+.pActive .pName {
+  font-size: 1.05rem;
+}
+
+/* 大卡描述区（激活时挂载浮现） */
+.pDesc {
+  margin: 10px 4px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: var(--kf-revealUp) .4s cubic-bezier(.22, .61, .36, 1) both;
+}
+.pDesc > p:first-child {
+  font-size: .78rem;
+  color: var(--ink-2);
+  line-height: 1.75;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 .pMeta {
   font-size: .72rem;
   color: var(--ink-3);
-  margin: 0 4px;
   letter-spacing: .02em;
 }
 .pMeta b {
@@ -99,14 +143,33 @@
   font-weight: 600;
 }
 
-/* 滚动揭示：进入视口淡入上浮（view() 时间线，不支持时静态可见）
+/* 立即播放（粉底白字 + 金色扫金，与 Hero 按钮同语言） */
+.pPlayBtn {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: .78rem;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(120deg, var(--pink), var(--pink-deep));
+  border-radius: 999px;
+  padding: 8px 18px;
+  box-shadow: 0 10px 20px -10px rgba(251, 114, 153, .7);
+  transition: filter .2s ease, box-shadow .2s ease;
+}
+.pPlayBtn:hover {
+  filter: brightness(1.06);
+  box-shadow: 0 12px 24px -10px rgba(251, 114, 153, .85);
+}
+
+/* 滚动揭示：容器进入视口淡入上浮（view() 时间线，不支持时静态可见）
  * 注：section-head 的 revealUp 已在共享组件 SectionHead.module.css 中 */
-.pGrid {
+.pRail {
   animation: var(--kf-revealUp) .8s cubic-bezier(.22, .61, .36, 1) both;
   animation-timeline: view();
   animation-range: entry 8% cover 26%;
 }
-
 /* 米哈游风格：卡片逐个错落浮现（各自 view() 时间线 + 负延迟错开） */
 .pCard {
   animation: var(--kf-revealUp) .8s cubic-bezier(.22, .61, .36, 1) both;
@@ -117,10 +180,27 @@
 .pCard:nth-child(3) { animation-delay: -.24s; }
 .pCard:nth-child(4) { animation-delay: -.36s; }
 
+/* 移动端：降级为原有网格布局 */
 @media (max-width: 960px) {
-  .pGrid { grid-template-columns: repeat(2, 1fr); }
+  .pRail {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+    overflow: visible;
+  }
+  .pCard,
+  .pActive {
+    flex: initial;
+    width: auto;
+  }
+  .pCover {
+    height: auto;
+    aspect-ratio: 1;
+  }
+  /* 移动端无 hover 焦点，描述区隐藏保持原信息密度 */
+  .pDesc { display: none; }
 }
 
 @media (max-width: 420px) {
-  .pGrid { grid-template-columns: 1fr; }
+  .pRail { grid-template-columns: 1fr; }
 }
