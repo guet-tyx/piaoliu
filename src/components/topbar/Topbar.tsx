@@ -24,11 +24,20 @@ export function Topbar() {
       <div className={styles.topbarIn}>
         <a className={styles.brand} href={anchor("#top")} aria-label="漂流 DRIFT 星海版 回到顶部">
           <span className={styles.brandMark} aria-hidden="true">
-            <svg viewBox="0 0 24 24" width="17" height="17" fill="none">
-              <path d="M12 3v11" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-              <path d="M12 4.5 19 11h-7z" fill="currentColor" />
-              <path d="M2.5 13.5Q12 17.5 21.5 13.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-              <path d="M5 18Q8.5 20 12 18" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" opacity=".6" />
+            <svg viewBox="0 0 32 32" width="20" height="20" fill="none">
+              {/* 纸船主体（梯形） */}
+              <path d="M6 17 L26 17 L23 24 L9 24 Z" fill="currentColor" opacity=".18" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+              {/* 纸船帆（三角形） */}
+              <path d="M11 17 L16 8 L21 17 Z" fill="currentColor" opacity=".25" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+              {/* 桅杆延伸为音符干 */}
+              <path d="M16 8 L16 3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+              {/* 音符头（椭圆） */}
+              <ellipse cx="14.6" cy="4.2" rx="2.4" ry="1.7" fill="currentColor" transform="rotate(-22 14.6 4.2)" />
+              {/* 音符旗（弯曲弧线，从桅杆顶端向右延伸，发光感） */}
+              <path d="M16 3.5 C 20 3.5, 21.5 5.5, 19.5 7.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" fill="none" />
+              {/* 水面波浪（两条） */}
+              <path d="M2.5 27 Q 8 29, 13 27 T 23 27 T 29.5 27" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" fill="none" />
+              <path d="M5 30.5 Q 10 32.5, 16 30.5 T 27 30.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" fill="none" opacity=".55" />
             </svg>
           </span>
           <span className={styles.brandName}>
