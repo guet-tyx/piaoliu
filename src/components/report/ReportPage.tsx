@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { SectionHead } from "@/components/shared/SectionHead";
 import { ReportCard } from "@/components/report/ReportCard";
-import { computeWeeklyReport, trackNameOf, type WeeklyReport } from "@/lib/api/report";
+import { fetchWeeklyReport, trackNameOf, type WeeklyReport } from "@/lib/api/report";
 import { TRACKS } from "@/data/tracks";
 import styles from "./ReportPage.module.css";
 
@@ -23,8 +23,8 @@ export function ReportPage() {
   // 周报数据为客户端专属（localStorage），SSR 渲染空态，effect 后计算（避免水合冲突）
   const [report, setReport] = useState<WeeklyReport | null>(null);
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage 外部源初始化（SSR 空态安全，水合后更新）
-    setReport(computeWeeklyReport());
+    // 外部源（localStorage/Supabase RPC）初始化，SSR 空态安全，水合后更新
+    fetchWeeklyReport().then(setReport);
   }, []);
 
   const maxDay = report

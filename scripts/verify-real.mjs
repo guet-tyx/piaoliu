@@ -48,6 +48,8 @@ if (!url || !anon) {
 /* ---------- 两个独立匿名用户 ---------- */
 const A = createClient(url, anon);
 const B = createClient(url, anon);
+/** 找回码验证用的第三用户（C = 新设备），模块级以便清理 */
+let C = null;
 
 let passed = 0;
 let failed = 0;
@@ -195,6 +197,37 @@ async function main() {
   const { data: limB } = await B.rpc("get_daily_limits");
   ok("B 拾后限额 picked=1", limB?.[0]?.picked === 1, JSON.stringify(limB));
 
+  /* 15. 新增功能验证：周报 / 同船在线 / 找回码 */
+  console.log("\n--- 新增功能验证（周报 / 同船在线 / 找回码） ---");
+
+  // 周报：record_listen 上报 + get_weekly_report 聚合（含 bottles 键）
+  const { error: rlErr } = await A.rpc("record_listen", { p_track_id: "t01" });
+  ok("A 收听上报（record_listen）", !rlErr, rlErr?.message);
+  const { data: weekly, error: wrErr } = await A.rpc("get_weekly_report");
+  ok("A 周报可查询（get_weekly_report）", !wrErr && !!weekly, wrErr?.message);
+  ok("周报含收听记录（listens≥1）", (weekly?.summary?.listens ?? 0) >= 1, `listens=${weekly?.summary?.listens}`);
+  ok("周报含本周启航的瓶子", (weekly?.bottles ?? []).some((b) => b.id === bottleId), `瓶=${bottleId}`);
+
+  // 同船在线：upsert_listener 心跳 + online_listeners 脱敏视图可见
+  const { error: ulErr } = await A.rpc("upsert_listener", { p_anon_key: "smoke-a-peer", p_track_id: "t01" });
+  ok("A 心跳上报（upsert_listener）", !ulErr, ulErr?.message);
+  const { data: online } = await A.from("online_listeners").select("anon_key, track_id, updated_at");
+  ok("在线视图可见自己（online_listeners）", (online ?? []).some((r) => r.anon_key === "smoke-a-peer"), JSON.stringify(online));
+
+  // 跨设备找回：A 设码 → C（新设备）用码恢复（行转移 + 单次有效）
+  const { error: srErr } = await A.rpc("set_recovery_code", { p_code: "SMK-TEST" });
+  ok("A 生成找回码（set_recovery_code）", !srErr, srErr?.message);
+  C = createClient(url, anon);
+  const { error: cSignErr } = await C.auth.signInAnonymously();
+  ok("C（新设备）匿名登录", !cSignErr, cSignErr?.message);
+  if (!cSignErr) {
+    // claim 需要当前行存在（与真实 App 一致：先 bootstrap 船员证）
+    await C.rpc("get_or_create_sailor");
+    const { data: recovered, error: crErr } = await C.rpc("claim_recovery", { p_code: "SMK-TEST" });
+    ok("C 用码恢复（claim_recovery）", !crErr && !!recovered, crErr?.message);
+    ok("船员证属性已转移（anon_mark 一致）", recovered?.anon_mark === sailorA?.anon_mark, `期望=${sailorA?.anon_mark} 得到=${recovered?.anon_mark}`);
+  }
+
   finish();
 }
 
@@ -214,6 +247,7 @@ main()
     try {
       A.auth.signOut().catch(() => {});
       B.auth.signOut().catch(() => {});
+      if (C) C.auth.signOut().catch(() => {});
     } catch {
       // 忽略清理失败
     }

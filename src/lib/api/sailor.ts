@@ -88,6 +88,22 @@ export function getLocalSailorSync(): Sailor | null {
   return readLocal();
 }
 
+/** Supabase sailors 行（snake_case）→ 本地模型（camelCase）；RPC 返回类型宽，逐字段安全转换 */
+function mapSailorRow(row: unknown): Sailor | null {
+  const r = (row ?? {}) as Record<string, unknown>;
+  if (typeof r.id !== "string") return null;
+  return {
+    id: r.id,
+    anonMark: typeof r.anon_mark === "string" ? r.anon_mark : "匿名船客",
+    bottleStyle: typeof r.bottle_style === "string" ? r.bottle_style : "paper",
+    nickname: (r.nickname as string | null) ?? null,
+    bondValue: typeof r.bond_value === "number" ? r.bond_value : 0,
+    level: typeof r.level === "number" ? r.level : 1,
+    badges: Array.isArray(r.badges) ? (r.badges as string[]) : [],
+    createdAt: typeof r.created_at === "string" ? Date.parse(r.created_at) : Date.now(),
+  };
+}
+
 /** 获取（或创建）星尘船员证（FR-9）：本地模拟 / 真实 RPC */
 export async function getOrCreateSailor(): Promise<Sailor | null> {
   if (!isSupabaseReady()) {
@@ -111,17 +127,7 @@ export async function getOrCreateSailor(): Promise<Sailor | null> {
   if (!sb) return null;
   const { data: row, error } = await sb.rpc("get_or_create_sailor");
   if (error || !row) return null;
-  const r = (row ?? {}) as Record<string, unknown>;
-  return {
-    id: typeof r.id === "string" ? r.id : "",
-    anonMark: typeof r.anon_mark === "string" ? r.anon_mark : "匿名船客",
-    bottleStyle: typeof r.bottle_style === "string" ? r.bottle_style : "paper",
-    nickname: (r.nickname as string | null) ?? null,
-    bondValue: typeof r.bond_value === "number" ? r.bond_value : 0,
-    level: typeof r.level === "number" ? r.level : 1,
-    badges: Array.isArray(r.badges) ? (r.badges as string[]) : [],
-    createdAt: typeof r.created_at === "string" ? Date.parse(r.created_at) : Date.now(),
-  };
+  return mapSailorRow(row);
 }
 
 /* ---------- 昵称（FR-9.1：1-12 字 + 敏感词过滤） ---------- */
@@ -211,7 +217,8 @@ export function bumpStat(kind: "launched" | "picked" | "replied"): SailorStatsSt
   stats[kind] += 1;
   stats.updatedAt = Date.now();
   writeStats(stats);
-  bumpDaily(kind);
+  // 真实模式：周报聚合已由服务端 action_logs 承担，本地日活不再累积（徽章判定仍读本地 stats）
+  if (!isSupabaseReady()) bumpDaily(kind);
   return stats;
 }
 
@@ -222,12 +229,15 @@ export function pushListen(trackId: string): SailorStatsState {
   if (stats.listenStreak > stats.maxListenStreak) {
     stats.maxListenStreak = stats.listenStreak;
   }
-  stats.trackCounts[trackId] = (stats.trackCounts[trackId] ?? 0) + 1;
-  const today = localDate();
-  stats.listenByDay[today] = (stats.listenByDay[today] ?? 0) + 1;
+  if (!isSupabaseReady()) {
+    // 真实模式：周报收听数据由 record_listen RPC 写服务端，本地 trackCounts/listenByDay 不再累积
+    stats.trackCounts[trackId] = (stats.trackCounts[trackId] ?? 0) + 1;
+    const today = localDate();
+    stats.listenByDay[today] = (stats.listenByDay[today] ?? 0) + 1;
+  }
   stats.updatedAt = Date.now();
   writeStats(stats);
-  bumpDaily("listen");
+  if (!isSupabaseReady()) bumpDaily("listen");
   return stats;
 }
 
@@ -304,15 +314,23 @@ function genCode(): string {
   return `${code.slice(0, 3)}-${code.slice(3)}`;
 }
 
-/** 生成找回码（本地模拟：码 ↔ 船员证快照映射；真实模式仅返回码，哈希存服务端） */
-export function genRecoveryCode(): string | null {
-  const sailor = readLocal();
-  if (!sailor) return null;
+/** 生成找回码（本地模拟：码 ↔ 船员证快照映射；真实模式：RPC 存 bcrypt 哈希，返回明文码给用户） */
+export async function genRecoveryCode(): Promise<string | null> {
+  if (!isSupabaseReady()) {
+    const sailor = readLocal();
+    if (!sailor) return null;
+    const code = genCode();
+    const record: RecoveryRecord = { code, sailor: { ...sailor }, createdAt: Date.now() };
+    const records = readJson<RecoveryRecord[]>(RECOVERY_KEY, []);
+    records.push(record);
+    writeJson(RECOVERY_KEY, records);
+    return code;
+  }
+  const sb = getSupabase();
+  if (!sb) return null;
   const code = genCode();
-  const record: RecoveryRecord = { code, sailor: { ...sailor }, createdAt: Date.now() };
-  const records = readJson<RecoveryRecord[]>(RECOVERY_KEY, []);
-  records.push(record);
-  writeJson(RECOVERY_KEY, records);
+  const { error } = await sb.rpc("set_recovery_code", { p_code: code });
+  if (error) return null;
   return code;
 }
 
@@ -320,7 +338,7 @@ type ClaimResult =
   | { ok: true; sailor: Sailor }
   | { ok: false; reason: "invalid" | "offline" };
 
-/** 输入找回码恢复船员证（本地模拟：命中映射即恢复；真实模式走 claim_recovery RPC） */
+/** 输入找回码恢复船员证（本地模拟：命中映射即恢复；真实模式走 claim_recovery RPC，单次有效） */
 export async function claimRecoveryCode(code: string): Promise<ClaimResult> {
   const normalized = code.trim().toUpperCase();
   if (!isSupabaseReady()) {
@@ -331,6 +349,13 @@ export async function claimRecoveryCode(code: string): Promise<ClaimResult> {
     writeLocal(sailor);
     return { ok: true, sailor };
   }
-  // 真实模式：claim_recovery RPC 联调后启用（002_collection.sql 注释预留）
-  return { ok: false, reason: "offline" };
+  // 真实模式：claim_recovery RPC（bcrypt 校验 + 行转移 + 单次有效）
+  const sb = getSupabase();
+  if (!sb) return { ok: false, reason: "offline" };
+  const { data, error } = await sb.rpc("claim_recovery", { p_code: normalized });
+  if (error || !data) return { ok: false, reason: "invalid" };
+  const sailor = mapSailorRow(data);
+  if (!sailor) return { ok: false, reason: "invalid" };
+  writeLocal(sailor);
+  return { ok: true, sailor };
 }

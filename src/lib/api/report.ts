@@ -1,14 +1,13 @@
 import { readDailyActivity, readStats } from "@/lib/api/sailor";
 import { readPool } from "@/lib/api/bottles";
+import { getSupabase } from "@/lib/supabase/client";
+import { isSupabaseReady } from "@/lib/supabase/anon";
 import { TRACKS } from "@/data/tracks";
 
 /**
- * 星海周报统计（FR-13）：本地模拟聚合
- * - 个人航行小结：本周投/拾/回信/听歌（drift-daily-activity 近 7 天）
- * - 热门航线：每首歌播放次数 top3（drift-stats.trackCounts）
- * - 收听星图：近 7 天播放分布（drift-stats.listenByDay）
- * - 热漂瓶子：本周启航的瓶子 + 被拾状态（瓶池）
- * 真实模式由 action_logs 聚合 RPC（004 迁移预留）
+ * 星海周报统计（FR-13）：
+ * - 本地模拟：聚合 localStorage（drift-daily-activity / drift-stats / 瓶池）
+ * - 真实模式：action_logs 聚合 RPC（004/005 迁移 get_weekly_report），失败回退本地
  */
 
 export interface WeeklyReport {
@@ -41,6 +40,11 @@ function daysAgo(n: number): string {
   const m = String(d.getMonth() + 1).padStart(2, "0");
   const day = String(d.getDate()).padStart(2, "0");
   return `${d.getFullYear()}-${m}-${day}`;
+}
+
+/** 瓶文截断（列表展示统一 30 字，本地/真实两路径共用） */
+function truncateBottleText(text: string): string {
+  return text.length > 30 ? `${text.slice(0, 30)}…` : text;
 }
 
 /** 计算本周周报（数据从 V2.0 起累积） */
@@ -80,7 +84,7 @@ export function computeWeeklyReport(): WeeklyReport {
     .filter((b) => b.createdAt >= weekStart)
     .map((b) => ({
       id: b.id,
-      text: b.text.length > 30 ? `${b.text.slice(0, 30)}…` : b.text,
+      text: truncateBottleText(b.text),
       trackName: b.track.t,
       picked: b.pickedBy !== null,
       replied: b.repliedAt !== null,
@@ -92,6 +96,77 @@ export function computeWeeklyReport(): WeeklyReport {
     0;
 
   return { week, topTracks, listenDays, bottles, hasData };
+}
+
+/** 真实模式 get_weekly_report 返回行（snake_case jsonb）→ WeeklyReport（camelCase） */
+function mapWeeklyReportRow(row: unknown): WeeklyReport {
+  const r = (row ?? {}) as Record<string, unknown>;
+  const summary = (r.summary ?? {}) as Record<string, unknown>;
+  const topTracks = (Array.isArray(r.top_tracks) ? r.top_tracks : []) as {
+    track_id?: unknown;
+    cnt?: unknown;
+  }[];
+  const listenDays = (Array.isArray(r.listen_days) ? r.listen_days : []) as {
+    day?: unknown;
+    cnt?: unknown;
+  }[];
+  const bottles = (Array.isArray(r.bottles) ? r.bottles : []) as {
+    id?: unknown;
+    text?: unknown;
+    track_name?: unknown;
+    picked?: unknown;
+    replied?: unknown;
+  }[];
+
+  const num = (v: unknown): number => (typeof v === "number" ? v : 0);
+  const str = (v: unknown): string => (typeof v === "string" ? v : "");
+
+  const week = {
+    launched: num(summary.launched),
+    picked: num(summary.picked),
+    replied: num(summary.replied),
+    listens: num(summary.listens),
+  };
+  const mappedTopTracks = topTracks
+    .map((t) => ({ trackId: str(t.track_id), count: num(t.cnt) }))
+    .filter((t) => t.trackId !== "");
+  const mappedListenDays = listenDays.map((d) => ({
+    date: str(d.day),
+    count: num(d.cnt),
+  }));
+  const mappedBottles = bottles.map((b) => ({
+    id: str(b.id),
+    text: truncateBottleText(str(b.text)),
+    trackName: str(b.track_name),
+    picked: b.picked === true,
+    replied: b.replied === true,
+  }));
+
+  const hasData =
+    week.launched + week.picked + week.replied + week.listens +
+    mappedTopTracks.length + mappedBottles.length >
+    0;
+
+  return {
+    week,
+    topTracks: mappedTopTracks,
+    listenDays: mappedListenDays,
+    bottles: mappedBottles,
+    hasData,
+  };
+}
+
+/**
+ * 本周周报（真实模式走 get_weekly_report RPC，失败/未配置回退本地聚合）
+ * 异步：调用方在 effect 中消费（SSR 空态安全，水合后更新）
+ */
+export async function fetchWeeklyReport(): Promise<WeeklyReport> {
+  if (!isSupabaseReady()) return computeWeeklyReport();
+  const sb = getSupabase();
+  if (!sb) return computeWeeklyReport();
+  const { data, error } = await sb.rpc("get_weekly_report");
+  if (error || !data) return computeWeeklyReport();
+  return mapWeeklyReportRow(data);
 }
 
 /** 按 trackId 取歌曲名（热门航线展示） */

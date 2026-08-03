@@ -12,7 +12,8 @@ import {
   updateNickname,
   type BondKind,
 } from "@/lib/api/sailor";
-import { ensureAnonSession } from "@/lib/supabase/anon";
+import { ensureAnonSession, isSupabaseReady } from "@/lib/supabase/anon";
+import { getSupabase } from "@/lib/supabase/client";
 import { useDanmakuStore } from "@/stores/danmaku";
 import { SKINS, titleOf } from "@/data/collection";
 import {
@@ -101,7 +102,7 @@ interface IdentityState {
   /** 听歌中断重置 */
   resetListen: () => void;
   /** 生成找回码 */
-  recoveryCode: () => string | null;
+  recoveryCode: () => Promise<string | null>;
   /** 输入找回码恢复 */
   claim: (code: string) => Promise<boolean>;
 }
@@ -209,6 +210,16 @@ export const useIdentityStore = create<IdentityState>()((set, get) => ({
     const sailor = get().sailor;
     if (!sailor) return;
     const stats = pushListen(trackId);
+    // 真实模式：切歌上报服务端（周报收听数据源；fire-and-forget，失败静默不阻塞连听/羁绊）
+    if (isSupabaseReady()) {
+      void (async () => {
+        try {
+          await getSupabase()?.rpc("record_listen", { p_track_id: trackId });
+        } catch {
+          // 静默
+        }
+      })();
+    }
     // 每满 3 首：羁绊 + 回应 + 重置计数（周报收听计数与羁绊解耦，pushListen 已独立记录）
     if (stats.listenStreak >= 3) {
       get().bond("listen", true);

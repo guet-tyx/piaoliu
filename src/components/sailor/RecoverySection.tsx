@@ -15,15 +15,21 @@ export function RecoverySection() {
   const [code, setCode] = useState("");
   const [generated, setGenerated] = useState<string | null>(null);
   const [msg, setMsg] = useState<{ text: string; ok: boolean } | null>(null);
+  const [generating, setGenerating] = useState(false);
 
-  const onGen = () => {
-    const c = recoveryCode();
-    setGenerated(c);
-    setMsg(
-      c
-        ? { text: "保存好这串码。换设备时输入它，就能找回你的船员证。", ok: true }
-        : { text: "生成失败，稍后再试。", ok: false },
-    );
+  const onGen = async () => {
+    setGenerating(true);
+    try {
+      const c = await recoveryCode();
+      setGenerated(c);
+      setMsg(
+        c
+          ? { text: "保存好这串码。换设备时输入它，就能找回你的船员证。", ok: true }
+          : { text: "生成失败，稍后再试。", ok: false },
+      );
+    } finally {
+      setGenerating(false);
+    }
   };
 
   const onClaim = async () => {
@@ -42,8 +48,8 @@ export function RecoverySection() {
         匿名保护：找回码不落服务端明文（哈希存储），生成后可随时作废。
       </p>
       <div className={styles.genRow}>
-        <button className={styles.genBtn} type="button" onClick={onGen}>
-          生成找回码
+        <button className={styles.genBtn} type="button" disabled={generating} onClick={onGen}>
+          {generating ? "生成中…" : "生成找回码"}
         </button>
         {generated && <code className={styles.code}>{generated}</code>}
       </div>

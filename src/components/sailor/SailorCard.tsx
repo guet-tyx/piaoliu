@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useIdentityStore } from "@/stores/identity";
 import { nextLevelBond, TITLE_TIERS } from "@/data/collection";
-import { computeWeeklyReport } from "@/lib/api/report";
+import { fetchWeeklyReport } from "@/lib/api/report";
 import styles from "./SailorCard.module.css";
 
 /**
@@ -22,9 +22,8 @@ export function SailorCard() {
     replied: number;
   } | null>(null);
   useEffect(() => {
-    const r = computeWeeklyReport();
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage 外部源初始化（SSR 空态安全，水合后更新）
-    setWeek({ ...r.week });
+    // 外部源（localStorage/Supabase RPC）初始化，SSR 空态安全，水合后更新
+    fetchWeeklyReport().then((r) => setWeek({ ...r.week }));
   }, []);
 
   if (!sailor) return null;
