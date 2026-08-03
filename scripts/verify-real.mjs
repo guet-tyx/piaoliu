@@ -97,7 +97,8 @@ async function main() {
 
   /* 2. 初始限额 */
   const { data: lim0, error: l0Err } = await A.rpc("get_daily_limits");
-  ok("A 初始限额 {0,0}", !l0Err && lim0?.launched === 0 && lim0?.picked === 0, l0Err?.message ?? JSON.stringify(lim0));
+  // RPC returns table(...) → supabase-js 返回数组，取首行
+  ok("A 初始限额 {0,0}", !l0Err && lim0?.[0]?.launched === 0 && lim0?.[0]?.picked === 0, l0Err?.message ?? JSON.stringify(lim0));
 
   /* 3. A 投瓶 */
   const { data: bottle, error: lbErr } = await A.rpc("launch_bottle", {
@@ -111,7 +112,7 @@ async function main() {
 
   /* 4. 投后限额 */
   const { data: lim1 } = await A.rpc("get_daily_limits");
-  ok("A 投后限额 launched=1", lim1?.launched === 1, JSON.stringify(lim1));
+  ok("A 投后限额 launched=1", lim1?.[0]?.launched === 1, JSON.stringify(lim1));
 
   /* 5. 用户 B 匿名登录 + 拾瓶（原子 claim） */
   const { error: bSignErr } = await B.auth.signInAnonymously();
@@ -120,6 +121,11 @@ async function main() {
 
   const { data: ub } = await B.auth.getUser();
   const uidB = ub?.user?.id;
+
+  // 与真实 App 一致：任何操作前先引导船员证（回信/拾瓶署名依赖 anon_mark）
+  const { error: bSailorErr } = await B.rpc("get_or_create_sailor");
+  ok("B 创建船员证（回信署名依赖）", !bSailorErr, bSailorErr?.message);
+  if (bSailorErr) return;
 
   const { data: picked, error: pbErr } = await B.rpc("pick_bottle");
   ok("B 拾瓶成功", !pbErr && !!picked?.id, pbErr?.message);
@@ -187,7 +193,7 @@ async function main() {
 
   /* 14. B 拾后限额 */
   const { data: limB } = await B.rpc("get_daily_limits");
-  ok("B 拾后限额 picked=1", limB?.picked === 1, JSON.stringify(limB));
+  ok("B 拾后限额 picked=1", limB?.[0]?.picked === 1, JSON.stringify(limB));
 
   finish();
 }

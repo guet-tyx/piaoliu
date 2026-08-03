@@ -41,7 +41,13 @@ values
    '考试周第四天。凌晨三点，窗外有鸟在叫。今晚的歌很轻，刚好盖过焦虑。',
    '{"t":"凌晨三点半的港","tag":"爵士嘻哈","s":"爵士嘻哈 · 失眠人士精选","cover":"/images/cover-anime-2.png"}',
    'paper', '星海信使·SEED', 'drifting', true, now() + interval '72 hours')
-on conflict (id) do nothing;
+-- 幂等 + 可恢复：重复执行会把预热瓶重置为漂流中（冷启动内容可随时重新投放）
+on conflict (id) do update
+  set status = 'drifting',
+      picked_by = null,
+      replied_at = null,
+      read_at = null,
+      expires_at = now() + interval '72 hours';
 
 -- ---------- 敏感词初值（⚠️ 人工评审后增补，与 src/data/bad-words.ts 对应） ----------
 insert into public.bad_words (word) values
