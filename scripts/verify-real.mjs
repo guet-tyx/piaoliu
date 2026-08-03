@@ -215,7 +215,7 @@ async function main() {
   ok("在线视图可见自己（online_listeners）", (online ?? []).some((r) => r.anon_key === "smoke-a-peer"), JSON.stringify(online));
 
   // 跨设备找回：A 设码 → C（新设备）用码恢复（行转移 + 单次有效）
-  const { error: srErr } = await A.rpc("set_recovery_code", { p_code: "SMK-TEST" });
+  const { error: srErr } = await A.rpc("set_recovery_code", { p_code: "SMK-ABC" });
   ok("A 生成找回码（set_recovery_code）", !srErr, srErr?.message);
   C = createClient(url, anon);
   const { error: cSignErr } = await C.auth.signInAnonymously();
@@ -223,7 +223,7 @@ async function main() {
   if (!cSignErr) {
     // claim 需要当前行存在（与真实 App 一致：先 bootstrap 船员证）
     await C.rpc("get_or_create_sailor");
-    const { data: recovered, error: crErr } = await C.rpc("claim_recovery", { p_code: "SMK-TEST" });
+    const { data: recovered, error: crErr } = await C.rpc("claim_recovery", { p_code: "SMK-ABC" });
     ok("C 用码恢复（claim_recovery）", !crErr && !!recovered, crErr?.message);
     ok("船员证属性已转移（anon_mark 一致）", recovered?.anon_mark === sailorA?.anon_mark, `期望=${sailorA?.anon_mark} 得到=${recovered?.anon_mark}`);
   }

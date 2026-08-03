@@ -732,11 +732,12 @@ $$;
 
 -- ---------- 2. 跨设备找回：生成/重置找回码（bcrypt 哈希，单一生效码） ----------
 -- 前端 genCode 生成 XXX-XXX 格式码 → 此处只存哈希（不落明文），覆盖旧码。
+-- 注：Supabase 默认把 pgcrypto 装入 extensions schema，search_path 需带上 extensions。
 create or replace function public.set_recovery_code(p_code text)
 returns void
 language plpgsql
 security definer
-set search_path = public
+set search_path = public, extensions
 as $$
 begin
   if auth.uid() is null then raise exception 'not authenticated'; end if;
@@ -744,7 +745,7 @@ begin
     raise exception 'invalid code format';
   end if;
   update public.sailors
-  set recovery_hash = public.crypt(p_code, public.gen_salt('bf'))
+  set recovery_hash = crypt(p_code, gen_salt('bf'))
   where id = auth.uid();
 end;
 $$;
@@ -757,7 +758,7 @@ create or replace function public.claim_recovery(p_code text)
 returns public.sailors
 language plpgsql
 security definer
-set search_path = public
+set search_path = public, extensions
 as $$
 declare
   v_uid    uuid := auth.uid();
@@ -772,7 +773,7 @@ begin
   select * into v_target
   from public.sailors
   where recovery_hash is not null
-    and recovery_hash = public.crypt(p_code, recovery_hash)
+    and recovery_hash = crypt(p_code, recovery_hash)
   limit 1;
   if v_target is null then raise exception 'recovery code invalid'; end if;
 
