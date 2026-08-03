@@ -106,6 +106,9 @@ npx supabase gen types typescript --project-id <ref> > src/types/database.ts
 - 每个匿名用户「投 1 / 拾 3」按日独立限额（服务端 Asia/Shanghai 时区）
 - 预热瓶 72h 过期；重跑 `seed.sql` 会重置为漂流中
 
-## 尚未接入（预留，不影响当前玩法）
+## 已接通 vs 尚未接入
 
-周报真实接线（`record_listen`/`get_weekly_report` 前端调用）、跨设备找回 `claim_recovery`、同船在线 presence 真实模式 —— 见 `archive/docs/ARCHITECTURE.md` 预留点。
+**已接通（真实模式）**：核心玩法（投瓶/拾瓶/回信/星海来讯/昵称/羁绊/限额/匿名登录）、同船弹幕（Realtime broadcast）、同船在线（presence）、跨设备找回（claim_recovery）、星海周报（record_listen/get_weekly_report）。
+验证：`npm run verify:real` 全绿（33 项）。
+
+**尚未接入（下轮候选）**：RPC 契约类型（`src/types/rpc.ts`）、bad_words 双源收敛、错误处理硬化、周报定时推送（pg_cron 快照表 `report_weekly`）——见 `archive/docs/ARCHITECTURE.md` 预留点。
