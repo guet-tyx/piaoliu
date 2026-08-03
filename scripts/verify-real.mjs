@@ -86,14 +86,14 @@ async function main() {
   /* 1. 用户 A 匿名登录 + 船员证 */
   const { error: aSignErr } = await A.auth.signInAnonymously();
   ok("A 匿名登录（匿名 Sign-In 已启用）", !aSignErr, aSignErr?.message);
-  if (aSignErr) return finish();
+  if (aSignErr) return;
 
   const { data: ua } = await A.auth.getUser();
   const uidA = ua?.user?.id;
 
   const { data: sailorA, error: saErr } = await A.rpc("get_or_create_sailor");
   ok("A 获取/创建船员证（代号非空）", !saErr && !!sailorA?.anon_mark, sailorA?.anon_mark);
-  if (saErr || !sailorA?.anon_mark) return finish();
+  if (saErr || !sailorA?.anon_mark) return;
 
   /* 2. 初始限额 */
   const { data: lim0, error: l0Err } = await A.rpc("get_daily_limits");
@@ -106,7 +106,7 @@ async function main() {
     p_style: "paper",
   });
   ok("A 投瓶成功（status=drifting）", !lbErr && !!bottle?.id && bottle?.status === "drifting", lbErr?.message);
-  if (lbErr || !bottle?.id) return finish();
+  if (lbErr || !bottle?.id) return;
   const bottleId = bottle.id;
 
   /* 4. 投后限额 */
@@ -116,14 +116,14 @@ async function main() {
   /* 5. 用户 B 匿名登录 + 拾瓶（原子 claim） */
   const { error: bSignErr } = await B.auth.signInAnonymously();
   ok("B 匿名登录", !bSignErr, bSignErr?.message);
-  if (bSignErr) return finish();
+  if (bSignErr) return;
 
   const { data: ub } = await B.auth.getUser();
   const uidB = ub?.user?.id;
 
   const { data: picked, error: pbErr } = await B.rpc("pick_bottle");
   ok("B 拾瓶成功", !pbErr && !!picked?.id, pbErr?.message);
-  if (pbErr || !picked?.id) return finish();
+  if (pbErr || !picked?.id) return;
   ok("拾瓶原子 claim（picked_by=B）", picked?.picked_by === uidB, picked?.picked_by);
 
   /* 6. B 回信（无论拾到谁，直接验证 replied_at 列存在——列缺失时此 RPC 报 42703） */
@@ -132,7 +132,7 @@ async function main() {
     p_text: REPLY_TEXT,
   });
   ok("B 回信成功（replied_at 列存在，不再 42703）", !rbErr && reply?.text === REPLY_TEXT, rbErr?.message);
-  if (rbErr) return finish();
+  if (rbErr) return;
 
   /* 7. A 收件箱：是否拾到测试瓶决定断言深度（池中随机，两条都是正确行为） */
   const { data: inbox, error: ibErr } = await A.rpc("fetch_inbox");
@@ -194,11 +194,22 @@ async function main() {
 
 function finish() {
   console.log(`\n=== 结果：${passed} ✅ / ${failed} ❌${skipped > 0 ? ` / ${skipped} ⚠️ 跳过` : ""} ===`);
-  if (failed > 0) process.exit(1);
-  console.log("冒烟通过：真实后端核心链路可用。");
+  if (failed === 0) console.log("冒烟通过：真实后端核心链路可用。");
 }
 
-main().catch((e) => {
-  console.error("❌ 冒烟脚本异常：", e.message);
-  process.exit(1);
-});
+main()
+  .catch((e) => {
+    console.error("❌ 冒烟脚本异常：", e.message);
+    process.exitCode = 1;
+  })
+  .finally(() => {
+    // 清理：登出清除 supabase-js 的 auth 刷新定时器/连接句柄，
+    // 避免 Windows 下 process.exit 撞 libuv 断言崩溃（UV_HANDLE_CLOSING）。
+    try {
+      A.auth.signOut().catch(() => {});
+      B.auth.signOut().catch(() => {});
+    } catch {
+      // 忽略清理失败
+    }
+    process.exitCode = process.exitCode || (failed > 0 ? 1 : 0);
+  });

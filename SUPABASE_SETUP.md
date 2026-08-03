@@ -18,12 +18,13 @@
 1. 打开 <https://supabase.com> 注册/登录
 2. 点击 **New project**：
    - 名称随意（如 `drift-web`）
-   - 设置数据库密码（保存好）
+   - 设置数据库密码（**保存好，勿写进仓库**——数据库密码是特权凭证，只放 `.env.local` / 密码管理器）
    - Region 就近选择
    - 免费计划（Free tier）
 3. 记下两样东西（项目首页 / **Settings → API**）：
    - **Project URL**：`https://<project-ref>.supabase.co`
-   - **anon public key**：`eyJ...` 开头的长字符串
+   - **anon public key** / **publishable key**：`eyJ...` 或 `sb_publishable_...` 开头
+     > ⚠️ anon/publishable key 是客户端公开密钥，可以放心放 `.env.local`；但**数据库密码、service_role key 是特权凭证，一律不得写入仓库文件**。
 
 ## 2. 启用匿名登录（必需，FR-9 身份底座）
 
