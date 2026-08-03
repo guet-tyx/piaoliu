@@ -50,17 +50,11 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
 ## 4. 执行迁移（SQL Editor）
 
 1. 打开项目 Dashboard → **SQL Editor** → New query
-2. 按顺序**逐个粘贴执行**本仓库的：
-   ```
-   supabase/migrations/001_init.sql
-   supabase/migrations/002_collection.sql
-   supabase/migrations/003_realtime.sql
-   supabase/migrations/004_report_events.sql
-   supabase/seed.sql
-   ```
+2. **推荐**：粘贴 `supabase/install.sql`（合并版：001~004 + seed 一次执行，721 行）
+   - 或按顺序逐个粘贴：`migrations/001_init.sql` → `002_collection.sql` → `003_realtime.sql` → `004_report_events.sql` → `seed.sql`
 3. 每个都显示 **Success** 即可
 
-> 💡 建议先跑完冒烟测试（第 5 步）再执行 `seed.sql`：空瓶池时冒烟能完整覆盖「拾瓶→回信→收件箱」黄金链路；`seed.sql` 只是投放 6 艘预热系统瓶（冷启动内容），随时可执行（已幂等）。
+> 💡 建议先跑完冒烟测试（第 5 步）再执行 `seed.sql`：空瓶池时冒烟能完整覆盖「拾瓶→回信→收件箱」黄金链路；`seed.sql` 只是投放 6 艘预热系统瓶（冷启动内容），随时可执行（已幂等）。合并版 `install.sql` 已含 seed，如需「先冒烟后 seed」可只粘贴前四段。
 
 ## 5. 冒烟验证
 

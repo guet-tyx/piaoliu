@@ -92,12 +92,12 @@ async function main() {
   const uidA = ua?.user?.id;
 
   const { data: sailorA, error: saErr } = await A.rpc("get_or_create_sailor");
-  ok("A 获取/创建船员证（代号非空）", !saErr && !!sailorA?.anon_mark, sailorA?.anon_mark);
+  ok("A 获取/创建船员证（代号非空）", !saErr && !!sailorA?.anon_mark, saErr?.message ?? sailorA?.anon_mark);
   if (saErr || !sailorA?.anon_mark) return;
 
   /* 2. 初始限额 */
   const { data: lim0, error: l0Err } = await A.rpc("get_daily_limits");
-  ok("A 初始限额 {0,0}", !l0Err && lim0?.launched === 0 && lim0?.picked === 0, JSON.stringify(lim0));
+  ok("A 初始限额 {0,0}", !l0Err && lim0?.launched === 0 && lim0?.picked === 0, l0Err?.message ?? JSON.stringify(lim0));
 
   /* 3. A 投瓶 */
   const { data: bottle, error: lbErr } = await A.rpc("launch_bottle", {
