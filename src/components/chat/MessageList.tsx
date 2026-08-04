@@ -6,7 +6,7 @@ import Image from "next/image";
 import { personaOf } from "@/data/chat-personas";
 import type { ChatPersona } from "@/data/chat-personas";
 import { TRACKS } from "@/data/tracks";
-import { stickerOf, type Sticker } from "@/data/stickers";
+import { stickerOf, stickerSrc, type Sticker } from "@/data/stickers";
 import { useChatStore } from "@/stores/chat";
 import { useTtsStore } from "@/stores/tts";
 import { MessageActions } from "@/components/chat/MessageActions";
@@ -61,10 +61,13 @@ function MusicChip({ name }: { name: string }) {
 }
 
 /** R5 表情包贴纸：块级居中大图（黑色贴纸底，气泡内融合） */
+/** R5 表情包贴纸：块级居中大图（黑色贴纸底，气泡内融合）。
+ * unoptimized：贴纸走原始路径 + 版本号（?v=），不经 next/image 优化器，
+ * 避免优化器按 URL 缓存旧图（素材更新后强制拉新）。 */
 function StickerImage({ sticker }: { sticker: Sticker }) {
   return (
     <span className={styles.stickerWrap} title={sticker.name}>
-      <Image src={sticker.path} alt={sticker.name} fill sizes="140px" />
+      <Image src={stickerSrc(sticker)} alt={sticker.name} fill sizes="140px" unoptimized />
     </span>
   );
 }
@@ -77,7 +80,7 @@ function StickerCard({ stickerId }: { stickerId: string }) {
   }
   return (
     <span className={styles.stickerCard} title={st.name}>
-      <Image src={st.path} alt={st.name} fill sizes="190px" />
+      <Image src={stickerSrc(st)} alt={st.name} fill sizes="190px" unoptimized />
     </span>
   );
 }

@@ -20,9 +20,9 @@ export interface Sticker {
 const STICKERS: Sticker[] = [
   // 汐 · 星海电台导航少女
   { id: "sio-01", roleId: "sio", path: "/images/sio-sticker-01.webp", name: "挥手问好", vibe: "冷暖打招呼/开场" },
-  { id: "sio-02", roleId: "sio", path: "/images/sio-sticker-02.webp", name: "开心点头", vibe: "认同/开心" },
+  { id: "sio-02", roleId: "sio", path: "/images/sio-sticker-02.webp", name: "捧心比心", vibe: "喜爱/感谢/示好" },
   { id: "sio-03", roleId: "sio", path: "/images/sio-sticker-03.webp", name: "点赞加油", vibe: "夸奖/鼓励" },
-  { id: "sio-04", roleId: "sio", path: "/images/sio-sticker-04.webp", name: "温柔安慰", vibe: "难过/安慰" },
+  { id: "sio-04", roleId: "sio", path: "/images/sio-sticker-04.webp", name: "委屈哭哭", vibe: "难过/委屈/撒娇" },
   { id: "sio-05", roleId: "sio", path: "/images/sio-sticker-05.webp", name: "太棒了", vibe: "欢呼/庆祝" },
   { id: "sio-06", roleId: "sio", path: "/images/sio-sticker-06.webp", name: "呆住惊讶", vibe: "惊讶/意外" },
   { id: "sio-07", roleId: "sio", path: "/images/sio-sticker-07.webp", name: "偷笑调皮", vibe: "玩笑/俏皮" },
@@ -62,6 +62,18 @@ const STICKERS: Sticker[] = [
 /** 按 id 取表情，未知返回 undefined（渲染层按字面文本兜底） */
 export function stickerOf(id: string): Sticker | undefined {
   return STICKERS.find((s) => s.id === id);
+}
+
+/**
+ * 素材版本号：美术更新贴纸图后 +1。
+ * 渲染地址带版本参数，强制浏览器与 next/image 优化器绕过旧缓存
+ * （曾出现改图后仍显示旧图的问题——优化器按 URL 缓存不随源文件失效）。
+ */
+export const STICKER_ASSET_VERSION = 2;
+
+/** 贴纸图片渲染地址（含版本号，素材更新后必然拉新） */
+export function stickerSrc(sticker: Pick<Sticker, "path">): string {
+  return `${sticker.path}?v=${STICKER_ASSET_VERSION}`;
 }
 
 /** 某角色全部表情（按编号有序） */

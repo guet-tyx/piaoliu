@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import { stickerOf, stickerPromptFor, stickersOfRole } from "@/data/stickers";
+import { stickerOf, stickerPromptFor, stickersOfRole, stickerSrc } from "@/data/stickers";
 
 /** R5 表情包数据冒烟：素材就位 / id 唯一 / prompt 可读 */
 
@@ -27,6 +27,12 @@ describe("素材就位", () => {
   it("stickerOf 命中已知 / 未知返回 undefined", () => {
     expect(stickerOf("sio-01")?.path).toBe("/images/sio-sticker-01.webp");
     expect(stickerOf("nope-99")).toBeUndefined();
+  });
+
+  it("stickerSrc 带版本号（素材更新后强制绕过浏览器/优化器旧缓存）", () => {
+    const s = stickerOf("sio-02")!;
+    expect(stickerSrc(s)).toBe("/images/sio-sticker-02.webp?v=2");
+    expect(stickerSrc(s)).toContain("?v=");
   });
 });
 

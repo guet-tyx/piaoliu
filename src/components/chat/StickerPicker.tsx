@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import Image from "next/image";
-import { stickersOfRole } from "@/data/stickers";
+import { stickersOfRole, stickerSrc } from "@/data/stickers";
 import styles from "./StickerPicker.module.css";
 
 interface StickerPickerProps {
@@ -47,7 +47,7 @@ export function StickerPicker({ roleId, busy, onClose, onSend }: StickerPickerPr
               aria-label={`发送表情包 ${s.name}`}
               onClick={() => onSend(s.id)}
             >
-              <Image src={s.path} alt={s.name} width={72} height={72} className={styles.img} />
+              <Image src={stickerSrc(s)} alt={s.name} width={72} height={72} className={styles.img} unoptimized />
               <span className={styles.itemName}>{s.name}</span>
             </button>
           ))}
