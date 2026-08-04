@@ -1,5 +1,10 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { callChatCompletionOnce, callChatCompletions } from "./upstream";
+import {
+  callChatCompletionOnce,
+  callChatCompletions,
+  getDynamicTemperature,
+} from "./upstream";
+import { defaultEmotion } from "@/data/emotion";
 import type { LLMProvider } from "./providers";
 
 /** 构造最小 provider（唯一 id 避免 env/模块级状态串扰） */
@@ -75,5 +80,49 @@ describe("callChatCompletions", () => {
     const r = await callChatCompletions(makeProvider("a"), "m1", []);
     expect(r.ok).toBe(false);
     expect(warn).toHaveBeenCalled();
+  });
+
+  it("options.temperature 覆盖默认温度（人机感动态温度透传）", async () => {
+    let sent: { temperature?: number } = {};
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (...args: unknown[]) => {
+        sent = JSON.parse((args[1] as RequestInit).body as string);
+        return new Response("data: [DONE]\n\n", { status: 200 });
+      }),
+    );
+    const r = await callChatCompletions(makeProvider("a"), "m1", [], { temperature: 0.7 });
+    expect(r.ok).toBe(true);
+    expect(sent.temperature).toBe(0.7);
+  });
+});
+
+describe("getDynamicTemperature 动态温度（人机感 P1-⑥）", () => {
+  it("无情感状态回退默认 0.85", () => {
+    expect(getDynamicTemperature()).toBe(0.85);
+  });
+
+  it("高激活高愉悦 → 温度升高（≤1.0）", () => {
+    const e = { ...defaultEmotion("sio"), arousal: 100, valence: 100 };
+    const t = getDynamicTemperature(e);
+    expect(t).toBeGreaterThan(0.85);
+    expect(t).toBeLessThanOrEqual(1.0);
+  });
+
+  it("低激活低愉悦 → 温度降低（≥0.6）", () => {
+    const e = { ...defaultEmotion("sio"), arousal: 0, valence: 0 };
+    const t = getDynamicTemperature(e);
+    expect(t).toBeLessThan(0.85);
+    expect(t).toBeGreaterThanOrEqual(0.6);
+  });
+
+  it("全取值域内始终落在 [0.6, 1.0]", () => {
+    for (const v of [0, 25, 50, 75, 100]) {
+      for (const a of [0, 25, 50, 75, 100]) {
+        const t = getDynamicTemperature({ ...defaultEmotion("sio"), valence: v, arousal: a });
+        expect(t).toBeGreaterThanOrEqual(0.6);
+        expect(t).toBeLessThanOrEqual(1.0);
+      }
+    }
   });
 });

@@ -6,13 +6,19 @@ import type { ChatApiError, SummarizeApiResponse } from "@/types/api";
 import { isSafeText } from "@/lib/api/moderation";
 import { localReply } from "@/lib/chat/local";
 import { consumeSSE } from "@/lib/chat/sse";
-import { sleep, typewriter, THINK_DELAY_BASE, THINK_DELAY_JITTER } from "@/lib/chat/typing";
+import {
+  sleep,
+  typewriter,
+  thinkDelayFor,
+} from "@/lib/chat/typing";
+import { shouldInitiate } from "@/lib/chat/initiative";
 import { fetchWithTimeout } from "@/lib/net/fetchWithTimeout";
 import { MAX_HISTORY, MAX_STORED_MESSAGES, MAX_TEXT } from "@/lib/chat/limits";
 import { nextSummaryChunk, formatSummaryChunk } from "@/lib/chat/summarize";
 import { splitStickerMessages, stickerToModelText } from "@/lib/chat/split";
-import { chatKey, chatSummaryKey, readStorage, writeStorage } from "@/lib/storage";
+import { chatKey, chatSummaryKey, memoriesKey, readStorage, writeStorage } from "@/lib/storage";
 import { stickerOf } from "@/data/stickers";
+import { useEmotionStore } from "@/stores/emotion";
 
 /** 无摘要的初始态（只读共享引用，更新时总是创建新对象） */
 const EMPTY_SUMMARY: ChatSummary = { text: "", covered: 0 };
@@ -38,6 +44,18 @@ function capMessages(msgs: ChatMessage[]): ChatMessage[] {
   return msgs.length > MAX_STORED_MESSAGES ? msgs.slice(-MAX_STORED_MESSAGES) : msgs;
 }
 
+/** 记忆合并去重（人机感 ⑧）：按行去重后追加，避免多块摘要重复提取同一记忆 */
+function mergeMemories(prev: string, gained: string): string {
+  if (!prev) return gained;
+  const existing = new Set(prev.split("\n").map((s) => s.trim()).filter(Boolean));
+  const fresh = gained
+    .split("\n")
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .filter((s) => !existing.has(s));
+  return fresh.length ? [...existing, ...fresh].join("\n") : prev;
+}
+
 /**
  * 角色 AI 聊天（V2.3 基础设施，V2.4 全屏聊天页使用）：
  * - 未配置服务端 key 时（apiReadyCache 记忆 503 no-key）走本地回复池降级；
@@ -49,6 +67,10 @@ export interface ChatState {
   status: Record<string, ChatStatus>;
   /** 对话自动总结：每角色的累积摘要（随聊天持久化，清空时重置） */
   summaries: Record<string, ChatSummary>;
+  /** 人机感 ⑤：每角色累计回合数（内存态，主动反问频率判定用） */
+  turns: Record<string, number>;
+  /** 人机感 ⑧：角色记得的关于用户的关键记忆（跨会话持久，drift-memories-<roleId>） */
+  memories: Record<string, string>;
   /** 挂载时按需从 localStorage 恢复某角色（V2.4 页内只跑一次） */
   restore: (roleId: string) => void;
   /** 发送消息；ok.degraded 表示 AI 已降级为本地回复池（供错误横幅提示，V2.4） */
@@ -134,6 +156,14 @@ export const useChatStore = create<ChatState>()((set, get) => {
       const gained = data?.summary?.trim() ?? "";
       const text = gained ? (summary.text ? `${summary.text}\n${gained}` : gained) : summary.text;
       commitSummary(roleId, { text, covered: chunk.end });
+      // 人机感 ⑧：新发现的关键记忆单独累积（去重后持久化，注入「你记得的关于用户的事」）
+      const gainedMemories = data?.memories?.trim() ?? "";
+      if (gainedMemories) {
+        const prevMem = get().memories[roleId] ?? "";
+        const merged = mergeMemories(prevMem, gainedMemories);
+        set((s) => ({ memories: { ...s.memories, [roleId]: merged } }));
+        writeStorage(memoriesKey(roleId), merged);
+      }
     } catch {
       // 网络异常：静默，不推进
     } finally {
@@ -187,11 +217,13 @@ export const useChatStore = create<ChatState>()((set, get) => {
   };
 
   /** 真实 LLM：fetch /api/chat + SSE 流式；返回是否完成（false 需降级）。
-   *  history 指定调用上下文（send 传完整列表 / retry 传重试点前），draftIndex 指定回复插入位置。 */
+   *  history 指定调用上下文（send 传完整列表 / retry 传重试点前），draftIndex 指定回复插入位置。
+   *  options.initiative 人机感 ⑤：本轮末尾主动反问/新话题（send 按回合计数判定，retry 不主动）。 */
   const streamFromApi = async (
     roleId: string,
     history?: ChatMessage[],
     draftIndex?: number,
+    options: { initiative?: boolean } = {},
   ): Promise<boolean> => {
     const context = history ?? get().messages[roleId] ?? [];
     // 贴纸消息序列化为文本标记（route 校验 text 必填；模型与 AI 输出 token 同格式）
@@ -200,10 +232,17 @@ export const useChatStore = create<ChatState>()((set, get) => {
     );
     // 非空摘要随请求携带，由服务端注入 system（Summarize：retry 路径同样生效）
     const summaryText = get().summaries[roleId]?.text ?? "";
+    // 人机感 ⑧：关键记忆随请求携带，服务端注入「你记得的关于用户的事」
+    const memoriesText = get().memories[roleId] ?? "";
+    // 人机感 ④：最新情感状态随请求携带，服务端注入「当前状态」并计算动态温度
+    const emotion = useEmotionStore.getState().emotions[roleId];
     const body = {
       roleId,
       messages: modelContext.slice(-MAX_HISTORY),
       ...(summaryText ? { summary: summaryText } : {}),
+      ...(memoriesText ? { memories: memoriesText } : {}),
+      ...(emotion ? { emotion } : {}),
+      ...(options.initiative ? { initiative: true } : {}),
     };
     const controller = new AbortController();
     const res = await fetchWithTimeout(
@@ -269,14 +308,14 @@ export const useChatStore = create<ChatState>()((set, get) => {
     return true;
   };
 
-  /** 本地降级：延迟思考 + 逐字打字机（R4 起支持指定插入位置） */
+  /** 本地降级：延迟思考 + 逐字打字机（R4 起支持指定插入位置；P2-⑦ 动作描写开场时思考更久） */
   const replyFromLocal = async (
     roleId: string,
     text: string,
     draftIndex?: number,
   ) => {
-    await sleep(THINK_DELAY_BASE + Math.random() * THINK_DELAY_JITTER);
     const reply = localReply(roleId, text);
+    await sleep(thinkDelayFor(reply));
     const msgId = genId();
     appendDraft(roleId, msgId, draftIndex);
     set((s) => ({ status: { ...s.status, [roleId]: "streaming" } }));
@@ -300,11 +339,13 @@ export const useChatStore = create<ChatState>()((set, get) => {
    * R4: AI 回合统一入口（send / retryMessage 共用）：
    * thinking → 真实 LLM 流式 → 失败降级本地回复池；返回是否降级（true = degraded）。
    * history 为本次调用上下文；draftIndex 指定回复插入位置（retry 插回原位置）。
+   * options.initiative 人机感 ⑤：仅 send 按回合计数判定后传入，retry 不主动。
    */
   const startReply = async (
     roleId: string,
     history: ChatMessage[],
     draftIndex?: number,
+    options: { initiative?: boolean } = {},
   ): Promise<boolean> => {
     // 防重入：同角色同时只允许一个进行中的回合（UI busy 已禁用按钮，双保险）
     if (busyRoles.has(roleId)) return false;
@@ -324,7 +365,7 @@ export const useChatStore = create<ChatState>()((set, get) => {
         return degrade();
       }
       try {
-        const done = await streamFromApi(roleId, history, draftIndex);
+        const done = await streamFromApi(roleId, history, draftIndex, options);
         // 503 no-key / 全部模型失败 / 网络异常 / 空流：一律降级本地
         if (!done) return degrade();
         return false;
@@ -340,6 +381,8 @@ export const useChatStore = create<ChatState>()((set, get) => {
     messages: {},
     status: {},
     summaries: {},
+    turns: {},
+    memories: {},
 
     restore: (roleId) => {
       if (!(roleId in get().messages)) {
@@ -355,6 +398,13 @@ export const useChatStore = create<ChatState>()((set, get) => {
           },
         }));
       }
+      if (!(roleId in get().memories)) {
+        set((s) => ({
+          memories: { ...s.memories, [roleId]: readStorage<string>(memoriesKey(roleId), "") },
+        }));
+      }
+      // 人机感 ④：同步恢复角色情绪（刷新后第一轮保持历史情绪，不重置）
+      useEmotionStore.getState().restore(roleId);
     },
 
     probe: async () => {
@@ -386,10 +436,17 @@ export const useChatStore = create<ChatState>()((set, get) => {
 
       const userMsg: ChatMessage = { id: genId(), role: "user", text: trimmed, at: Date.now() };
       commitMessages(roleId, [...(get().messages[roleId] ?? []), userMsg]);
+      // 人机感 ④：每轮先更新角色情绪（影响回复风格与动态温度）
+      useEmotionStore.getState().update(roleId, trimmed);
+      // 人机感 ⑤：回合计数 +1，按输入节奏决定本轮是否主动反问（内存态）
+      const turns = (get().turns[roleId] ?? 0) + 1;
+      set((s) => ({ turns: { ...s.turns, [roleId]: turns } }));
       // 后台触发对话总结（fire-and-forget，不阻塞本轮回复）
       void maybeSummarize(roleId);
       // 完整列表作为上下文（末尾即刚发的用户消息）
-      const degraded = await startReply(roleId, [...(get().messages[roleId] ?? [])]);
+      const degraded = await startReply(roleId, [...(get().messages[roleId] ?? [])], undefined, {
+        initiative: shouldInitiate(trimmed, turns),
+      });
       return { ok: true, degraded };
     },
 
@@ -404,6 +461,8 @@ export const useChatStore = create<ChatState>()((set, get) => {
         sticker: stickerId,
       };
       commitMessages(roleId, [...(get().messages[roleId] ?? []), userMsg]);
+      // 贴纸也算一轮对话（节奏计数），但不触发主动反问（表情本身即回应）
+      set((s) => ({ turns: { ...s.turns, [roleId]: (s.turns[roleId] ?? 0) + 1 } }));
       void maybeSummarize(roleId);
       const degraded = await startReply(roleId, [...(get().messages[roleId] ?? [])]);
       return { ok: true, degraded };
@@ -458,6 +517,11 @@ export const useChatStore = create<ChatState>()((set, get) => {
       commitMessages(roleId, []);
       // 清空对话同时清除摘要并重置计数（PRD §3.3）
       commitSummary(roleId, EMPTY_SUMMARY);
+      // 人机感：回合计数归零、记忆清空、情绪重置（全新开始）
+      set((s) => ({ turns: { ...s.turns, [roleId]: 0 } }));
+      set((s) => ({ memories: { ...s.memories, [roleId]: "" } }));
+      writeStorage(memoriesKey(roleId), "");
+      useEmotionStore.getState().clear(roleId);
     },
   };
 });

@@ -47,6 +47,10 @@ export const STORAGE = {
   reports: "drift-reports",
   /** 同船在线心跳（本地模拟） */
   presence: "drift-presence",
+  /** 角色情感状态（人机感，每角色：drift-emotion-<roleId>） */
+  emotion: "drift-emotion",
+  /** 角色记得的关于用户的关键记忆（人机感，每角色：drift-memories-<roleId>） */
+  memories: "drift-memories",
 } as const;
 
 /** 每角色独立键构造器：`${prefix}-${roleId}` */
@@ -64,6 +68,10 @@ export const lifeStatusKey = (roleId: string) => roleKey(STORAGE.lifeStatus, rol
 export const greetingKey = (roleId: string) => roleKey(STORAGE.greeting, roleId);
 /** 开场白最近记录键（聊天页占用） */
 export const chatGreetingKey = (roleId: string) => roleKey(STORAGE.chatGreeting, roleId);
+/** 角色情感状态键 */
+export const emotionKey = (roleId: string) => roleKey(STORAGE.emotion, roleId);
+/** 角色关键记忆键 */
+export const memoriesKey = (roleId: string) => roleKey(STORAGE.memories, roleId);
 
 /**
  * 读 JSON；不存在 / 解析失败 / guard 校验不通过 → fallback。

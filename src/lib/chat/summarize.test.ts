@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { nextSummaryChunk, formatSummaryChunk } from "@/lib/chat/summarize";
+import {
+  nextSummaryChunk,
+  formatSummaryChunk,
+  splitSummaryOutput,
+} from "@/lib/chat/summarize";
 import type { ChatMessage } from "@/types/chat";
 
 /** 组装一条消息（sticker 参数可选） */
@@ -55,5 +59,46 @@ describe("formatSummaryChunk 消息块格式化", () => {
   it("纯贴纸块返回空串（无可提取内容）", () => {
     const chunk = [msg("s1", "user", "", "sio-01"), msg("s2", "user", "", "sio-02")];
     expect(formatSummaryChunk(chunk)).toBe("");
+  });
+});
+
+describe("splitSummaryOutput 输出拆分（人机感 P2-⑧：关键记忆单独抽出）", () => {
+  it("普通输出：关键记忆行抽出为 memories，其余归 summary", () => {
+    const raw = [
+      "用户信息：用户叫小明，养了一只猫叫咪咪",
+      "关键话题：聊过考试压力；喜欢后摇音乐",
+      "情绪状态：提到考试有些紧张",
+      "关键记忆：喜欢后摇音乐；养了一只猫；最近在准备考试",
+    ].join("\n");
+    expect(splitSummaryOutput(raw)).toEqual({
+      summary:
+        "用户信息：用户叫小明，养了一只猫叫咪咪\n关键话题：聊过考试压力；喜欢后摇音乐\n情绪状态：提到考试有些紧张",
+      memories: "喜欢后摇音乐；养了一只猫；最近在准备考试",
+    });
+  });
+
+  it("无关键记忆：memories 为空串", () => {
+    expect(splitSummaryOutput("用户信息：无\n关键话题：无")).toEqual({
+      summary: "用户信息：无\n关键话题：无",
+      memories: "",
+    });
+  });
+
+  it("关键记忆为「无」时不计入", () => {
+    expect(splitSummaryOutput("用户信息：用户叫小明\n关键记忆：无")).toEqual({
+      summary: "用户信息：用户叫小明",
+      memories: "",
+    });
+  });
+
+  it("「无」单字输出 → 全空", () => {
+    expect(splitSummaryOutput("无")).toEqual({ summary: "", memories: "" });
+  });
+
+  it("容错：未按类名前缀的行保留在 summary", () => {
+    expect(splitSummaryOutput("用户喜欢后摇音乐")).toEqual({
+      summary: "用户喜欢后摇音乐",
+      memories: "",
+    });
   });
 });
