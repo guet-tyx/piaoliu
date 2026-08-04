@@ -40,6 +40,7 @@ describe("synthesizeSpeech 请求体组装（预置音色 / voicedesign / 纯文
   async function captureRequest(opts: {
     voiceId?: string;
     voiceDesign?: boolean;
+    voiceClone?: { mime: string; dataBase64: string };
   }): Promise<{ model: string; messages: { role: string; content: string }[]; audio: Record<string, string> }> {
     let captured: { model: string; messages: { role: string; content: string }[]; audio: Record<string, string> } | undefined;
     vi.stubGlobal(
@@ -73,6 +74,18 @@ describe("synthesizeSpeech 请求体组装（预置音色 / voicedesign / 纯文
     expect(body.model).toBe("mimo-v2.5-tts-voicedesign");
     expect(body.audio).toEqual({ format: "wav" }); // 不含 voice
     expect(body.messages[0].content).toBe("测试音色描述"); // 无朗读包装
+  });
+
+  it("voiceclone：模型切换 + audio.voice=data URI + user 消息空串（优先级最高）", async () => {
+    vi.stubEnv("MIMO_API_KEY", "k");
+    const body = await captureRequest({
+      voiceClone: { mime: "audio/wav", dataBase64: "QUJD" },
+      voiceId: "冰糖",
+      voiceDesign: true,
+    });
+    expect(body.model).toBe("mimo-v2.5-tts-voiceclone");
+    expect(body.audio).toEqual({ format: "wav", voice: "data:audio/wav;base64,QUJD" });
+    expect(body.messages[0].content).toBe("");
   });
 
   it("无 voiceId/voiceDesign（纯文本控制）：audio 仅 format，保持兼容", async () => {

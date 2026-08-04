@@ -22,8 +22,14 @@ export interface ChatPersona {
   /** 空态问候签名，如「—— 汐 · 星海版限定」 */
   signature: string;
   /**
+   * 音色复刻参考文件（public/voices/<roleId>.wav，由 scripts/gen-voice-refs.mjs 用
+   * voicedesign 生成后冻结）。设置了就优先走 mimo-v2.5-tts-voiceclone 复刻——
+   * 声线由参考样本固定，跨消息最稳定，且完全自定义（不再受预置音色池限制）。
+   */
+  voiceClone?: string;
+  /**
    * MiMo 预置音色 id（V2.5 中文音色：冰糖/茉莉=女声，苏打/白桦=男声）。
-   * 会作为 audio.voice 传给 TTS 请求；voiceDesign=true 时忽略。
+   * 会作为 audio.voice 传给 TTS 请求；voiceClone/voiceDesign 优先级更高。
    */
   voiceId?: string;
   /**
@@ -47,7 +53,9 @@ export const CHAT_PERSONAS: ChatPersona[] = [
     avatar: "/images/avatar-sio.png",
     image: "/images/character-main.webp",
     signature: "—— 汐 · 星海版限定",
-    // 预置音色「冰糖」= 清亮甜美女声；风格指令聚焦温柔俏皮
+    // 音色复刻：参考声线由 voicedesign 生成（清亮甜美女声），复刻保证跨消息稳定
+    voiceClone: "public/voices/sio.wav",
+    // 预置音色「冰糖」= 清亮甜美女声（参考文件缺失时的兜底）；风格指令聚焦温柔俏皮
     voiceId: "冰糖",
     voicePrompt: "甜美清澈的少女声，温柔中带俏皮，轻声细语，带一点夜晚电台的宁静与淘气感，句尾轻轻上扬",
     // 角色传记式 prompt（人机感 P0-①）：以「我是谁」开头而非「回复规则」清单，让模型代入人格而非被约束。
@@ -93,7 +101,9 @@ export const CHAT_PERSONAS: ChatPersona[] = [
     avatar: "/images/avatar-lumen.png",
     image: "/images/lumen-main.webp",
     signature: "—— 流明 · 星海版限定",
-    // 预置音色「茉莉」= 柔润知性女声；风格指令聚焦沉稳克制（与汐的清亮俏皮明显区分）
+    // 音色复刻：参考声线 = 偏低音知性女声（复刻稳定）
+    voiceClone: "public/voices/lumen.wav",
+    // 预置音色「茉莉」= 柔润知性女声（兜底）；风格指令聚焦沉稳克制（与汐的清亮俏皮明显区分）
     voiceId: "茉莉",
     voicePrompt: "知性沉稳的年轻女声，冷静克制，语气平缓可靠，像灯塔守夜人一样安定，叙述感强，情绪起伏小",
     system:
@@ -138,7 +148,9 @@ export const CHAT_PERSONAS: ChatPersona[] = [
     avatar: "/images/avatar-soku.png",
     image: "/images/soku-main.webp",
     signature: "—— 朔空 · 星海版限定",
-    // 朔空是夜航 DJ 男声：预置音色「苏打」= 元气明亮男声（修复此前误配少女声）
+    // 音色复刻：参考声线 = 偏低的青年男声（复刻稳定；兜底预置「苏打」同为男声）
+    voiceClone: "public/voices/soku.wav",
+    // 预置音色「苏打」= 元气明亮男声（兜底；修复此前误配少女声）
     voiceId: "苏打",
     voicePrompt: "元气明亮的青年男声，语速偏快，热情带一点玩梗自嗨的兴奋感，像凌晨电台的夜航 DJ 报歌打碟",
     system:
@@ -183,7 +195,9 @@ export const CHAT_PERSONAS: ChatPersona[] = [
     avatar: "/images/avatar-yoe.png",
     image: "/images/yoe-main.webp",
     signature: "—— 悠 · 星海版限定",
-    // 悠用 voicedesign 文本设计音色（空灵神秘），避开与汐/流明共用女性预置音色，音色最独特
+    // 音色复刻：参考声线 = voicedesign 空灵神秘女声（避免与汐/流明共用女性预置音色）
+    voiceClone: "public/voices/yoe.wav",
+    // 兜底：voicedesign 文本设计音色（参考文件缺失时）
     voiceDesign: true,
     voicePrompt: "空灵神秘的年轻女声，声线偏轻、慵懒朦胧，像夜晚的占卜师低声解读星图，语速慢半拍、带呼吸感",
     system:

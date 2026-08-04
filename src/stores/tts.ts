@@ -153,10 +153,12 @@ export const useTtsStore = create<TtsState>()((set, get) => {
 
       const seq = ++speakSeq;
       const persona = personaOf(roleId);
-      // 缓存键含音色身份（预置 id / voicedesign 标记 + 描述），避免换音色后串出旧音频
-      const voiceIdentity = persona.voiceDesign
-        ? `design:${persona.voicePrompt}`
-        : `preset:${persona.voiceId ?? ""}:${persona.voicePrompt}`;
+      // 缓存键含音色身份（复刻参考 / 预置 id / voicedesign 标记 + 描述），避免换音色后串出旧音频
+      const voiceIdentity = persona.voiceClone
+        ? `clone:${persona.voiceClone}`
+        : persona.voiceDesign
+          ? `design:${persona.voicePrompt}`
+          : `preset:${persona.voiceId ?? ""}:${persona.voicePrompt}`;
       const cacheKey = `${clean}|${voiceIdentity}`;
       const cached = cache.get(cacheKey);
       if (cached) {

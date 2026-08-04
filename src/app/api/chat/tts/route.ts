@@ -1,6 +1,8 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { personaOf } from "@/data/chat-personas";
 import { isSafeText } from "@/lib/api/moderation";
-import { mimoConfigured, synthesizeSpeech } from "@/lib/tts/mimo";
+import { mimoConfigured, synthesizeSpeech, type VoiceCloneSample } from "@/lib/tts/mimo";
 import { MAX_TTS_TEXT } from "@/lib/chat/limits";
 import type { TtsApiRequest } from "@/types/api";
 
@@ -44,15 +46,27 @@ export async function POST(req: Request) {
   }
 
   // 音色按角色绑定（personaOf 未知角色兜底汐，与聊天行为一致）：
-  // 预置音色（voiceId）打底区分男女声，voicedesign 文本设计音色给最独特的角色。
+  // ① voiceclone 参考文件（public/voices/<role>.wav，最稳定、完全自定义）
+  // ② 参考文件缺失 → 回退 voicedesign（悠）/ 预置音色（voiceId）
   const persona = personaOf(roleId);
+  let voiceClone: VoiceCloneSample | undefined;
+  if (persona.voiceClone) {
+    try {
+      const buf = readFileSync(join(process.cwd(), persona.voiceClone));
+      voiceClone = { mime: "audio/wav", dataBase64: buf.toString("base64") };
+    } catch {
+      // 参考文件缺失（本地未生成/部署漏传）：回退下一级音色配置
+      voiceClone = undefined;
+    }
+  }
 
   try {
     const result = await synthesizeSpeech({
       text,
       voicePrompt: persona.voicePrompt,
-      ...(persona.voiceId ? { voiceId: persona.voiceId } : {}),
-      ...(persona.voiceDesign ? { voiceDesign: true } : {}),
+      ...(voiceClone ? { voiceClone } : {}),
+      ...(!voiceClone && persona.voiceId ? { voiceId: persona.voiceId } : {}),
+      ...(!voiceClone && persona.voiceDesign ? { voiceDesign: true } : {}),
     });
     if (!result.ok) {
       if (result.detail === "no-key") {

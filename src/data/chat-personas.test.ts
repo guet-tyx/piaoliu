@@ -15,18 +15,19 @@ describe("chat-personas（TTS 音色绑定）", () => {
     expect(personaOf("nope").roleId).toBe("sio");
   });
 
-  it("音色配置互异：每角色必有预置音色或 voicedesign，且四者不同（朔空为男声预置）", () => {
-    const identities = CHAT_PERSONAS.map((p) => {
-      if (p.voiceDesign) {
-        expect(p.voiceId).toBeUndefined(); // voicedesign 不配预置 id
-        return "design";
-      }
-      expect(p.voiceId, `${p.roleId} 有预置音色`).toBeTruthy();
-      return `preset:${p.voiceId}`;
+  it("音色配置：四角色均配复刻参考文件且互异；朔空参考为男声描述；参考文件真实存在", async () => {
+    const refs = CHAT_PERSONAS.map((p) => {
+      expect(p.voiceClone, `${p.roleId} 有音色复刻参考文件`).toBeTruthy();
+      return p.voiceClone!;
     });
-    expect(new Set(identities).size).toBe(CHAT_PERSONAS.length);
-    // 朔空是唯一男声角色：用男声预置（苏打/白桦），其余女声预置
+    expect(new Set(refs).size).toBe(CHAT_PERSONAS.length);
+    // 每个参考文件真实存在（部署漏传会静默回退预置音色）
+    for (const ref of refs) {
+      const exists = await import("node:fs").then((fs) => fs.existsSync(ref));
+      expect(exists, `${ref} 存在`).toBe(true);
+    }
+    // 朔空是唯一男声角色：参考声线描述须体现男声（配合 gen-voice-refs.mjs）
     const soku = CHAT_PERSONAS.find((p) => p.roleId === "soku")!;
-    expect(["苏打", "白桦"]).toContain(soku.voiceId);
+    expect(soku.voicePrompt).toMatch(/男声|青年男声/);
   });
 });
