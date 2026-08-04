@@ -132,8 +132,14 @@ export function parseInline(text: string): MarkdownInline[] {
       break;
     }
     const idx = i + next.index;
-    if (idx > i) pushText(text.slice(i, idx));
-    i = idx;
+    if (idx > i) {
+      pushText(text.slice(i, idx));
+      i = idx;
+    } else {
+      // 特殊字符（单个 ~、未知 [ 开头等）无法构成合法 token：按字面推进一位，防死循环
+      pushText(text[i]);
+      i += 1;
+    }
   }
   return nodes;
 }

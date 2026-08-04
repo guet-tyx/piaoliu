@@ -161,6 +161,14 @@ describe("安全与边界（验收 #12）", () => {
     expect(parseMarkdown("~~删")).toEqual([p("~~删")]);
   });
 
+  it("单个 ~ 不构成删除线，按字面输出（防死循环回归）", () => {
+    expect(parseMarkdown("晚安~ 今天真开心~")).toEqual([p("晚安~ 今天真开心~")]);
+  });
+
+  it("未知 [ 开头按字面输出（防死循环回归）", () => {
+    expect(parseMarkdown("[未知内容] 结束")).toEqual([p("[未知内容] 结束")]);
+  });
+
   it("序号超 3 位不误判为有序列表（2026. 3月）", () => {
     expect(parseMarkdown("2026. 3月")).toEqual([p("2026. 3月")]);
   });
