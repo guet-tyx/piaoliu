@@ -1,0 +1,246 @@
+/* ============ 聊天顶栏（R1 §4） ============ */
+.header {
+  flex: none;
+  position: relative;
+  z-index: 10;
+  background: linear-gradient(180deg, var(--chat-accent-soft), transparent 140%);
+  border-bottom: 1px solid rgba(123, 177, 255, .12);
+}
+.headerIn {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+}
+
+/* ← 返回 */
+.backBtn {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 0;
+  background: transparent;
+  color: var(--ink-2);
+  font-size: .85rem;
+  font-weight: 600;
+  letter-spacing: .06em;
+  cursor: pointer;
+  padding: 8px 6px;
+  border-radius: 10px;
+  transition: color .2s ease, background .2s ease;
+}
+.backBtn:hover {
+  color: var(--ink);
+  background: rgba(123, 177, 255, .1);
+}
+
+/* 角色头像（56px 圆，点击展开信息） */
+.avatarWrap {
+  position: relative;
+  flex: none;
+}
+.avatarBtn {
+  display: block;
+  position: relative;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  overflow: hidden;
+  padding: 0;
+  border: 2px solid var(--chat-accent);
+  box-shadow: 0 6px 20px -8px var(--chat-accent);
+  background: var(--panel-2);
+  cursor: pointer;
+  transition: transform .2s ease;
+}
+.avatarBtn:hover { transform: translateY(-2px); }
+
+.roleMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.roleName {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  color: var(--ink);
+  line-height: 1.3;
+}
+/* 状态指示器（R1 §4.2） */
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: .75rem;
+  color: var(--ink-3);
+}
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  transition: background-color .3s ease, opacity .3s ease;
+}
+.dotIdle { color: #4ade80; }
+.dotThinking { color: #fbbf24; animation: var(--kf-blink) 1s steps(1) infinite; }
+.dotStreaming { color: #38bdf8; animation: var(--kf-dotJump) 1s ease infinite; }
+.dotError { color: #f87171; }
+
+.spacer { flex: 1; }
+
+/* 预设切换（占位，R7 启用） */
+.preset {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 1px solid rgba(123, 177, 255, .25);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--ink-2);
+  font-size: .75rem;
+  font-family: inherit;
+  padding: 6px 12px;
+  cursor: not-allowed;
+  opacity: .72;
+}
+
+/* ⚙ 设置 */
+.settingsWrap { position: relative; flex: none; }
+.settingsBtn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid rgba(123, 177, 255, .25);
+  background: var(--panel);
+  color: var(--ink-2);
+  font-size: 1.02rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: color .2s ease, border-color .2s ease, transform .2s ease;
+}
+.settingsBtn:hover {
+  color: var(--ink);
+  border-color: var(--chat-accent);
+  transform: rotate(18deg);
+}
+
+/* 弹层（角色信息 / 设置菜单）：全屏透明遮罩 + 卡片 */
+.pop { position: fixed; inset: 0; z-index: 30; }
+.maskClose {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(5, 12, 30, .38);
+  border: 0;
+  cursor: default;
+}
+.card {
+  position: absolute;
+  background: var(--panel);
+  border: 1px solid var(--line-panel);
+  border-radius: 18px;
+  box-shadow: 0 30px 80px -30px rgba(5, 12, 30, .75);
+  padding: 18px;
+  animation: var(--kf-rise) .25s ease;
+}
+
+/* 角色信息浮层（头像下方居中） */
+.infoCard {
+  left: 50%;
+  top: 86px;
+  transform: translateX(-50%);
+  width: min(400px, calc(100vw - 32px));
+}
+.infoRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.infoAvatar {
+  position: relative;
+  flex: none;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid var(--chat-accent);
+  background: var(--panel-2);
+}
+.infoText { display: flex; flex-direction: column; gap: 2px; }
+.infoName {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+.infoName em { font-style: normal; font-size: .72rem; color: var(--ink-3); margin-left: 6px; }
+.infoLv { font-size: .78rem; color: var(--ink-3); }
+.infoTags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.infoTag {
+  font-size: .72rem;
+  color: var(--ink-2);
+  border: 1px solid rgba(123, 177, 255, .2);
+  border-radius: 999px;
+  padding: 2px 9px;
+}
+.infoDesc {
+  margin-top: 12px;
+  font-size: .84rem;
+  line-height: 1.8;
+  color: var(--ink-2);
+}
+
+/* 设置菜单（gear 下方右对齐） */
+.settingsCard {
+  top: 64px;
+  right: max(10px, calc((100vw - 800px) / 2 + 8px));
+  width: 236px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  color: var(--ink-2);
+  font-size: .84rem;
+  font-family: inherit;
+  padding: 9px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background .2s ease, color .2s ease;
+}
+.menuItem:hover {
+  background: var(--chat-accent-soft);
+  color: var(--ink);
+}
+.menuAvatar {
+  border-radius: 50%;
+  object-fit: cover;
+  flex: none;
+}
+.menuDivider {
+  height: 1px;
+  background: rgba(123, 177, 255, .14);
+  margin: 5px 6px;
+}
+
+/* 响应式（R1 §3.3）：<560px 顶栏紧凑、返回文字缩略、预设隐藏 */
+@media (max-width: 559px) {
+  .headerIn { padding: 8px 10px; gap: 9px; }
+  .backText { display: none; }
+  .preset { display: none; }
+  .avatarBtn { width: 48px; height: 48px; }
+  .roleName { font-size: 16px; }
+  .infoCard { top: 76px; }
+  .settingsCard { top: 58px; }
+}

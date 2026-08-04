@@ -42,3 +42,9 @@ next-env.d.ts
 
 # tool artifacts
 .zcode/
+
+# 曲库音频（CC BY 4.0，323MB；本地已有，可从 CREDITS.md 来源重下）
+/public/music/
+
+# GUI 测试截图（临时产物）
+/gui-test-screenshots/

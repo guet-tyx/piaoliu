@@ -1,0 +1,23 @@
+/* 迷你 toast（P2-01）：fixed 底部居中，入场/离场淡入 */
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 56px;
+  transform: translateX(-50%);
+  z-index: 80;
+  max-width: min(86vw, 420px);
+  padding: 10px 22px;
+  border-radius: 999px;
+  font-size: 14px;
+  letter-spacing: 0.03em;
+  color: var(--ink-panel);
+  background: rgba(20, 30, 58, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  animation: var(--kf-revealUp) 0.25s ease both;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

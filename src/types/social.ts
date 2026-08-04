@@ -9,6 +9,8 @@ type BottleStatus = "drifting" | "picked" | "replied" | "sunk";
 
 /** 曲目快照：投瓶时冻结歌曲信息，防曲库变更后展示失真 */
 export interface TrackSnapshot {
+  /** 曲目 id（P3-02 起写入，用于收瓶播放跳转；旧数据可能缺失） */
+  id?: string;
   /** 曲名 */
   t: string;
   /** 流派标签 */

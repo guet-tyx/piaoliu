@@ -5,6 +5,8 @@
   padding: 2px;
   overflow: hidden;
   background: linear-gradient(120deg, rgba(251, 114, 153, .45), rgba(0, 174, 236, .45));
+  /* P1-05：频道切换时整卡淡入过渡（新频道信息重挂载带动画） */
+  animation: var(--kf-revealUp) .5s ease both;
 }
 .player {
   position: relative;

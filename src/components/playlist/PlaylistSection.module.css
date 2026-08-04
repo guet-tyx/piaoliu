@@ -205,3 +205,18 @@
 @media (max-width: 420px) {
   .pRail { grid-template-columns: 1fr; }
 }
+
+/* P1-04：进入歌单广场入口 */
+.pSquareLink {
+  margin-top: 28px;
+  text-align: center;
+}
+.pSquareLink a {
+  display: inline-block;
+  font-size: 15px;
+  letter-spacing: 0.08em;
+  color: var(--ice);
+}
+.pSquareLink a:hover {
+  color: var(--ice-bright);
+}

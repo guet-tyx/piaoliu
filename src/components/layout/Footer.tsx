@@ -1,7 +1,12 @@
+"use client";
+
+import { usePathname } from "next/navigation";
 import styles from "./Footer.module.css";
 
-/** 页脚（静态）：品牌 + 链接 + 版权与音乐授权声明 */
+/** 页脚（静态）：品牌 + 链接 + 版权与音乐授权声明（V2.4：/chat/* 全屏聊天页隐藏） */
 export function Footer() {
+  const pathname = usePathname();
+  if (pathname.startsWith("/chat")) return null;
   return (
     <footer className={styles.footer}>
       <div className={styles.footInner}>

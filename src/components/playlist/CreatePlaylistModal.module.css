@@ -1,0 +1,463 @@
+/* 创建歌单弹窗（P2-02）：三步表单 + 歌曲选择器共用样式 */
+
+.modal {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 6px 2px 2px;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  color: var(--ink);
+}
+
+.stepBadge {
+  font-size: 12px;
+  color: var(--ink-4);
+  border: 1px solid var(--line-panel);
+  border-radius: 999px;
+  padding: 3px 12px;
+}
+
+/* —— Step1 表单 —— */
+
+.step1 {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.fieldLabel {
+  font-size: 13px;
+  color: var(--ink-3);
+  letter-spacing: 0.04em;
+}
+.fieldLabel em {
+  font-style: normal;
+  font-size: 12px;
+  color: var(--ink-4);
+  margin-left: 6px;
+}
+
+.input {
+  border: 1px solid var(--line-panel);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--ink);
+  font-size: 14px;
+  padding: 11px 14px;
+  border-radius: 12px;
+  outline: none;
+  transition: border-color 0.2s ease;
+  font-family: inherit;
+}
+.input:focus {
+  border-color: var(--blue);
+}
+
+.covers {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.coverBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  border: 2px solid transparent;
+  background: none;
+  padding: 3px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: border-color 0.18s ease, transform 0.18s ease;
+}
+.coverBtn:hover {
+  transform: translateY(-2px);
+}
+.coverBtn.coverOn {
+  border-color: var(--pink);
+}
+.coverBtn img {
+  border-radius: 8px;
+}
+
+.firstCover {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+  font-size: 24px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px dashed var(--line-panel);
+}
+.firstCoverLabel {
+  font-size: 10px;
+  color: var(--ink-4);
+  max-width: 62px;
+  text-align: center;
+  line-height: 1.3;
+}
+
+.tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tag {
+  border: 1px solid var(--line-panel);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--ink-2);
+  font-size: 13px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  font-family: inherit;
+}
+.tag:hover {
+  border-color: var(--ice);
+  color: var(--ice);
+}
+.tag.tagOn {
+  border-color: var(--pink);
+  background: rgba(251, 114, 153, 0.14);
+  color: var(--pink);
+}
+
+.err {
+  color: var(--pink);
+  font-size: 13px;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.ghost {
+  border: 1px solid var(--line-panel);
+  background: none;
+  color: var(--ink-2);
+  font-size: 14px;
+  padding: 10px 22px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  text-decoration: none;
+}
+.ghost:hover {
+  border-color: var(--ice);
+  color: var(--ice);
+}
+
+.primary {
+  border: none;
+  background: linear-gradient(135deg, var(--pink), #ff9ab5);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 11px 24px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+  font-family: inherit;
+  text-decoration: none;
+}
+.primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(251, 114, 153, 0.35);
+}
+.primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* —— Step2 歌曲选择器 —— */
+
+.picker {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pickerTop {
+  display: flex;
+  gap: 10px;
+}
+
+.search {
+  flex: 1;
+  border: 1px solid var(--line-panel);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--ink);
+  font-size: 14px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  outline: none;
+  font-family: inherit;
+}
+.search:focus {
+  border-color: var(--blue);
+}
+
+.selectAll {
+  border: 1px solid var(--line-panel);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--ink-2);
+  font-size: 13px;
+  padding: 0 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.18s ease;
+}
+.selectAll:hover {
+  border-color: var(--ice);
+  color: var(--ice);
+}
+
+.pickerBody {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  max-height: 46vh;
+}
+
+.trackPool {
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-right: 6px;
+}
+
+.trackRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  border: none;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--ink-2);
+  padding: 7px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.16s ease;
+  font-family: inherit;
+}
+.trackRow:hover {
+  background: rgba(255, 255, 255, 0.07);
+}
+.trackRow.picked {
+  background: rgba(251, 114, 153, 0.12);
+}
+
+.trackCover {
+  border-radius: 6px;
+  flex: none;
+}
+
+.trackText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.trackName {
+  font-size: 13.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.trackTag {
+  font-style: normal;
+  font-size: 11px;
+  color: var(--ice);
+  margin-left: 6px;
+}
+.trackSub {
+  font-size: 11px;
+  color: var(--ink-4);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.trackTime {
+  font-size: 12px;
+  color: var(--ink-4);
+  font-variant-numeric: tabular-nums;
+  flex: none;
+}
+.check {
+  flex: none;
+  font-size: 15px;
+}
+
+.selectedPane {
+  border-left: 1px solid var(--line-panel);
+  padding-left: 14px;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.selectedHead {
+  font-size: 13px;
+  color: var(--ink-3);
+  margin-bottom: 8px;
+}
+.selectedHead b {
+  color: var(--pink);
+}
+
+.selectedList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.selectedItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  cursor: grab;
+}
+.selectedItem:active {
+  cursor: grabbing;
+}
+
+.dragHandle {
+  color: var(--ink-4);
+  font-size: 13px;
+  letter-spacing: -2px;
+  user-select: none;
+}
+
+.selectedName {
+  flex: 1;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.moveBtns {
+  display: flex;
+  gap: 2px;
+}
+.moveBtns button {
+  border: 1px solid var(--line-panel);
+  background: none;
+  color: var(--ink-3);
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1;
+  transition: all 0.15s ease;
+}
+.moveBtns button:hover:not(:disabled) {
+  border-color: var(--ice);
+  color: var(--ice);
+}
+.moveBtns button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.empty,
+.emptySmall {
+  color: var(--ink-4);
+  font-size: 13px;
+  text-align: center;
+  padding: 24px 8px;
+}
+
+/* —— Step3 成功 —— */
+
+.step3 {
+  text-align: center;
+  padding: 18px 8px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.successArt {
+  font-size: 44px;
+  margin: 0;
+}
+
+.successTitle {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--ink);
+  margin: 0;
+}
+
+.successDesc {
+  font-size: 14px;
+  color: var(--ink-3);
+  margin: 0;
+}
+
+.createMore {
+  border: none;
+  background: none;
+  color: var(--ice);
+  font-size: 13px;
+  cursor: pointer;
+  margin-top: 4px;
+  font-family: inherit;
+}
+.createMore:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 960px) {
+  .pickerBody {
+    grid-template-columns: 1fr;
+    max-height: 60vh;
+  }
+  .selectedPane {
+    border-left: none;
+    padding-left: 0;
+    border-top: 1px solid var(--line-panel);
+    padding-top: 10px;
+  }
+}

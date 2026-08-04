@@ -2,8 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import type { KeyboardEvent } from "react";
 import { PLAYLISTS } from "@/data/playlists";
+import { playlistTracks } from "@/data/music-utils";
 import { usePlayerStore } from "@/stores/player";
 import { SectionHead } from "@/components/shared/SectionHead";
 import styles from "./PlaylistSection.module.css";
@@ -11,11 +13,12 @@ import styles from "./PlaylistSection.module.css";
 /**
  * 歌单（米哈游舞台式焦点横排，2026-08-02 改造）：
  * 桌面端 1 张大卡 + 3 张小卡横排，hover / 键盘聚焦切换焦点卡（大卡展示
- * 叙事描述 + 立即播放），点击任意卡播放对应曲目；溢出容器横向可滚动。
+ * 叙事描述 + 立即播放），点击任意卡播放该歌单第一首（P1-03 起按 trackIds）；
+ * 底部提供「进入歌单广场」入口（P1-04）。溢出容器横向可滚动。
  * <960px 降级为原有网格布局（无 hover 焦点概念，activeIndex 恒为 0）。
  */
 export function PlaylistSection() {
-  const playTrack = usePlayerStore((s) => s.playTrack);
+  const playQueue = usePlayerStore((s) => s.playQueue);
   const [activeIndex, setActiveIndex] = useState(0);
   const railRef = useRef<HTMLDivElement | null>(null);
 
@@ -31,9 +34,11 @@ export function PlaylistSection() {
     }
   }, [activeIndex]);
 
-  /** 播放对应曲目并滚动到播放器 */
+  /** 播放歌单第一首并滚动到播放器（队列=歌单曲目，P1-03 起按 trackIds） */
   const handlePlay = (index: number) => {
-    playTrack(index);
+    const playlist = PLAYLISTS[index];
+    if (!playlist) return;
+    playQueue(playlistTracks(playlist), { type: "playlist", id: playlist.id });
     document.getElementById("player")?.scrollIntoView({ behavior: "smooth" });
   };
 
@@ -102,6 +107,12 @@ export function PlaylistSection() {
             </div>
           );
         })}
+      </div>
+
+      <div className={styles.pSquareLink}>
+        <Link href="/playlist" className="sweepGold sweepGold--left" data-text="进入歌单广场">
+          进入歌单广场 →
+        </Link>
       </div>
     </section>
   );

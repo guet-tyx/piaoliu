@@ -8,7 +8,9 @@ import { Reveal } from "@/components/shared/Reveal";
 import { SwitchDots } from "@/components/shared/SwitchDots";
 import { SkinBoat, type SkinVariant } from "@/components/shared/SkinBoat";
 import { useFadeIn } from "@/hooks/useFadeIn";
+import { useAutoCycle } from "@/hooks/useAutoCycle";
 import { InboxModal } from "@/components/bottle/InboxModal";
+import { TrackAttachmentCard } from "@/components/bottle/TrackAttachmentCard";
 import { useIdentityStore } from "@/stores/identity";
 import { useBottleStore } from "@/stores/bottle";
 import { usePlayerStore } from "@/stores/player";
@@ -60,6 +62,8 @@ export function BottleSection() {
 
   const [inboxOpen, setInboxOpen] = useState(false);
   const [sceneIndex, setSceneIndex] = useState(0);
+  // 自动轮播暂停：鼠标悬停/键盘聚焦场景区时暂停（V2.2）
+  const [hoverPaused, setHoverPaused] = useState(false);
   const autoOpenedRef = useRef(false);
 
   // 切换场景浮现（WAAPI/rAF 由 useFadeIn 驱动：主图先起，标题 .08s、描述 .16s 依次浮现）
@@ -71,6 +75,9 @@ export function BottleSection() {
   useFadeIn(sceneImgRef, sceneDeps);
   useFadeIn(sceneTitleRef, sceneDeps, 80);
   useFadeIn(sceneDescRef, sceneDeps, 160);
+
+  // 自动轮播（V2.2）：5s 切换漂流场景，hover/聚焦暂停，reduced-motion 禁用
+  useAutoCycle(SCENES.length, sceneIndex, setSceneIndex, { paused: hoverPaused });
 
   // 身份引导 + 收件箱拉取（星海来讯）
   useEffect(() => {
@@ -123,8 +130,14 @@ export function BottleSection() {
         <LaunchCard />
         <div className={styles.dockCol}>
           <DockCard />
-          {/* 星海漂流三幕（崩坏3式：单主图 + 底部切换条，切换时图/文 WAAPI 浮现） */}
-          <div>
+          {/* 星海漂流三幕（崩坏3式：单主图 + 底部切换条，切换时图/文 WAAPI 浮现）；
+              自动轮播 hover/聚焦暂停仅作用于场景区，避免投瓶/拾瓶交互时误暂停 */}
+          <div
+            onMouseEnter={() => setHoverPaused(true)}
+            onMouseLeave={() => setHoverPaused(false)}
+            onFocusCapture={() => setHoverPaused(true)}
+            onBlurCapture={() => setHoverPaused(false)}
+          >
             <figure className={styles.sceneItem}>
               <Image
                 ref={sceneImgRef}
@@ -160,7 +173,9 @@ export function BottleSection() {
 
 /** 投瓶卡：绑定当前播放歌曲 + 10-200 字 + 启航动画与反馈 */
 function LaunchCard() {
-  const track = usePlayerStore((s) => s.tracks[s.currentIndex]);
+  const tracks = usePlayerStore((s) => s.tracks);
+  const currentIndex = usePlayerStore((s) => s.currentIndex);
+  const track = tracks[currentIndex];
   const launch = useBottleStore((s) => s.launch);
   const busy = useBottleStore((s) => s.busy);
   const noteAction = useIdentityStore((s) => s.noteAction);
@@ -183,12 +198,21 @@ function LaunchCard() {
   const canLaunch =
     !busy && len >= 10 && len <= 200 && safe.ok && phase === "idle";
 
-  const snapshot: TrackSnapshot = {
-    t: track.t,
-    tag: track.tag,
-    s: track.s,
-    cover: track.cover,
-  };
+  // P3-02：投瓶绑定当前播放歌曲（track 必填；无播放时用占位快照，仍允许投纯文字瓶）
+  const snapshot: TrackSnapshot = track
+    ? {
+        id: track.id,
+        t: track.t,
+        tag: track.tag,
+        s: track.s,
+        cover: track.cover,
+      }
+    : {
+        t: "星海未知旋律",
+        tag: "氛围",
+        s: "未绑定歌曲",
+        cover: "/images/cover-anime-1.png",
+      };
 
   const onLaunch = async () => {
     if (!canLaunch) return;
@@ -225,23 +249,30 @@ function LaunchCard() {
         <i>✎</i> 启航一艘纸船
       </h3>
 
-      {/* 当前歌曲绑定 */}
-      <div className={styles.nowPlaying}>
-        <Image
-          src={track.cover}
-          alt=""
-          width={42}
-          height={42}
-          className={styles.nowCover}
-        />
-        <span className={styles.nowMeta}>
-          <b>{track.t}</b>
-          <small>
-            {track.tag} · {track.s}
-          </small>
-        </span>
-        <span className={styles.nowTag}>随船出发</span>
-      </div>
+      {/* P3-02 当前歌曲绑定（无播放时空态） */}
+      {track ? (
+        <div className={styles.nowPlaying}>
+          <Image
+            src={track.cover}
+            alt=""
+            width={42}
+            height={42}
+            className={styles.nowCover}
+          />
+          <span className={styles.nowMeta}>
+            <b>{track.t}</b>
+            <small>
+              {track.tag} · {track.s}
+            </small>
+          </span>
+          <span className={styles.nowTag}>随船出发</span>
+        </div>
+      ) : (
+        <div className={styles.nowPlayingEmpty}>
+          <span className={styles.nowEmptyMark} aria-hidden="true">📎</span>
+          当前没有播放，纸船将不带歌出发
+        </div>
+      )}
 
       {/* 节日活动提示（FR-14）：限定瓶面 + 活动语汇 */}
       {event && (
@@ -405,9 +436,8 @@ function DockCard() {
                   )}
                 </p>
                 <p className={styles.dockText}>{picked.text}</p>
-                <p className={styles.dockSong}>
-                  🎵 {picked.track.t} · {picked.track.s}
-                </p>
+                {/* P3-02 收瓶歌曲卡片（可播放跳转） */}
+                <TrackAttachmentCard track={picked.track} />
                 <div className={styles.frontRow}>
                   {picked.repliedAt === null && (
                     <div className={styles.replyBox}>

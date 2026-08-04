@@ -1,0 +1,79 @@
+/* 主持人气泡（P3-01）：悬浮在播放器卡上方，向下淡入 */
+
+.bubble {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  position: absolute;
+  top: -8px;
+  right: 28px;
+  z-index: 20;
+  max-width: 340px;
+  /* P3-01 优化：专用长停留动画（约 6s：淡入 → 保持 → 淡出），配合 JS timer 清 DOM */
+  animation: var(--kf-hostBubble) 6s ease both;
+}
+
+.avatarLink {
+  flex: none;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid rgba(251, 114, 153, 0.5);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+.avatarLink:hover {
+  transform: scale(1.06);
+  border-color: var(--pink);
+}
+.avatar {
+  display: block;
+  object-fit: cover;
+}
+
+.speech {
+  position: relative;
+  padding: 12px 34px 10px 16px;
+  border-radius: 14px;
+  background: rgba(14, 22, 44, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+}
+
+.text {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--ink);
+  margin: 0 0 4px;
+}
+
+.meta {
+  font-size: 11px;
+  color: var(--ink-4);
+  margin: 0;
+  letter-spacing: 0.04em;
+}
+
+.close {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  border: none;
+  background: none;
+  color: var(--ink-4);
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px;
+  transition: color 0.18s ease;
+}
+.close:hover {
+  color: var(--pink);
+}
+
+/* 移动端：气泡收窄避免溢出 */
+@media (max-width: 960px) {
+  .bubble {
+    right: 8px;
+    max-width: calc(100vw - 48px);
+  }
+}

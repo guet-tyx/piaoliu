@@ -13,6 +13,16 @@ import { avatarColor } from "@/lib/realtime/types";
 import { isSafeText } from "@/lib/api/moderation";
 import { SectionHead } from "@/components/shared/SectionHead";
 import { Reveal } from "@/components/shared/Reveal";
+import { CHANNELS } from "@/data/channels";
+import { TRACKS } from "@/data/tracks";
+import { buildFmQueue } from "@/stores/player";
+import { ChannelTabs } from "./ChannelTabs";
+import { ChannelInfo } from "./ChannelInfo";
+import { ChannelPlaylist } from "./ChannelPlaylist";
+import { FmProgress } from "./FmProgress";
+import { SleepTimer } from "./SleepTimer";
+import { HostBubble } from "./HostBubble";
+import { HostToggle } from "./HostToggle";
 import styles from "./PlayerSection.module.css";
 
 /** 播放模式展示元数据（FR-3） */
@@ -63,6 +73,7 @@ export function PlayerSection() {
   const peers = usePresence();
 
   const track = usePlayerStore((s) => s.tracks[s.currentIndex]);
+  const tracks = usePlayerStore((s) => s.tracks);
   const total = usePlayerStore((s) => s.tracks.length);
   const currentIndex = usePlayerStore((s) => s.currentIndex);
   const isPlaying = usePlayerStore((s) => s.isPlaying);
@@ -75,6 +86,7 @@ export function PlayerSection() {
   const currentTime = usePlayerStore((s) => s.currentTime);
   const duration = usePlayerStore((s) => s.duration);
   const failed = usePlayerStore((s) => s.failed);
+  const channelId = usePlayerStore((s) => s.channelId);
 
   const toggle = usePlayerStore((s) => s.toggle);
   const next = usePlayerStore((s) => s.next);
@@ -85,16 +97,41 @@ export function PlayerSection() {
   const setVolume = usePlayerStore((s) => s.setVolume);
   const toggleMute = usePlayerStore((s) => s.toggleMute);
   const cyclePlayMode = usePlayerStore((s) => s.cyclePlayMode);
+  const playQueue = usePlayerStore((s) => s.playQueue);
 
-  // 同船弹幕（当前曲目频道的用户弹幕）
+  // P1-05 频道：当前频道（source 为 channel 时命中，否则 null）
+  const currentChannel = channelId
+    ? CHANNELS.find((c) => c.id === channelId) ?? null
+    : null;
+
+  /** 切换频道：频道曲目池 → 队列；私人 FM 动态抽样 */
+  const onSwitchChannel = (id: string) => {
+    const ch = CHANNELS.find((c) => c.id === id);
+    if (!ch) return;
+    const pool =
+      ch.id === "ch-fm"
+        ? buildFmQueue()
+        : ch.trackIds
+            .map((tid) => TRACKS.find((t) => t.id === tid))
+            .filter((t): t is (typeof TRACKS)[number] => Boolean(t));
+    playQueue(pool, { type: "channel", id: ch.id });
+  };
+
+  // P3-04 同船弹幕（当前频道 + 当前曲目；非频道来源时按 trackId 过滤兜底）
   const danmakuItems = useDanmakuStore((s) => s.items);
-  const trackDm = danmakuItems.filter((m) => m.trackId === track.id).slice(-6);
+  const trackDm = danmakuItems
+    .filter(
+      (m) =>
+        (m.channelId ? m.channelId === channelId : m.trackId === track.id) &&
+        m.trackId === track.id,
+    )
+    .slice(-6);
 
   // 发弹幕（FR-10.2）
   const [dmText, setDmText] = useState("");
   const [dmErr, setDmErr] = useState<string | null>(null);
   const onSendDm = () => {
-    const ok = publishDanmaku(track.id, dmText);
+    const ok = publishDanmaku(channelId, track.id, dmText);
     if (ok) {
       setDmText("");
       setDmErr(null);
@@ -124,6 +161,16 @@ export function PlayerSection() {
 
       {/* 米哈游风格：播放器卡进入视口浮现 */}
       <Reveal className={styles.playerWrap}>
+        {/* P1-05 多频道电台：频道 tab 栏 + 频道信息（切歌单/曲库时保持展示当前频道） */}
+        <ChannelTabs
+          activeId={channelId}
+          onSwitch={onSwitchChannel}
+        />
+        <ChannelInfo channel={currentChannel} />
+
+        {/* P3-01 虚拟主持人气泡（绝对定位于 playerWrap 右上） */}
+        <HostBubble />
+
         <div className={styles.player}>
           {/* 唱片 + 同船弹幕层（V1.3 实时弹幕，假数据已移除） */}
           <div className={`${styles.recordBox}${isPlaying ? ` ${styles.live}` : ""}`}>
@@ -156,7 +203,9 @@ export function PlayerSection() {
           {/* 现在播放信息 */}
           <div className={styles.pNow}>
             <p className={styles.nowKicker}>
-              星海电台 · 第 {currentIndex + 1}/{total} 站
+              {channelId === "ch-fm"
+                ? `📻 私人 FM · 为你现调 第 ${currentIndex + 1} 站`
+                : `星海电台 · 第 ${currentIndex + 1}/${total} 站`}
             </p>
             <h3 className={styles.nowTitle}>
               「{track.t}」<em className={styles.nowTag}>{track.tag}</em>
@@ -264,6 +313,10 @@ export function PlayerSection() {
               >
                 <i>弹</i> {danmakuOn ? "弹幕开" : "弹幕关"}
               </button>
+              {/* P2-04 定时关闭入口 */}
+              <SleepTimer />
+              {/* P3-01 主持人开关 */}
+              <HostToggle />
             </div>
 
             {/* 发弹幕（FR-10.2）：同曲频道广播，1-50 字，敏感词拦截 */}
@@ -295,6 +348,13 @@ export function PlayerSection() {
             {dmErr && <p className={styles.dmErr}>{dmErr}</p>}
           </div>
         </div>
+
+        {/* P2-03 私人 FM：隐藏节目单，显示推荐进度；其余频道显示节目单 */}
+        {channelId === "ch-fm" ? (
+          <FmProgress />
+        ) : (
+          <ChannelPlaylist tracks={tracks} />
+        )}
       </Reveal>
     </section>
   );

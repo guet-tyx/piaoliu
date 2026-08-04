@@ -1,0 +1,148 @@
+/* ============ 聊天输入栏（R1 §6） ============ */
+.inputBar {
+  flex: none;
+  position: relative;
+  z-index: 9;
+  border-top: 1px solid rgba(123, 177, 255, .12);
+  background: linear-gradient(0deg, rgba(5, 12, 30, .88), rgba(5, 12, 30, .58));
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+.inputRow {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 10px 16px 12px;
+}
+
+/* 工具按钮（选歌 / 语音占位） */
+.tools {
+  display: flex;
+  gap: 6px;
+  padding-bottom: 4px;
+}
+.toolBtn {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  border: 1px solid rgba(123, 177, 255, .22);
+  background: var(--panel);
+  color: var(--ink-2);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color .2s ease, color .2s ease, transform .2s ease;
+}
+.toolBtn:hover {
+  border-color: var(--chat-accent);
+  color: var(--ink);
+  transform: translateY(-1px);
+}
+.toolActive {
+  border-color: var(--chat-accent);
+  color: var(--ink);
+  background: var(--chat-accent-soft);
+}
+
+/* 输入框 + 字数 */
+.inputWrap {
+  flex: 1;
+  position: relative;
+  min-width: 0;
+}
+.input {
+  width: 100%;
+  resize: none;
+  overflow-y: auto;
+  min-height: 40px;
+  max-height: 150px; /* ~6 行（R1 §6.1） */
+  border-radius: 14px;
+  border: 1px solid rgba(123, 177, 255, .25);
+  background: rgba(13, 21, 40, .8);
+  color: var(--ink);
+  padding: 9px 12px;
+  font-size: .92rem;
+  line-height: 1.6;
+  font-family: inherit;
+  transition: border-color .2s ease, box-shadow .2s ease, opacity .2s ease;
+}
+.input::placeholder { color: var(--ink-3); }
+.input:focus {
+  border-color: var(--chat-accent);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--chat-accent-soft);
+}
+.input:disabled { opacity: .58; }
+.inputOver { border-color: #f87171 !important; }
+.inputOver:focus { box-shadow: 0 0 0 3px rgba(248, 113, 113, .18); }
+
+.count {
+  position: absolute;
+  right: 10px;
+  bottom: 7px;
+  font-size: .66rem;
+  color: var(--ink-4);
+  pointer-events: none;
+  letter-spacing: .04em;
+}
+.countNear { color: #fbbf24; }
+.countOver { color: #f87171; }
+
+/* 发送 */
+.sendBtn {
+  flex: none;
+  height: 40px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--chat-accent), var(--chat-accent-2));
+  color: #fff;
+  font-size: .86rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-shadow: 0 8px 20px -10px var(--chat-accent);
+  transition: opacity .2s ease, transform .2s ease, box-shadow .2s ease;
+}
+.sendBtn:hover:not(:disabled) { transform: translateY(-1px); }
+.sendBtn:disabled {
+  opacity: .42;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+.sendSpinner {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, .35);
+  border-top-color: #fff;
+  animation: var(--kf-spin) .8s linear infinite;
+}
+
+/* 语音占位提示 / 输入错误 */
+.voiceHint {
+  text-align: center;
+  color: var(--ink-3);
+  font-size: .78rem;
+  padding: 0 0 8px;
+  animation: var(--kf-msgRise) .25s ease;
+}
+.err {
+  text-align: center;
+  color: #f87171;
+  font-size: .78rem;
+  padding: 0 0 8px;
+}
+
+/* 响应式（R1 §3.3） */
+@media (max-width: 559px) {
+  .inputRow { padding: 8px 10px 10px; }
+  .toolBtn { width: 36px; height: 36px; }
+}

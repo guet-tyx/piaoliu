@@ -1,0 +1,118 @@
+/* 频道信息卡（P1-05） */
+
+.info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+  padding: 16px 20px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--line-panel);
+  animation: var(--kf-revealUp) 0.4s ease both;
+}
+
+.kicker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+.icon {
+  font-size: 20px;
+}
+
+.desc {
+  font-size: 14px;
+  color: var(--ink-3);
+  margin-bottom: 6px;
+}
+
+.greeting {
+  font-size: 13px;
+  color: var(--ice);
+}
+.greetMark {
+  margin-right: 6px;
+  color: var(--pink);
+}
+
+/* 主持人（带聊天入口） */
+.host {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  padding: 8px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--line-panel);
+  background: rgba(255, 255, 255, 0.05);
+  transition: all 0.2s ease;
+}
+.host:hover {
+  border-color: var(--pink);
+  background: rgba(251, 114, 153, 0.1);
+}
+
+.hostAvatar {
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.hostMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.hostName {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.hostRole {
+  font-size: 11px;
+  color: var(--ink-4);
+}
+
+.hostCta {
+  font-size: 12px;
+  color: var(--ice);
+  white-space: nowrap;
+}
+
+/* 私人 FM 动态提示 */
+.fmNote {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+.fmBars {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 16px;
+}
+.fmBars i {
+  width: 4px;
+  height: 100%;
+  border-radius: 2px;
+  background: var(--ice);
+  animation: var(--kf-eqb) 0.9s ease-in-out infinite;
+  animation-delay: var(--d, 0s);
+}
+
+@media (max-width: 960px) {
+  .info {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

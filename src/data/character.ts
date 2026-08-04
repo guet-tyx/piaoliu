@@ -27,18 +27,14 @@ interface Character {
   name: string;
   en: string;
   lv: string;
+  /** 全身立绘（角色区/聊天页） */
   image: string;
   imageAlt: string;
-  expressions?: CharacterExpression[];
+  /** 方形头像（电台主持人/小尺寸场景用，与 id 同命名） */
+  avatar: string;
   tags: CharacterTag[];
   desc: CharacterDescSegment[];
   stats: CharacterStat[];
-}
-
-/** 角色情绪表情变体 */
-export interface CharacterExpression {
-  label: string; // 表情描述
-  image: string; // 表情图路径
 }
 
 /**
@@ -53,11 +49,7 @@ export const CHARACTERS: Character[] = [
     lv: "★ 星海版限定",
     image: "/images/character-main.webp",
     imageAlt: "星海漂流少女「汐」：深紫短发，戴白色头戴式耳机，白上衣蓝裙，自带极光",
-    expressions: [
-      { label: "微笑", image: "/images/char-expr-smile.webp" },
-      { label: "聆听", image: "/images/char-expr-listen.webp" },
-      { label: "感受", image: "/images/char-expr-feel.webp" },
-    ],
+    avatar: "/images/avatar-sio.png",
     tags: [
       { label: "# 星海导游", variant: "hot" },
       { label: "# 纸船船长", variant: "blue" },
@@ -82,11 +74,7 @@ export const CHARACTERS: Character[] = [
     lv: "★ 灯塔守望者",
     image: "/images/lumen-main.webp",
     imageAlt: "灯塔守望者「流明」：银白长发蓝瞳，深蓝星空长裙，背景灯塔与星光",
-    expressions: [
-      { label: "凝视", image: "/images/lumen-expr-gaze.webp" },
-      { label: "微光", image: "/images/lumen-expr-light.webp" },
-      { label: "微笑", image: "/images/lumen-expr-smile.webp" },
-    ],
+    avatar: "/images/avatar-lumen.png",
     tags: [
       { label: "# 灯塔守望者", variant: "blue" },
       { label: "# 星图编译者", variant: "hot" },
@@ -111,11 +99,7 @@ export const CHARACTERS: Character[] = [
     lv: "★ 夜航 DJ",
     image: "/images/soku-main.webp",
     imageAlt: "夜航 DJ「朔空」：金色短发蓝瞳，白色连帽衫牛仔裤，背景彩色光带",
-    expressions: [
-      { label: "打碟", image: "/images/soku-expr-dj.webp" },
-      { label: "沉浸", image: "/images/soku-expr-feel.webp" },
-      { label: "安利", image: "/images/soku-expr-recommend.webp" },
-    ],
+    avatar: "/images/avatar-soku.png",
     tags: [
       { label: "# 夜航 DJ", variant: "hot" },
       { label: "# 电台常客", variant: "blue" },
@@ -140,11 +124,7 @@ export const CHARACTERS: Character[] = [
     lv: "★ 星图占卜师",
     image: "/images/yoe-main.webp",
     imageAlt: "星图占卜师「悠」：黑色长发紫瞳，紫色长袍内搭黑裙，背景星座图案",
-    expressions: [
-      { label: "描绘", image: "/images/yoe-expr-draw.webp" },
-      { label: "凝视", image: "/images/yoe-expr-gaze.webp" },
-      { label: "指引", image: "/images/yoe-expr-guide.webp" },
-    ],
+    avatar: "/images/avatar-yoe.png",
     tags: [
       { label: "# 星图占卜师", variant: "hot" },
       { label: "# 失眠者之友", variant: "blue" },

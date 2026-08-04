@@ -1,0 +1,40 @@
+/* 收藏按钮（P2-01） */
+
+.favBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid var(--line-panel);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--ink-2);
+  font-size: 14px;
+  padding: 11px 22px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease, color 0.2s ease,
+    background 0.2s ease, box-shadow 0.2s ease;
+  font-family: inherit;
+}
+.favBtn:hover {
+  border-color: var(--pink);
+  color: var(--pink);
+  transform: scale(1.05);
+}
+.favBtn:active {
+  animation: var(--kf-heartPop) 0.3s ease;
+}
+.favBtn.favOn {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: rgba(201, 160, 67, 0.14);
+  box-shadow: 0 0 0 1px rgba(201, 160, 67, 0.35);
+}
+.favBtn.favOn:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.icon {
+  font-size: 16px;
+  line-height: 1;
+}

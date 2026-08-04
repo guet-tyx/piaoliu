@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import styles from "./Topbar.module.css";
 
@@ -18,6 +19,8 @@ const ANCHORS = [
  */
 export function Topbar() {
   const pathname = usePathname();
+  // V2.4：全屏沉浸聊天页自带顶栏，隐藏全站顶栏
+  if (pathname.startsWith("/chat")) return null;
   const anchor = (href: string) => (pathname === "/" ? href : `/${href}`);
 
   return (
@@ -59,6 +62,9 @@ export function Topbar() {
           <a href="/sailor" className="sweepGold sweepGold--left" data-text="船员证">
             船员证
           </a>
+          <Link href="/playlist" className="sweepGold sweepGold--left" data-text="歌单广场">
+            歌单广场
+          </Link>
           <a href="/report" className="sweepGold sweepGold--left" data-text="周报">
             周报
           </a>

@@ -84,17 +84,21 @@
 ```
 src/
 ├─ app/                    # App Router：layout（metadata）+ page（组装）+ globals.css（设计系统）
+│  ├─ chat/[roleId]/       # 全屏聊天页动态路由（首个 [param] 路由，server 层校验 + 客户端组件）
+│  └─ api/chat/route.ts    # 服务端代理（AI 聊天）：服务端密钥只在此层读取，不暴露浏览器
 ├─ components/
-│  ├─ shared/              # 跨区块复用组件（SectionHead / CountUp）
+│  ├─ shared/              # 跨区块复用组件（SectionHead / CountUp / Modal）
+│  ├─ chat/                # 全屏聊天页组件组（ChatPage 总装 + 顶栏/消息列表/输入栏/选歌浮层）
 │  ├─ topbar|hero|marquee|character|playlist|player|download|layout/
 │  │                       # 各区块：组件名 + 同名 *.module.css（样式私有化）
 │  └─ 区块组件              # 有交互的加 "use client"，纯静态保持 server
-├─ hooks/                  # 浏览器 API 封装（useAudioPlayer / useCountUp）
+├─ hooks/                  # 浏览器 API 封装（useAudioPlayer / useCountUp / usePrefersReducedMotion）
 ├─ stores/                 # Zustand 状态中枢（player.ts：唯一播放器状态源）
-├─ lib/                    # 基础设施（supabase 客户端等）
+├─ lib/                    # 基础设施（supabase 客户端 / chat 本地回复池与常量）
+│  └─ llm/                 # AI 调度层（providers.json 单一数据源 + scheduler/strip/upstream 模块）
 ├─ data/                   # 静态内容数据（tracks / playlists / danmaku / character…），
 │                          # 未来切换 Supabase 时替换为查询层
-└─ types/                  # 共享 TS 类型（music.ts 等）
+└─ types/                  # 共享 TS 类型（music.ts / chat.ts 等）
 ```
 
 分层依赖规则：`components → hooks/stores/data → types`，单向依赖，**禁止循环导入**。

@@ -8,6 +8,8 @@ export interface DanmakuMessage {
   id: string;
   text: string;
   variant?: "pink" | "blue";
+  /** 电台频道 id（P3-04 隔离维度；系统事件无） */
+  channelId?: string;
   /** 所属曲目 id（null = 全局/系统事件） */
   trackId?: string;
   /** 系统事件弹幕（非用户发布） */
@@ -22,6 +24,8 @@ export interface DanmakuMessage {
 export interface PresencePeer {
   /** 会话随机匿名标识（每次打开页面重新生成） */
   id: string;
+  /** 电台频道 id（P3-04 按频道统计） */
+  channelId?: string;
   /** 正在收听的曲目 id */
   trackId: string;
   /** 最近心跳时间戳 */

@@ -1,0 +1,64 @@
+/* ============ 聊天全屏页（R1 V2.4） ============
+ * data-role 属性驱动角色专属氛围（R1 §4.3）：
+ * 汐 紫粉 / 流明 蓝白 / 朔空 金蓝 / 悠 紫暗。
+ * --chat-accent/--chat-accent-2/--chat-accent-soft/--chat-glow 随 DOM 继承到
+ * 顶栏 / 气泡 / 输入栏等子组件（各组件 module 内用 var() 消费）。
+ */
+.page {
+  --chat-accent: #7BB1FF;
+  --chat-accent-2: #40C5F1;
+  --chat-accent-soft: rgba(123, 177, 255, .16);
+  --chat-glow: rgba(123, 177, 255, .12);
+
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  background:
+    radial-gradient(60% 42% at 50% 0%, var(--chat-glow) 0%, transparent 72%),
+    rgba(5, 12, 30, .66);
+  /* 入场：右滑 + 淡入 0.35s（R1 §7；reduced-motion 由 globals.css 全局压制） */
+  animation: var(--kf-chatSlideIn) .35s cubic-bezier(.22, .61, .36, 1) both;
+}
+/* 返回：左滑 + 淡出 0.3s（R1 §7） */
+.exiting {
+  animation: var(--kf-chatSlideOut) .3s ease both;
+}
+
+/* R5.3 角色背景图：淡化铺底（覆盖渐变底色之上、内容之下） */
+.bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: .16;
+  pointer-events: none;
+}
+.bg img {
+  object-fit: cover;
+}
+
+.page[data-role="sio"] {
+  --chat-accent: #FB7299;
+  --chat-accent-2: #B17CFF;
+  --chat-accent-soft: rgba(251, 114, 153, .16);
+  --chat-glow: rgba(251, 114, 153, .16);
+}
+.page[data-role="lumen"] {
+  --chat-accent: #7BB1FF;
+  --chat-accent-2: #D6E8FF;
+  --chat-accent-soft: rgba(123, 177, 255, .16);
+  --chat-glow: rgba(123, 177, 255, .14);
+}
+.page[data-role="soku"] {
+  --chat-accent: #C9A063;
+  --chat-accent-2: #4EA3D8;
+  --chat-accent-soft: rgba(201, 160, 99, .16);
+  --chat-glow: rgba(201, 160, 99, .14);
+}
+.page[data-role="yoe"] {
+  --chat-accent: #A78BFA;
+  --chat-accent-2: #6C4BB8;
+  --chat-accent-soft: rgba(167, 139, 250, .16);
+  --chat-glow: rgba(167, 139, 250, .15);
+}

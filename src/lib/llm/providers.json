@@ -1,0 +1,169 @@
+{
+  "_comment": "大模型 API Provider 注册表（V2.5 大池子 → V2.6 单一数据源）。全站唯一事实源：src/lib/llm/providers.ts 与 scripts/verify-providers.mjs 都从这里读取。改 provider 只需改本文件。",
+  "providers": [
+    {
+      "id": "modelscope",
+      "name": "魔搭社区",
+      "keyEnv": "MODELSCOPE_API_KEY",
+      "baseUrlEnv": "MODELSCOPE_BASE_URL",
+      "defaultBaseUrl": "https://api-inference.modelscope.cn/v1",
+      "modelsEnv": "MODELSCOPE_MODELS",
+      "supportsPool": true,
+      "preferredModels": [
+        "mistralai/Mistral-Large-Instruct-2407",
+        "Qwen/Qwen3-235B-A22B-Instruct-2507",
+        "MiniMax/MiniMax-M1-80k",
+        "Qwen/Qwen3-235B-A22B",
+        "Qwen/Qwen3-14B",
+        "XGenerationLab/XiYanSQL-QwenCoder-32B-2412",
+        "XGenerationLab/XiYanSQL-QwenCoder-32B-2504",
+        "opencompass/CompassJudger-1-32B-Instruct",
+        "deepseek-ai/DeepSeek-V4-Pro",
+        "deepseek-ai/DeepSeek-V3.2",
+        "ZhipuAI/GLM-4.7-Flash",
+        "ZhipuAI/GLM-5.2"
+      ],
+      "excludedModels": [
+        "LLM-Research/Llama-4-Maverick-17B-128E-Instruct",
+        "MiniMax/MiniMax-M2.5",
+        "MiniMax/MiniMax-M2.7",
+        "MiniMax/MiniMax-M3",
+        "moonshotai/Kimi-K2.5",
+        "nex-agi/Nex-N2-Pro",
+        "XiaomiMiMo/MiMo-V2-Flash",
+        "ZhipuAI/GLM-5",
+        "ZhipuAI/GLM-5.1",
+        "PaddlePaddle/ERNIE-4.5-300B-A47B-PT",
+        "PaddlePaddle/ERNIE-4.5-21B-A3B-PT",
+        "PaddlePaddle/ERNIE-4.5-0.3B-PT",
+        "meituan-longcat/LongCat-Flash-Lite",
+        "MedAIBase/AntAngelMed",
+        "OpenGVLab/InternVL3_5-241B-A28B",
+        "Tencent-Hunyuan/Hy3",
+        "deepseek-ai/DeepSeek-V4-Flash"
+      ]
+    },
+    {
+      "id": "zhipu",
+      "name": "智谱 GLM",
+      "keyEnv": "ZHIPU_API_KEY",
+      "baseUrlEnv": "ZHIPU_BASE_URL",
+      "defaultBaseUrl": "https://open.bigmodel.cn/api/paas/v4",
+      "modelsEnv": "ZHIPU_MODELS",
+      "supportsPool": true,
+      "preferredModels": ["glm-z1-flash", "glm-4-flash", "glm-4.7"]
+    },
+    {
+      "id": "siliconflow",
+      "name": "硅基流动",
+      "keyEnv": "SILICONFLOW_API_KEY",
+      "baseUrlEnv": "SILICONFLOW_BASE_URL",
+      "defaultBaseUrl": "https://api.siliconflow.cn/v1",
+      "modelsEnv": "SILICONFLOW_MODELS",
+      "supportsPool": true,
+      "preferredModels": [
+        "Qwen/Qwen2.5-7B-Instruct",
+        "THUDM/GLM-4-9B-0414",
+        "tencent/Hunyuan-MT-7B",
+        "inclusionAI/Ling-flash-2.0",
+        "zai-org/GLM-4.5-Air",
+        "deepseek-ai/DeepSeek-R1-0528-Qwen3-8B",
+        "THUDM/GLM-Z1-9B-0414",
+        "Qwen/Qwen3-8B"
+      ]
+    },
+    {
+      "id": "dashscope",
+      "name": "阿里百炼",
+      "keyEnv": "DASHSCOPE_API_KEY",
+      "baseUrlEnv": "DASHSCOPE_BASE_URL",
+      "defaultBaseUrl": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "modelsEnv": "DASHSCOPE_MODELS",
+      "supportsPool": true,
+      "preferredModels": ["qwen-turbo", "qwen-plus", "qwen-long"]
+    },
+    {
+      "id": "moonshot",
+      "name": "月之暗面 Kimi",
+      "keyEnv": "MOONSHOT_API_KEY",
+      "baseUrlEnv": "MOONSHOT_BASE_URL",
+      "defaultBaseUrl": "https://api.moonshot.cn/v1",
+      "modelsEnv": "MOONSHOT_MODELS",
+      "supportsPool": true,
+      "preferredModels": ["moonshot-v1-8k", "moonshot-v1-32k", "moonshot-v1-128k"]
+    },
+    {
+      "id": "openrouter",
+      "name": "OpenRouter",
+      "keyEnv": "OPENROUTER_API_KEY",
+      "baseUrlEnv": "OPENROUTER_BASE_URL",
+      "defaultBaseUrl": "https://openrouter.ai/api/v1",
+      "modelsEnv": "OPENROUTER_MODELS",
+      "supportsPool": false,
+      "preferredModels": [
+        "google/gemma-4-26b-a4b-it:free",
+        "nvidia/nemotron-3-nano-30b-a3b:free",
+        "openrouter/free"
+      ],
+      "extraHeaders": {
+        "HTTP-Referer": "https://localhost:3000",
+        "X-Title": "漂流 DRIFT · 星海版"
+      }
+    },
+    {
+      "id": "gemini",
+      "name": "Google Gemini",
+      "keyEnv": "GEMINI_API_KEY",
+      "baseUrlEnv": "GEMINI_BASE_URL",
+      "defaultBaseUrl": "https://generativelanguage.googleapis.com/v1beta/openai",
+      "modelsEnv": "GEMINI_MODELS",
+      "supportsPool": false,
+      "preferredModels": ["gemini-2.0-flash", "gemini-2.5-flash", "gemma-3-27b-it"]
+    },
+    {
+      "id": "groq",
+      "name": "Groq",
+      "keyEnv": "GROQ_API_KEY",
+      "baseUrlEnv": "GROQ_BASE_URL",
+      "defaultBaseUrl": "https://api.groq.com/openai/v1",
+      "modelsEnv": "GROQ_MODELS",
+      "supportsPool": true,
+      "preferredModels": ["llama-3.3-70b-versatile", "qwen3-32b", "llama-3.1-8b-instant"]
+    },
+    {
+      "id": "cerebras",
+      "name": "Cerebras",
+      "keyEnv": "CEREBRAS_API_KEY",
+      "baseUrlEnv": "CEREBRAS_BASE_URL",
+      "defaultBaseUrl": "https://api.cerebras.ai/v1",
+      "modelsEnv": "CEREBRAS_MODELS",
+      "supportsPool": true,
+      "preferredModels": ["gpt-oss-120b", "llama-3.1-8b"]
+    },
+    {
+      "id": "nvidia",
+      "name": "NVIDIA NIM",
+      "keyEnv": "NVIDIA_API_KEY",
+      "baseUrlEnv": "NVIDIA_BASE_URL",
+      "defaultBaseUrl": "https://integrate.api.nvidia.com/v1",
+      "modelsEnv": "NVIDIA_MODELS",
+      "supportsPool": false,
+      "preferredModels": [
+        "deepseek-ai/deepseek-v4-flash",
+        "meta/llama-3.1-8b-instruct",
+        "minimaxai/minimax-m3",
+        "deepseek-ai/deepseek-v4-pro"
+      ]
+    },
+    {
+      "id": "agnes",
+      "name": "Agnes AI",
+      "keyEnv": "AGNES_API_KEY",
+      "baseUrlEnv": "AGNES_BASE_URL",
+      "defaultBaseUrl": "https://apihub.agnes-ai.cn/v1",
+      "modelsEnv": "AGNES_MODELS",
+      "supportsPool": true,
+      "preferredModels": ["agnes-2.5-flash", "agnes-2.0-flash"]
+    }
+  ]
+}

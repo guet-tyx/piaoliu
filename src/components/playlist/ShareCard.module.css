@@ -1,0 +1,48 @@
+/* 歌单分享卡片（P3-05） */
+
+.wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 4px 0 8px;
+}
+
+.hiddenCanvas {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.preview {
+  width: 100%;
+  max-width: 520px;
+  border-radius: 14px;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.4);
+}
+
+.download {
+  display: inline-block;
+  border: none;
+  background: linear-gradient(135deg, var(--pink), #ff9ab5);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 11px 26px;
+  border-radius: 999px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.download:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(251, 114, 153, 0.35);
+}
+
+.loading {
+  color: var(--ink-4);
+  font-size: 14px;
+  padding: 40px 0;
+}

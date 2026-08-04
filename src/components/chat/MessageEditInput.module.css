@@ -1,0 +1,74 @@
+/* ============ R4 消息编辑模式（§3.3） ============ */
+.edit {
+  position: relative;
+  width: 100%;
+}
+.input {
+  width: 100%;
+  resize: none;
+  overflow-y: auto;
+  min-height: 40px;
+  max-height: 88px; /* ~3 行，比主输入栏略矮 */
+  background: var(--panel-2);
+  border: 1px solid rgba(123, 177, 255, .25);
+  border-radius: 12px;
+  padding: 8px 12px;
+  color: var(--ink);
+  font-size: .92rem;
+  font-family: inherit;
+  line-height: 1.5;
+  transition: border-color .2s ease;
+}
+.input:focus {
+  outline: none;
+  border-color: var(--chat-accent);
+}
+.inputOver { border-color: rgba(248, 113, 113, .6); }
+
+.count {
+  position: absolute;
+  right: 10px;
+  bottom: 40px;
+  font-size: .68rem;
+  color: var(--ink-3);
+  pointer-events: none;
+}
+.countOver { color: #f87171; }
+
+.foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+}
+.cancel {
+  border: 0;
+  background: transparent;
+  color: var(--ink-3);
+  font-size: .8rem;
+  font-family: inherit;
+  padding: 5px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: color .2s ease;
+}
+.cancel:hover { color: var(--ink-2); }
+.save {
+  border: 0;
+  background: linear-gradient(135deg, var(--pink-bright), var(--pink-deep));
+  color: #fff;
+  font-size: .8rem;
+  font-weight: 600;
+  font-family: inherit;
+  padding: 5px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: opacity .2s ease, transform .2s ease;
+}
+.save:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+.save:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}

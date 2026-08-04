@@ -7,6 +7,7 @@ import { SkinPicker } from "@/components/sailor/SkinPicker";
 import { BadgeWall } from "@/components/sailor/BadgeWall";
 import { NicknameForm } from "@/components/sailor/NicknameForm";
 import { RecoverySection } from "@/components/sailor/RecoverySection";
+import { MyPlaylists } from "@/components/sailor/MyPlaylists";
 import { useIdentityStore } from "@/stores/identity";
 import styles from "./SailorPage.module.css";
 
@@ -33,15 +34,19 @@ export function SailorPage() {
       />
 
       {sailor ? (
-        <div className={styles.grid}>
-          <SailorCard />
-          <div className={styles.column}>
-            <NicknameForm />
-            <SkinPicker />
-            <BadgeWall />
-            <RecoverySection />
+        <>
+          <div className={styles.grid}>
+            <SailorCard />
+            <div className={styles.column}>
+              <NicknameForm />
+              <SkinPicker />
+              <BadgeWall />
+              <RecoverySection />
+            </div>
           </div>
-        </div>
+          {/* P2-01/02：我的歌单（收藏 + 自建） */}
+          <MyPlaylists />
+        </>
       ) : status === "offline" ? (
         <p className={styles.empty}>星海暂时无风，船员证稍后再发。</p>
       ) : (

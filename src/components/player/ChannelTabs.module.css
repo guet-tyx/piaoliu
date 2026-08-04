@@ -1,0 +1,47 @@
+/* 频道选择胶囊栏（P1-05） */
+
+.tabs {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid var(--line-panel);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--ink-2);
+  font-size: 14px;
+  padding: 9px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.22s ease;
+  font-family: inherit;
+}
+.tab:hover:not(:disabled) {
+  border-color: var(--ice);
+  color: var(--ice);
+  transform: translateY(-1px);
+}
+.tab:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+.tab.active {
+  border-color: var(--pink);
+  background: rgba(251, 114, 153, 0.14);
+  color: var(--pink);
+  box-shadow: 0 0 0 1px rgba(251, 114, 153, 0.4), 0 6px 20px rgba(251, 114, 153, 0.22);
+}
+
+.tabIcon {
+  font-size: 15px;
+  line-height: 1;
+}
+.tabName {
+  letter-spacing: 0.03em;
+  font-weight: 600;
+}

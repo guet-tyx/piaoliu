@@ -46,9 +46,16 @@ export function useAudioPlayer() {
       usePlayerStore.getState().setProgress(audio.currentTime, audio.duration);
     const onLoadedMetadata = () =>
       usePlayerStore.getState().setProgress(audio.currentTime, audio.duration);
-    /** 播放结束：单曲循环 → 本曲重播；否则走 next()（随机模式在 store 内处理） */
+    /** 播放结束：单曲循环 → 本曲重播；P2-04「当前曲目结束」定时 → 暂停并清除；
+     *  否则走 next()（随机模式在 store 内处理；FM 播完末尾由 store 追加推荐） */
     const onEnded = () => {
-      const { playMode } = usePlayerStore.getState();
+      const { playMode, sleepMode } = usePlayerStore.getState();
+      // P2-04：定时关闭「当前曲目结束时」→ 播完这首就停
+      if (sleepMode === "track") {
+        audio.pause();
+        usePlayerStore.setState({ isPlaying: false, sleepMode: null, sleepDeadline: null });
+        return;
+      }
       if (playMode === "loop") {
         audio.currentTime = 0;
         audio.play().catch(() => {});
@@ -144,6 +151,7 @@ export function useAudioPlayer() {
           muted?: unknown;
           playMode?: unknown;
           danmakuOn?: unknown;
+          hostBubbleOn?: unknown;
         };
         const { tracks: list } = usePlayerStore.getState();
         const patch: {
@@ -152,6 +160,7 @@ export function useAudioPlayer() {
           muted?: boolean;
           playMode?: PlayMode;
           danmakuOn?: boolean;
+          hostBubbleOn?: boolean;
         } = {};
         if (
           typeof saved.currentIndex === "number" &&
@@ -175,6 +184,7 @@ export function useAudioPlayer() {
           patch.playMode = saved.playMode as PlayMode;
         }
         if (typeof saved.danmakuOn === "boolean") patch.danmakuOn = saved.danmakuOn;
+        if (typeof saved.hostBubbleOn === "boolean") patch.hostBubbleOn = saved.hostBubbleOn;
         // 只恢复 UI 状态；isPlaying 强制 false，避免浏览器拦截自动播放
         usePlayerStore.setState({ ...patch, isPlaying: false });
       }
@@ -194,6 +204,20 @@ export function useAudioPlayer() {
     } catch {
       // 损坏数据忽略
     }
+    // P1-03：歌单收藏独立 key（与曲目收藏并存）
+    try {
+      const plFavRaw = localStorage.getItem("drift-fav-playlists");
+      if (plFavRaw) {
+        const fav: unknown = JSON.parse(plFavRaw);
+        if (Array.isArray(fav)) {
+          usePlayerStore.setState({
+            likedPlaylistIds: fav.filter((x): x is string => typeof x === "string"),
+          });
+        }
+      }
+    } catch {
+      // 损坏数据忽略
+    }
     const unsubscribe = usePlayerStore.subscribe((state, prev) => {
       // 仅持久化字段变化时写入（避免 setProgress 高频触发）
       if (
@@ -202,7 +226,8 @@ export function useAudioPlayer() {
         state.volume === prev.volume &&
         state.muted === prev.muted &&
         state.playMode === prev.playMode &&
-        state.danmakuOn === prev.danmakuOn
+        state.danmakuOn === prev.danmakuOn &&
+        state.hostBubbleOn === prev.hostBubbleOn
       ) {
         return;
       }
@@ -216,6 +241,7 @@ export function useAudioPlayer() {
             muted: state.muted,
             playMode: state.playMode,
             danmakuOn: state.danmakuOn,
+            hostBubbleOn: state.hostBubbleOn,
           }),
         );
       } catch {
@@ -230,9 +256,21 @@ export function useAudioPlayer() {
         // 隐私模式等场景忽略写入失败
       }
     });
+    const unsubscribePlFav = usePlayerStore.subscribe((state, prev) => {
+      if (state.likedPlaylistIds === prev.likedPlaylistIds) return;
+      try {
+        localStorage.setItem(
+          "drift-fav-playlists",
+          JSON.stringify(state.likedPlaylistIds),
+        );
+      } catch {
+        // 隐私模式等场景忽略写入失败
+      }
+    });
     return () => {
       unsubscribe();
       unsubscribeFav();
+      unsubscribePlFav();
     };
   }, []);
 }

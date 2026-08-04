@@ -1,0 +1,110 @@
+/* 定时关闭（P2-04）：入口胶囊 + 选择面板 */
+
+.wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.entry {
+  border: 1px solid var(--line-panel);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--ink-2);
+  font-size: 13px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
+}
+.entry:hover {
+  border-color: var(--ice);
+  color: var(--ice);
+}
+.entry.on {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: rgba(201, 160, 67, 0.12);
+}
+
+.panel {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 10px);
+  width: 264px;
+  z-index: 30;
+  padding: 16px 18px;
+  border-radius: 16px;
+  background: rgba(14, 22, 44, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.5);
+  animation: var(--kf-revealUp) 0.25s ease both;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.panelTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0;
+}
+.panelHint {
+  font-size: 12px;
+  color: var(--ink-4);
+  margin: 0 0 4px;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.option {
+  border: 1px solid var(--line-panel);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--ink-2);
+  font-size: 13px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.18s ease;
+  font-family: inherit;
+}
+.option:hover {
+  border-color: var(--pink);
+  color: var(--pink);
+}
+
+.custom {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 6px;
+  border-top: 1px solid var(--line-panel);
+}
+.customLabel {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+.custom input[type="range"] {
+  width: 100%;
+  accent-color: var(--pink);
+}
+
+.cancel {
+  border: none;
+  background: none;
+  color: var(--ink-4);
+  font-size: 12px;
+  padding: 6px;
+  cursor: pointer;
+  align-self: center;
+  font-family: inherit;
+}
+.cancel:hover {
+  color: var(--ink-2);
+}

@@ -608,3 +608,20 @@
     animation-duration: .01ms !important;
   }
 }
+
+/* P3-02 无播放空态 */
+.nowPlayingEmpty {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--panel-2);
+  border: 1px dashed var(--line-panel);
+  border-radius: 14px;
+  padding: 10px 14px;
+  margin-bottom: 10px;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+.nowEmptyMark {
+  font-size: 16px;
+}

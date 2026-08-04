@@ -1,14 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import { CHARACTERS } from "@/data/character";
 import { SectionHead } from "@/components/shared/SectionHead";
 import { CountUp } from "@/components/shared/CountUp";
-import { SwitchDots } from "@/components/shared/SwitchDots";
-import { useFadeIn } from "@/hooks/useFadeIn";
 import { useShioStore } from "@/stores/shio";
 import { useIdentityStore } from "@/stores/identity";
+import { useAutoCycle } from "@/hooks/useAutoCycle";
 import type { ShioSlot } from "@/data/shio-lines";
 import styles from "./CharacterSection.module.css";
 
@@ -21,35 +20,44 @@ const SLOT_LABEL: Record<ShioSlot, string> = {
 
 /**
  * 星海守望者（仿崩坏3官网角色切换，2026-08-02）：
- * 顶部头像列表点击切换角色（汐/流明/朔空/悠），立绘 + 档案 + 表情随切换更新；
- * 每日一句与行为回应为汐专属（切换其他角色时隐藏）
+ * 顶部头像列表点击切换角色（汐/流明/朔空/悠），立绘 + 档案随切换更新；
+ * 每日一句为 4 位角色各一套（V2.2 由汐专属扩展，角色区「三种瞬间」已移除）；
+ * 行为回应气泡仍为汐专属互动（听歌/收信/投瓶/羁绊）。
  */
 export function CharacterSection() {
   const [activeId, setActiveId] = useState("sio");
-  const [exprIndex, setExprIndex] = useState(0);
+  // 自动轮播暂停：鼠标悬停/键盘聚焦角色区时暂停（V2.2）
+  const [hoverPaused, setHoverPaused] = useState(false);
   const active = CHARACTERS.find((c) => c.id === activeId) ?? CHARACTERS[0];
+  const activeIndex = CHARACTERS.findIndex((c) => c.id === active.id);
   const isSio = activeId === "sio";
 
-  // 表情切换浮现（rAF 驱动：主图先起，说明文字 .08s 后浮现；切角色时一并重播）
-  // 注意：deps 必须 useMemo 缓存稳定引用（React Compiler 按引用比较依赖，字面量数组会导致 effect 反复重跑）
-  const exprDeps = useMemo(() => [active.id, exprIndex], [active.id, exprIndex]);
-  const exprImgRef = useRef<HTMLImageElement | null>(null);
-  const exprCapRef = useRef<HTMLElement | null>(null);
-  useFadeIn(exprImgRef, exprDeps);
-  useFadeIn(exprCapRef, exprDeps, 80);
-
-  const greeting = useShioStore((s) => s.greeting);
-  const slot = useShioStore((s) => s.slot);
+  const greeting = useShioStore((s) => s.greetings[active.id]);
   const ensureDailyGreeting = useShioStore((s) => s.ensureDailyGreeting);
   const response = useIdentityStore((s) => s.response);
 
-  // 每日首次挂载：按时段选句（客户端专属，effect 内读取 localStorage）
+  // 每日首次挂载/切换角色：按时段为当前角色选句（客户端专属，effect 内读取 localStorage）
   useEffect(() => {
-    ensureDailyGreeting();
-  }, [ensureDailyGreeting]);
+    ensureDailyGreeting(active.id);
+  }, [ensureDailyGreeting, active.id]);
+
+  // 自动轮播（V2.2）：5s 切换到下一位守望者，hover/聚焦暂停，reduced-motion 禁用；
+  // onAdvance 用 useCallback 稳定引用（否则每次渲染都会重建 interval）
+  const advanceRole = useCallback(
+    (next: number) => setActiveId(CHARACTERS[next].id),
+    [],
+  );
+  useAutoCycle(CHARACTERS.length, activeIndex, advanceRole, { paused: hoverPaused });
 
   return (
-    <section className={`section ${styles.charSection}`} id="char">
+    <section
+      className={`section ${styles.charSection}`}
+      id="char"
+      onMouseEnter={() => setHoverPaused(true)}
+      onMouseLeave={() => setHoverPaused(false)}
+      onFocusCapture={() => setHoverPaused(true)}
+      onBlurCapture={() => setHoverPaused(false)}
+    >
       <SectionHead
         tag="STAR SEA WATCHERS"
         title="星海守望者"
@@ -136,57 +144,32 @@ export function CharacterSection() {
             ))}
           </div>
 
-          {/* 角色情绪表情变体（崩坏3式：单主图 + 底部切换条；切换 WAAPI 浮现） */}
-          <div className={styles.exprRow}>
-            <p className={styles.exprLabel}>{active.name}的三种瞬间</p>
-            <figure className={styles.exprMain}>
-              {active.expressions && active.expressions[exprIndex] && (
-                <>
-                  <Image
-                    ref={exprImgRef}
-                    src={active.expressions[exprIndex].image}
-                    alt={`${active.name} · ${active.expressions[exprIndex].label}`}
-                    fill
-                    style={{ objectFit: "cover", objectPosition: "50% 0%" }}
-                  />
-                  <figcaption ref={exprCapRef} className={styles.exprCap}>
-                    {active.expressions[exprIndex].label}
-                  </figcaption>
-                </>
-              )}
-            </figure>
-            {active.expressions && active.expressions.length > 1 && (
-              <SwitchDots
-                count={active.expressions.length}
-                active={exprIndex}
-                onChange={setExprIndex}
-                ariaLabel={`切换${active.name}的表情`}
-              />
+          {/* 角色每日一句（V2.2：4 位角色各一套专属文案，切换角色同步更新） */}
+          <div className={styles.greetCard}>
+            <p className={styles.greetKicker}>
+              {active.name}的今日问候
+              {greeting?.slot ? ` · ${SLOT_LABEL[greeting.slot]}` : ""}
+            </p>
+            <p className={styles.greetText}>
+              {greeting ? `「${greeting.line.text}」` : "……"}
+            </p>
+            <p className={styles.greetSign}>—— {active.name}</p>
+
+            {/* 汐的行为回应气泡（FR-8.2）——浮动层 4 秒自动淡出，不撑高角色卡（V2.2） */}
+            {isSio && response && (
+              <div key={response.at} className={styles.responseBubble} role="status">
+                <p className={styles.responseText}>「{response.line.text}」</p>
+                <p className={styles.responseSign}>—— 汐 · 刚刚</p>
+              </div>
             )}
           </div>
-
-          {/* 汐的每日一句（FR-8 最小版）与行为回应——汐专属，切换隐藏 */}
-          {isSio && (
-            <div className={styles.greetCard}>
-              <p className={styles.greetKicker}>
-                汐的今日问候{slot ? ` · ${SLOT_LABEL[slot]}` : ""}
-              </p>
-              <p className={styles.greetText}>
-                {greeting ? `「${greeting.text}」` : "……"}
-              </p>
-              <p className={styles.greetSign}>—— 汐</p>
-
-              {/* 汐的行为回应气泡（FR-8.2：听歌 3 首/收信/首次投瓶） */}
-              {response && (
-                <div className={styles.responseBubble}>
-                  <p className={styles.responseText}>「{response.line.text}」</p>
-                  <p className={styles.responseSign}>—— 汐 · 刚刚</p>
-                </div>
-              )}
-            </div>
-          )}
         </div>
       </div>
+
+      {/* AI 聊天入口（V2.4）：全屏聊天页 /chat/<roleId>，置于角色卡外，不撑高角色卡 */}
+      <a className={styles.chatBtn} href={`/chat/${active.id}`}>
+        ✦ 与{active.name}聊聊
+      </a>
     </section>
   );
 }

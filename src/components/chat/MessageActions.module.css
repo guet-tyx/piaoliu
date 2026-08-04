@@ -1,0 +1,60 @@
+/* ============ R4 消息悬浮操作栏（PC） ============ */
+.bar {
+  position: absolute;
+  top: 4px;
+  right: 8px;
+  z-index: 2;
+  display: flex;
+  gap: 4px;
+  padding: 3px;
+  background: rgba(13, 21, 40, .85);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 8px;
+  opacity: 0;
+  transform: translateY(4px);
+  pointer-events: none;
+  transition: opacity .15s ease, transform .15s ease;
+}
+.barVisible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 0;
+  background: transparent;
+  color: var(--ink-2);
+  font-size: .86rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease;
+}
+.btn:hover:not(:disabled) {
+  background: var(--chat-accent-soft);
+  color: var(--ink);
+}
+.btn:disabled {
+  opacity: .4;
+  cursor: not-allowed;
+}
+
+/* 删除二次确认：变红 + 展开为文字按钮 */
+.confirm {
+  width: auto;
+  padding: 0 9px;
+  border-radius: 999px;
+  background: rgba(248, 113, 113, .22);
+  color: #fca5a5;
+  font-size: .7rem;
+  font-weight: 600;
+}
+.confirm:hover:not(:disabled) {
+  background: rgba(248, 113, 113, .34);
+  color: #fecaca;
+}

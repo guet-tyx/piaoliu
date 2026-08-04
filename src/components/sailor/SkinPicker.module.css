@@ -28,6 +28,7 @@
   align-items: center;
   gap: 12px;
   text-align: left;
+  color: var(--ink-panel); /* 覆盖 button UA 默认黑色（继承给皮肤名等） */
   border: 1.5px solid var(--line-panel);
   background: var(--panel);
   border-radius: 14px;

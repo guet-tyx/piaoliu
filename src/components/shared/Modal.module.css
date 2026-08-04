@@ -26,3 +26,18 @@
   .mask { padding: 12px; }
   .panel { max-height: 88vh; }
 }
+
+/* R4 底部弹出变体：长按菜单 / 动作单。底部对齐、顶部大圆角、上滑入场 */
+.sheet {
+  align-self: flex-end;
+  border-radius: 20px 20px 0 0;
+  max-width: 100%;
+  animation: sheetUp .28s cubic-bezier(.22, .61, .36, 1);
+}
+@media (max-width: 560px) {
+  .sheet { margin-bottom: -4px; }
+}
+@keyframes sheetUp {
+  from { transform: translateY(24px); opacity: .6; }
+  to { transform: translateY(0); opacity: 1; }
+}

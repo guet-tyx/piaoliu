@@ -1,0 +1,90 @@
+/* AI 推荐卡片（P3-03）：歌单卡 / 频道卡，撑满气泡 */
+
+.card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--line-panel);
+  border-radius: 12px;
+  padding: 8px 12px;
+  margin: 6px 0;
+  min-width: 0;
+}
+
+.cover {
+  width: 56px;
+  height: 56px;
+  border-radius: 10px;
+  object-fit: cover;
+  flex: none;
+}
+
+.chIcon {
+  flex: none;
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  font-size: 26px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  flex: 1;
+}
+
+.name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sub {
+  font-size: 12px;
+  color: var(--ink-4);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.btn {
+  flex: none;
+  border: none;
+  background: linear-gradient(135deg, var(--pink), #ff9ab5);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 7px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  font-family: inherit;
+}
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(251, 114, 153, 0.35);
+}
+
+.missing {
+  color: var(--ink-4);
+  font-size: 12px;
+}
+
+@media (max-width: 560px) {
+  .card {
+    flex-wrap: wrap;
+  }
+  .btn {
+    width: 100%;
+  }
+}

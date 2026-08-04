@@ -1,0 +1,75 @@
+/* 收瓶歌曲卡片（P3-02） */
+
+.card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--line-panel);
+  border-radius: 14px;
+  padding: 10px 14px;
+  margin: 12px 0;
+  min-width: 0;
+}
+
+.cover {
+  width: 56px;
+  height: 56px;
+  border-radius: 10px;
+  object-fit: cover;
+  flex: none;
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  flex: 1;
+}
+
+.name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sub {
+  font-size: 12px;
+  color: var(--ink-4);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.playBtn {
+  flex: none;
+  border: none;
+  background: linear-gradient(135deg, var(--pink), #ff9ab5);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 8px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  font-family: inherit;
+}
+.playBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(251, 114, 153, 0.35);
+}
+
+@media (max-width: 560px) {
+  .card {
+    flex-wrap: wrap;
+  }
+  .playBtn {
+    width: 100%;
+  }
+}

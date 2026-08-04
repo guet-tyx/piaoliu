@@ -65,6 +65,15 @@
   --kf-parallax: parallax;
   --kf-railDot: railDot;
   --kf-railLine: railLine;
+  --kf-bubbleToast: bubbleToast;
+  --kf-hostBubble: hostBubble;
+  --kf-blink: blink;
+  /* 聊天页（R1 V2.4） */
+  --kf-chatSlideIn: chatSlideIn;
+  --kf-chatSlideOut: chatSlideOut;
+  --kf-msgRise: msgRise;
+  --kf-dotJump: dotJump;
+  --kf-skeleton: skeleton;
 }
 
 /* ============ 基础 ============ */
@@ -190,6 +199,51 @@ section[id] { scroll-margin-top: 76px; }
 @keyframes railLine {
   0%, 100% { opacity: 1; }
   50% { opacity: .45; }
+}
+/* 回应气泡浮层：浮现 → 保持 → 淡出（4s 播放后 forwards 保持透明，配合 key 重挂载重播） */
+@keyframes bubbleToast {
+  0% { opacity: 0; transform: translateY(10px) scale(.98); }
+  6% { opacity: 1; transform: translateY(0) scale(1); }
+  88% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-4px); }
+}
+/* 主持人气泡（P3-01 优化）：快速淡入 → 长时间保持 → 结尾淡出（约 6s） */
+@keyframes hostBubble {
+  0% { opacity: 0; transform: translateY(10px) scale(.98); }
+  5% { opacity: 1; transform: translateY(0) scale(1); }
+  90% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-4px); }
+}
+/* 打字机光标闪烁（聊天流式输出） */
+@keyframes blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+/* 聊天页入场：右滑 + 淡入（R1 §7，0.35s） */
+@keyframes chatSlideIn {
+  from { opacity: 0; transform: translateX(48px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+/* 聊天页返回：左滑 + 淡出（R1 §7，0.3s） */
+@keyframes chatSlideOut {
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(-48px); }
+}
+/* 新消息入场：底部上浮 + 淡入（R1 §7，0.3s） */
+@keyframes msgRise {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+/* 思考三点跳动（AI 构思回复时） */
+@keyframes dotJump {
+  0%, 60%, 100% { transform: translateY(0); opacity: .45; }
+  30% { transform: translateY(-4px); opacity: 1; }
+}
+/* 骨架屏 shimmer（灰渐变扫过） */
+@keyframes skeleton {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
 }
 
 /* ============ 文字扫金 hover ============

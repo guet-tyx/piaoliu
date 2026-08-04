@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Modal } from "@/components/shared/Modal";
 import { BottleCard } from "@/components/bottle/BottleCard";
+import { TrackAttachmentCard } from "@/components/bottle/TrackAttachmentCard";
 import { useBottleStore, type InboxItem } from "@/stores/bottle";
 import { useIdentityStore } from "@/stores/identity";
 import { useDanmakuStore } from "@/stores/danmaku";
@@ -85,9 +86,8 @@ function InboxItemView({ item }: { item: InboxItem }) {
           你的纸船 <em>{bottle.anonMark}</em>
         </p>
         <p className={styles.origText}>{bottle.text}</p>
-        <p className={styles.origSong}>
-          🎵 {bottle.track.t} · {bottle.track.s}
-        </p>
+        {/* P3-02 收信歌曲卡片（可播放跳转） */}
+        <TrackAttachmentCard track={bottle.track} />
       </div>
 
       <div className={styles.replies}>

@@ -39,10 +39,11 @@ function prunePeers(peers: PresencePeer[]): PresencePeer[] {
 }
 
 /**
- * 心跳循环：播放中每 15s 更新自己的在线状态（曲目随播放器变化）；
+ * 心跳循环（P3-04 按频道）：播放中每 15s 更新自己的在线状态；
  * 返回停止函数（cleanup 释放 interval）
  */
 export function startHeartbeat(
+  getChannelId: () => string | null,
   getTrackId: () => string | null,
   getPlaying: () => boolean,
 ): () => void {
@@ -50,6 +51,7 @@ export function startHeartbeat(
     if (!getPlaying()) return;
     const trackId = getTrackId();
     if (!trackId) return;
+    const channelId = getChannelId();
     // 真实模式：心跳写 listeners 表（upsert RPC，一人一行）；本地模式：localStorage
     if (isSupabaseReady()) {
       // fire-and-forget：失败（匿名会话未就绪/网络）静默，下拍重试
@@ -58,6 +60,7 @@ export function startHeartbeat(
           await getSupabase()?.rpc("upsert_listener", {
             p_anon_key: getPeerId(),
             p_track_id: trackId,
+            p_channel_id: channelId ?? "",
           });
         } catch {
           // 静默
@@ -69,9 +72,10 @@ export function startHeartbeat(
     const self = peers.find((p) => p.id === getPeerId());
     if (self) {
       self.trackId = trackId;
+      self.channelId = channelId ?? undefined;
       self.at = Date.now();
     } else {
-      peers.push({ id: getPeerId(), trackId, at: Date.now() });
+      peers.push({ id: getPeerId(), trackId, channelId: channelId ?? undefined, at: Date.now() });
     }
     writePeers(peers);
   };
@@ -81,12 +85,12 @@ export function startHeartbeat(
 }
 
 /**
- * 订阅某曲目的同船在线者（排除自己）；
+ * 订阅某电台频道的同船在线者（P3-04 按频道统计，排除自己）；
  * storage 事件（其他标签页心跳变化）+ 30s 轮询兜底；
  * 返回取消函数
  */
 export function subscribePresence(
-  trackId: string,
+  channelId: string,
   cb: (peers: PresencePeer[]) => void,
 ): () => void {
   if (isSupabaseReady()) {
@@ -97,18 +101,24 @@ export function subscribePresence(
         try {
           const { data, error } = await sb
             .from("online_listeners")
-            .select("anon_key, track_id, updated_at");
-          if (error) return; // 失败保留上次结果，避免闪烁清空
+            .select("anon_key, track_id, channel_id, updated_at");
+          if (error) return; // 失败（SQL 未迁移）保留上次结果，避免闪烁清空
           const peers: PresencePeer[] = (data ?? [])
             .map((r) => {
-              const row = r as { anon_key?: unknown; track_id?: unknown; updated_at?: unknown };
+              const row = r as {
+                anon_key?: unknown;
+                track_id?: unknown;
+                channel_id?: unknown;
+                updated_at?: unknown;
+              };
               return {
                 id: typeof row.anon_key === "string" ? row.anon_key : "",
+                channelId: typeof row.channel_id === "string" ? row.channel_id : "",
                 trackId: typeof row.track_id === "string" ? row.track_id : "",
                 at: typeof row.updated_at === "string" ? Date.parse(row.updated_at) : Date.now(),
               };
             })
-            .filter((p) => p.trackId === trackId && p.id !== "" && p.id !== getPeerId());
+            .filter((p) => p.channelId === channelId && p.id !== "" && p.id !== getPeerId());
           cb(peers);
         } catch {
           // 保留上次
@@ -124,7 +134,7 @@ export function subscribePresence(
   const emit = () => {
     cb(
       prunePeers(readPeers()).filter(
-        (p) => p.trackId === trackId && p.id !== getPeerId(),
+        (p) => p.channelId === channelId && p.id !== getPeerId(),
       ),
     );
   };

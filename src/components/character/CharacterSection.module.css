@@ -172,10 +172,7 @@
   color: var(--ink-panel-2);
   line-height: 1.7;
   margin: 8px 0 12px;
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  /* 角色描述完整展示，不再单行截断（卡片高度随内容自然撑开） */
 }
 .charDesc b { color: var(--ink-panel); }
 
@@ -204,50 +201,14 @@
   letter-spacing: .12em;
 }
 
-/* 角色情绪表情变体（崩坏3式：单主图 + 底部切换条，切换浮现） */
-.exprRow {
-  margin-top: 12px;
-}
-.exprLabel {
-  font-size: .6rem;
-  font-weight: 800;
-  letter-spacing: .22em;
-  color: var(--ink-panel-3);
-  margin: 0 0 8px;
-}
-.exprMain {
-  position: relative;
-  height: 190px; /* 加大：脸部清晰（原 120px 太小），限宽保持竖版构图 */
-  max-width: 300px;
-  border-radius: 14px;
-  overflow: hidden;
-  border: 1px solid var(--line-panel);
-  background: linear-gradient(160deg, var(--space-2), var(--space));
-  box-shadow: 0 14px 28px -16px rgba(251, 114, 153, .35);
-}
-/* 切换浮现由 useFadeIn（setInterval）驱动：主图先起，说明文字 .08s 后浮现 */
-.exprCap {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 1;
-  padding: 18px 12px 8px;
-  font-size: .72rem;
-  font-weight: 700;
-  letter-spacing: .14em;
-  color: #fff;
-  text-align: center;
-  background: linear-gradient(0deg, rgba(5, 12, 30, .82) 30%, transparent 100%);
-}
-
-/* 汐的每日一句（深空卡，紧凑） */
+/* 角色每日一句（V2.2：深空卡，4 位角色各一套文案；原「三种瞬间」表情区已移除） */
 .greetCard {
   margin-top: 12px;
-  padding: 12px 16px;
+  padding: 14px 16px;
   border-radius: 14px;
   background: linear-gradient(135deg, var(--space-2), var(--space));
   border: 1px solid rgba(123, 177, 255, .25);
+  box-shadow: 0 12px 24px -18px rgba(0, 0, 0, .6), 0 0 24px -10px rgba(123, 177, 255, .14);
   position: relative;
   overflow: hidden;
 }
@@ -275,12 +236,24 @@
   text-align: right;
 }
 
-/* 汐的行为回应气泡（V1.2 羁绊） */
+/* 汐的行为回应气泡（V2.2 浮动化：绝对定位浮层，4 秒自动消失，不撑高角色卡） */
 .responseBubble {
-  margin-top: 8px;
-  padding-top: 8px;
-  border-top: 1px dashed rgba(123, 177, 255, .28);
-  animation: var(--kf-rise) .4s cubic-bezier(.22, .61, .36, 1);
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  top: 12px;
+  bottom: 12px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(13, 21, 40, .97);
+  border: 1px solid rgba(123, 177, 255, .35);
+  box-shadow: 0 12px 26px -14px rgba(0, 0, 0, .75), 0 0 22px -8px rgba(123, 177, 255, .32);
+  animation: var(--kf-bubbleToast) 4s cubic-bezier(.22, .61, .36, 1) forwards;
+  pointer-events: none;
 }
 .responseText {
   font-size: .8rem;
@@ -317,4 +290,27 @@
 
 @media (max-width: 420px) {
   .charStats { grid-template-columns: 1fr 1fr; }
+}
+
+/* AI 聊天入口（V2.3）：置于角色卡外，不撑高角色卡（V2.4 改为全屏页链接） */
+.chatBtn {
+  display: block;
+  text-align: center;
+  margin: 14px auto 0;
+  padding: 10px 26px;
+  border-radius: 999px;
+  border: 1px solid rgba(123, 177, 255, .35);
+  background: var(--panel);
+  color: var(--ink-2);
+  font-size: .8rem;
+  font-weight: 700;
+  letter-spacing: .14em;
+  cursor: pointer;
+  transition: color .2s ease, border-color .2s ease, transform .2s ease, box-shadow .2s ease;
+}
+.chatBtn:hover {
+  color: var(--ice);
+  border-color: rgba(123, 177, 255, .6);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px -12px rgba(123, 177, 255, .5);
 }

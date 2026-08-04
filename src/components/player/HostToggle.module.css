@@ -1,0 +1,22 @@
+/* 主持人开关（P3-01） */
+
+.toggle {
+  border: 1px solid var(--line-panel);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--ink-2);
+  font-size: 13px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+.toggle:hover {
+  border-color: var(--ice);
+  color: var(--ice);
+}
+.toggle.on {
+  border-color: var(--pink);
+  color: var(--pink);
+  background: rgba(251, 114, 153, 0.12);
+}
