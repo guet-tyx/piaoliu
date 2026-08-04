@@ -74,6 +74,8 @@
   --kf-msgRise: msgRise;
   --kf-dotJump: dotJump;
   --kf-skeleton: skeleton;
+  /* 角色生活状态（PRD 需求③） */
+  --kf-lifeFade: lifeFade;
 }
 
 /* ============ 基础 ============ */
@@ -244,6 +246,11 @@ section[id] { scroll-margin-top: 76px; }
 @keyframes skeleton {
   from { background-position: 200% 0; }
   to { background-position: -200% 0; }
+}
+/* 角色生活状态文案切换（PRD 需求③）：0.3s 淡入（key 重挂载触发） */
+@keyframes lifeFade {
+  from { opacity: 0; transform: translateY(2px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* ============ 文字扫金 hover ============

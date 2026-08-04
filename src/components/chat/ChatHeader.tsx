@@ -5,6 +5,7 @@ import Image from "next/image";
 import { CHARACTERS } from "@/data/character";
 import { personaOf } from "@/data/chat-personas";
 import { useChatStore } from "@/stores/chat";
+import { useLifeStatus } from "@/hooks/useLifeStatus";
 import type { ChatStatus, ChatMessage } from "@/types/chat";
 import styles from "./ChatHeader.module.css";
 
@@ -53,6 +54,9 @@ export function ChatHeader({ roleId, onBack }: ChatHeaderProps) {
   const confirmTimer = useRef<number | null>(null);
 
   const meta = STATUS_META[status];
+
+  // 角色生活状态（PRD 需求③）：顶栏「● 在线 · 🎧 正在听歌」，点击可手动切换
+  const { displayed, tooltip, rotate } = useLifeStatus(roleId);
 
   // 清空二次确认：3 秒未再点自动复位
   useEffect(() => {
@@ -148,10 +152,27 @@ export function ChatHeader({ roleId, onBack }: ChatHeaderProps) {
 
         <div className={styles.roleMeta}>
           <span className={styles.roleName}>{persona.name}</span>
-          <span className={styles.status} role="status">
-            <i className={`${styles.dot} ${styles[meta.dot]}`} aria-hidden="true" />
-            {meta.label}
-          </span>
+            <span className={styles.status} role="status">
+              <i className={`${styles.dot} ${styles[meta.dot]}`} aria-hidden="true" />
+              {meta.label}
+              {displayed && (
+                <button
+                  type="button"
+                  className={styles.life}
+                  onClick={rotate}
+                  aria-label="切换角色状态"
+                >
+                  <span key={displayed.key} className={styles.lifeText}>
+                    · {displayed.icon} {displayed.text}
+                  </span>
+                  {tooltip && (
+                    <span className={styles.lifeTip} role="tooltip">
+                      {tooltip}
+                    </span>
+                  )}
+                </button>
+              )}
+            </span>
         </div>
 
         <div className={styles.spacer} />

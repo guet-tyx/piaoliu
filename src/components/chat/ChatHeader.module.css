@@ -91,6 +91,60 @@
 .dotStreaming { color: #38bdf8; animation: var(--kf-dotJump) 1s ease infinite; }
 .dotError { color: #f87171; }
 
+/* ---- 角色生活状态（PRD 需求③）：悬停弹细节、点击手动切换、切换淡入 ---- */
+.life {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  border: 0;
+  background: transparent;
+  padding: 1px 5px;
+  margin-left: 2px;
+  color: var(--ink-2);
+  font-size: .75rem;
+  font-family: inherit;
+  letter-spacing: .02em;
+  cursor: pointer;
+  border-radius: 999px;
+  transition: color .2s ease, background .2s ease;
+}
+.life:hover {
+  color: var(--ink);
+  background: rgba(123, 177, 255, .1);
+}
+.lifeText {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  white-space: nowrap;
+  /* 状态变化时 key 重挂载触发淡入 */
+  animation: var(--kf-lifeFade) .3s ease;
+}
+/* 悬停细节气泡（锚在按钮下方） */
+.lifeTip {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 40;
+  width: max-content;
+  max-width: 260px;
+  background: var(--panel);
+  border: 1px solid var(--line-panel);
+  border-radius: 10px;
+  padding: 6px 10px;
+  font-size: .74rem;
+  color: var(--ink-2);
+  line-height: 1.6;
+  opacity: 0;
+  transform: translateY(-4px);
+  pointer-events: none;
+  transition: opacity .15s ease, transform .15s ease;
+}
+.life:hover .lifeTip {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 .spacer { flex: 1; }
 
 /* 预设切换（占位，R7 启用） */
