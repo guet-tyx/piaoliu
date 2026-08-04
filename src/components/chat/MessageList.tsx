@@ -9,6 +9,7 @@ import { TRACKS } from "@/data/tracks";
 import { stickerOf, stickerSrc, type Sticker } from "@/data/stickers";
 import { useChatStore } from "@/stores/chat";
 import { useTtsStore } from "@/stores/tts";
+import { useGreeting } from "@/hooks/useGreeting";
 import { MessageActions } from "@/components/chat/MessageActions";
 import { MessageEditInput } from "@/components/chat/MessageEditInput";
 import { PlaylistRecommendCard } from "@/components/chat/PlaylistRecommendCard";
@@ -60,7 +61,6 @@ function MusicChip({ name }: { name: string }) {
   );
 }
 
-/** R5 表情包贴纸：块级居中大图（黑色贴纸底，气泡内融合） */
 /** R5 表情包贴纸：块级居中大图（黑色贴纸底，气泡内融合）。
  * unoptimized：贴纸走原始路径 + 版本号（?v=），不经 next/image 优化器，
  * 避免优化器按 URL 缓存旧图（素材更新后强制拉新）。 */
@@ -196,14 +196,22 @@ function Skeleton() {
   );
 }
 
-/** 空状态（R1 §5.1）：立绘 + 问候语 + 签名 + 今日推荐入口 */
-function EmptyState({ persona, onPickToday }: { persona: ChatPersona; onPickToday: () => void }) {
+/** 空状态（R1 §5.1）：立绘 + 问候语 + 签名 + 今日推荐入口（问候语按时段/频道/久别重逢变化，PRD 需求⑤） */
+function EmptyState({
+  persona,
+  greeting,
+  onPickToday,
+}: {
+  persona: ChatPersona;
+  greeting: string;
+  onPickToday: () => void;
+}) {
   return (
     <div className={styles.empty}>
       <div className={styles.portrait}>
         <Image src={persona.image} alt={persona.name} fill sizes="280px" />
       </div>
-      <p className={styles.emptyGreet}>{persona.greeting}</p>
+      <p className={styles.emptyGreet}>{greeting}</p>
       <p className={styles.emptySign}>{persona.signature}</p>
       <button type="button" className={styles.todayBtn} onClick={onPickToday}>
         ♪ 今日推荐歌曲
@@ -393,6 +401,8 @@ export function MessageList({
   const ttsProgress = useTtsStore((s) => s.progress);
   const ttsDuration = useTtsStore((s) => s.duration);
   const persona = personaOf(roleId);
+  /** 开场白（PRD 需求⑤）：空态问候语，每次打开页面只算一次 */
+  const greeting = useGreeting(roleId);
   const editMessage = useChatStore((s) => s.editMessage);
   const deleteMessage = useChatStore((s) => s.deleteMessage);
   const retryMessage = useChatStore((s) => s.retryMessage);
@@ -531,7 +541,7 @@ export function MessageList({
 
           {loading && <Skeleton />}
 
-          {showEmpty && <EmptyState persona={persona} onPickToday={onPickToday} />}
+          {showEmpty && <EmptyState persona={persona} greeting={greeting} onPickToday={onPickToday} />}
 
           {!loading && !showEmpty && (
             <>
