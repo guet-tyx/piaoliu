@@ -4,6 +4,8 @@
  * 按角色 + 话题关键词匹配，兜底角色台词；台词人工维护（NFR-2 精神）。
  */
 
+import { pickRandom } from "@/lib/random";
+
 interface TopicRule {
   keys: string[];
   replies: string[];
@@ -172,8 +174,8 @@ export function localReply(roleId: string, text: string): string {
   if (!role) return LOCAL_REPLIES.sio.fallback[0];
   for (const topic of role.topics) {
     if (topic.keys.some((k) => text.includes(k))) {
-      return topic.replies[Math.floor(Math.random() * topic.replies.length)];
+      return pickRandom(topic.replies) ?? topic.replies[0];
     }
   }
-  return role.fallback[Math.floor(Math.random() * role.fallback.length)];
+  return pickRandom(role.fallback) ?? role.fallback[0];
 }

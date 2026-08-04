@@ -1,6 +1,7 @@
 import { getPeerId } from "./danmakuChannel";
 import { getSupabase } from "@/lib/supabase/client";
 import { isSupabaseReady } from "@/lib/supabase/anon";
+import { readStorage, writeStorage, STORAGE } from "@/lib/storage";
 import type { PresencePeer } from "./types";
 
 /**
@@ -10,26 +11,16 @@ import type { PresencePeer } from "./types";
  * - 真实模式：upsert_listener RPC 写 listeners 表 + 轮询 online_listeners 脱敏视图
  */
 
-const PRESENCE_KEY = "drift-presence";
 const HEARTBEAT_MS = 15_000;
 const STALE_MS = 60_000;
 const POLL_MS = 30_000;
 
 function readPeers(): PresencePeer[] {
-  try {
-    const raw = localStorage.getItem(PRESENCE_KEY);
-    return raw ? (JSON.parse(raw) as PresencePeer[]) : [];
-  } catch {
-    return [];
-  }
+  return readStorage<PresencePeer[]>(STORAGE.presence, []);
 }
 
 function writePeers(peers: PresencePeer[]) {
-  try {
-    localStorage.setItem(PRESENCE_KEY, JSON.stringify(peers));
-  } catch {
-    // 隐私模式等场景忽略写入失败
-  }
+  writeStorage(STORAGE.presence, peers);
 }
 
 /** 过滤 60s 内无心跳的离线者 */
@@ -139,7 +130,7 @@ export function subscribePresence(
     );
   };
   const onStorage = (e: StorageEvent) => {
-    if (e.key === PRESENCE_KEY) emit();
+    if (e.key === STORAGE.presence) emit();
   };
   window.addEventListener("storage", onStorage);
   emit();

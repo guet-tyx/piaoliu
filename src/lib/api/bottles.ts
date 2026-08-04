@@ -1,9 +1,19 @@
-"use client";
-
 import { getSupabase } from "@/lib/supabase/client";
 import { isSupabaseReady } from "@/lib/supabase/anon";
 import { isSafeText } from "./moderation";
 import { GUEST_ID, SYSTEM_ID } from "./sailor";
+import { readStorage, writeStorage, STORAGE } from "@/lib/storage";
+import { localDate } from "@/lib/time";
+import { pickRandom } from "@/lib/random";
+import {
+  BOTTLE_POOL_MAX,
+  BOTTLE_TEXT_MAX,
+  BOTTLE_TEXT_MIN,
+  LAUNCH_LIMIT,
+  PICK_LIMIT,
+  REPLIES_MAX,
+  REPORTS_MAX,
+} from "@/lib/bottle/limits";
 import type {
   Bottle,
   DailyLimits,
@@ -20,11 +30,6 @@ import type {
  * - 本地模拟：localStorage 模拟池（冷启动预热瓶 + 限额 + 回信），全流程本地可玩
  * 行为契约（限额/防重复拾取/回信可见性）与 archive/docs/ARCHITECTURE.md §5 一致。
  */
-
-const POOL_KEY = "drift-bottles-pool";
-const LIMITS_KEY = "drift-limits";
-const REPLIES_KEY = "drift-replies";
-const REPORTS_KEY = "drift-reports";
 
 /** 系统预热瓶（冷启动内容投放，署名「星海信使」；与 supabase/seed.sql 文案一致） */
 const SYSTEM_BOTTLES: Omit<Bottle, "id" | "createdAt" | "pickedBy" | "repliedAt" | "readAt" | "status">[] = [
@@ -78,32 +83,7 @@ const SYSTEM_BOTTLES: Omit<Bottle, "id" | "createdAt" | "pickedBy" | "repliedAt"
   },
 ];
 
-/* ---------- 本地模拟存储工具 ---------- */
-
-function readJson<T>(key: string, fallback: T): T {
-  try {
-    const raw = localStorage.getItem(key);
-    return raw ? (JSON.parse(raw) as T) : fallback;
-  } catch {
-    return fallback;
-  }
-}
-
-function writeJson(key: string, value: unknown) {
-  try {
-    localStorage.setItem(key, JSON.stringify(value));
-  } catch {
-    // 隐私模式等场景忽略写入失败
-  }
-}
-
-/** 本地日期（YYYY-MM-DD，按客户端时区；真实模式以服务端 Asia/Shanghai 为准） */
-function localDate(): string {
-  const d = new Date();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${d.getFullYear()}-${m}-${day}`;
-}
+/* ---------- 本地模拟存储（统一走 src/lib/storage.ts 工具） ---------- */
 
 function genId(): string {
   return typeof crypto !== "undefined" && "randomUUID" in crypto
@@ -112,7 +92,7 @@ function genId(): string {
 }
 
 export function readPool(): Bottle[] {
-  const pool = readJson<Bottle[]>(POOL_KEY, []);
+  const pool = readStorage<Bottle[]>(STORAGE.bottlesPool, []);
   if (pool.length > 0) return pool;
   // 首次：植入系统预热瓶
   const now = Date.now();
@@ -125,30 +105,31 @@ export function readPool(): Bottle[] {
     readAt: null,
     createdAt: now - i * 60_000, // 错峰投递时间
   }));
-  writeJson(POOL_KEY, seeded);
+  writeStorage(STORAGE.bottlesPool, seeded);
   return seeded;
 }
 
 function writePool(pool: Bottle[]) {
-  writeJson(POOL_KEY, pool);
+  // 存储上限：保留最近 N 艘（防 localStorage 无限增长；最旧的系统预热瓶可被裁剪）
+  writeStorage(
+    STORAGE.bottlesPool,
+    pool.length > BOTTLE_POOL_MAX ? pool.slice(-BOTTLE_POOL_MAX) : pool,
+  );
 }
 
 function readLimits(): DailyLimits {
   const today = localDate();
-  const l = readJson<DailyLimits>(LIMITS_KEY, { date: today, launched: 0, picked: 0 });
+  const l = readStorage<DailyLimits>(STORAGE.limits, { date: today, launched: 0, picked: 0 });
   return l.date === today ? l : { date: today, launched: 0, picked: 0 };
 }
 
 function writeLimits(l: DailyLimits) {
-  writeJson(LIMITS_KEY, l);
+  writeStorage(STORAGE.limits, l);
 }
 
 function readReplies(): Reply[] {
-  return readJson<Reply[]>(REPLIES_KEY, []);
+  return readStorage<Reply[]>(STORAGE.replies, []);
 }
-
-/** 本地拾瓶上限（投 1 / 拾 3） */
-const PICK_LIMIT = 3;
 
 /** 今日限额快照（UI 提示「今日可投 1 / 可拾 3」；真实模式由服务端 RPC 权威统计） */
 export async function getDailyLimits(): Promise<DailyLimits> {
@@ -173,13 +154,13 @@ export async function launchBottle(
   style?: string,
 ): Promise<LaunchResult> {
   const trimmed = text.trim();
-  if (trimmed.length < 10) return { ok: false, reason: "too-short" };
-  if (trimmed.length > 200) return { ok: false, reason: "too-long" };
+  if (trimmed.length < BOTTLE_TEXT_MIN) return { ok: false, reason: "too-short" };
+  if (trimmed.length > BOTTLE_TEXT_MAX) return { ok: false, reason: "too-long" };
   if (!isSafeText(trimmed).ok) return { ok: false, reason: "bad-word" };
 
   if (!isSupabaseReady()) {
     const limits = readLimits();
-    if (limits.launched >= 1) return { ok: false, reason: "limit" };
+    if (limits.launched >= LAUNCH_LIMIT) return { ok: false, reason: "limit" };
     const bottle: Bottle = {
       id: genId(),
       authorId: GUEST_ID,
@@ -224,7 +205,7 @@ export async function pickBottle(): Promise<PickResult> {
       (b) => b.status === "drifting" && b.authorId !== GUEST_ID,
     );
     if (candidates.length === 0) return { ok: false, reason: "empty" };
-    const picked = candidates[Math.floor(Math.random() * candidates.length)];
+    const picked = pickRandom(candidates) ?? candidates[0];
     picked.status = "picked";
     picked.pickedBy = GUEST_ID;
     writePool(pool);
@@ -243,8 +224,8 @@ export async function pickBottle(): Promise<PickResult> {
 /** 回信（FR-7）：仅拾瓶人可回；沿原航线靠岸，仅原投瓶人可见 */
 export async function replyBottle(bottleId: string, text: string): Promise<ReplyResult> {
   const trimmed = text.trim();
-  if (trimmed.length < 10) return { ok: false, reason: "too-short" };
-  if (trimmed.length > 200) return { ok: false, reason: "too-long" };
+  if (trimmed.length < BOTTLE_TEXT_MIN) return { ok: false, reason: "too-short" };
+  if (trimmed.length > BOTTLE_TEXT_MAX) return { ok: false, reason: "too-long" };
   if (!isSafeText(trimmed).ok) return { ok: false, reason: "bad-word" };
 
   if (!isSupabaseReady()) {
@@ -261,7 +242,8 @@ export async function replyBottle(bottleId: string, text: string): Promise<Reply
     };
     const replies = readReplies();
     replies.push(reply);
-    writeJson(REPLIES_KEY, replies);
+    // 存储上限：保留最近 N 封回信
+    writeStorage(STORAGE.replies, replies.length > REPLIES_MAX ? replies.slice(-REPLIES_MAX) : replies);
     bottle.status = "replied";
     bottle.repliedAt = Date.now();
     writePool(pool);
@@ -321,11 +303,15 @@ export async function reportBottle(
   targetType: "bottle" | "reply" = "bottle",
 ): Promise<boolean> {
   if (!isSupabaseReady()) {
-    const reports = readJson<
+    const reports = readStorage<
       { id: string; targetType: string; targetId: string; reason: string; at: number }[]
-    >(REPORTS_KEY, []);
+    >(STORAGE.reports, []);
     reports.push({ id: genId(), targetType, targetId, reason, at: Date.now() });
-    writeJson(REPORTS_KEY, reports);
+    // 存储上限：保留最近 N 条举报记录
+    writeStorage(
+      STORAGE.reports,
+      reports.length > REPORTS_MAX ? reports.slice(-REPORTS_MAX) : reports,
+    );
     return true;
   }
   const sb = getSupabase();

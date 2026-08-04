@@ -5,6 +5,8 @@
  * 选择优先级：久别重逢 > 频道联动 > 时段 > 默认；避开最近 2 次用过的句子。
  */
 
+import { pickRandom } from "@/lib/random";
+
 export type GreetingCategory = "default" | "night" | "morning" | "day" | "evening";
 
 export interface GreetingPool {
@@ -140,9 +142,9 @@ export interface PickedGreeting {
 /** 从某类别台词池随机取一条（避开最近用过的 key；全被排除时允许重复） */
 function pickFrom(lines: string[], category: string, roleId: string, excludeKeys: string[]): PickedGreeting {
   const all = lines.map((text, i) => ({ text, key: `${roleId}:${category}:${i}` }));
-  const candidates = all.filter((x) => !excludeKeys.includes(x.key));
-  const src = candidates.length > 0 ? candidates : all;
-  return src[Math.floor(Math.random() * src.length)];
+  const picked = pickRandom(all, { keyOf: (x) => x.key, exclude: excludeKeys });
+  // 池为空时兜底首条（实际池恒非空，此处仅防数据漂移）
+  return picked ?? all[0];
 }
 
 /**

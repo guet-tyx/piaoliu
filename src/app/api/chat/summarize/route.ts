@@ -3,8 +3,8 @@ import { activeProviders } from "@/lib/llm/providers";
 import { buildSchedule, isCooled, markCooled } from "@/lib/llm/scheduler";
 import { callChatCompletionOnce } from "@/lib/llm/upstream";
 import { formatSummaryChunk } from "@/lib/chat/summarize";
-import { MAX_TEXT } from "@/lib/chat/limits";
-import type { ChatMessage } from "@/types/chat";
+import { MAX_API_MESSAGES, MAX_TEXT } from "@/lib/chat/limits";
+import type { SummarizeApiRequest } from "@/types/api";
 
 /**
  * 对话自动总结（Summarize，2026-08-04）：
@@ -36,19 +36,27 @@ export async function POST(req: Request) {
     return Response.json({ error: "no-key" }, { status: 503 });
   }
 
-  let body: { roleId?: string; messages?: ChatMessage[] } | null = null;
+  let body: SummarizeApiRequest | null = null;
   try {
     body = await req.json();
   } catch {
     return Response.json({ error: "bad-request" }, { status: 400 });
   }
-  const { roleId, messages } = body ?? {};
+  if (!body) return Response.json({ error: "bad-request" }, { status: 400 });
+  const { roleId, messages } = body;
   if (!roleId || !Array.isArray(messages) || messages.length === 0) {
+    return Response.json({ error: "bad-request" }, { status: 400 });
+  }
+  if (messages.length > MAX_API_MESSAGES) {
     return Response.json({ error: "bad-request" }, { status: 400 });
   }
   for (const m of messages) {
     if (typeof m?.text !== "string" || m.text.length > MAX_TEXT) {
       return Response.json({ error: "too-long" }, { status: 400 });
+    }
+    // role 白名单校验：与主聊天路由一致，拒绝伪造 system 等角色
+    if (m.role !== "user" && m.role !== "assistant") {
+      return Response.json({ error: "bad-request" }, { status: 400 });
     }
     if (!isSafeText(m.text).ok) {
       return Response.json({ error: "bad-word" }, { status: 400 });
@@ -66,27 +74,32 @@ export async function POST(req: Request) {
     { role: "user", content: chunkText },
   ];
 
-  const schedule = await buildSchedule(providers);
-  let lastErr = "";
-  for (const { provider, model } of schedule) {
-    const coolKey = `${provider.id}::${model}`;
-    if (isCooled(coolKey)) continue;
-    const result = await callChatCompletionOnce(provider, model, openaiMessages, {
-      maxTokens: 300,
-    });
-    if (!result.ok) {
-      lastErr = result.detail;
-      markCooled(coolKey);
-      continue;
+  try {
+    const schedule = await buildSchedule(providers);
+    let lastErr = "";
+    for (const { provider, model } of schedule) {
+      const coolKey = `${provider.id}::${model}`;
+      if (isCooled(coolKey)) continue;
+      const result = await callChatCompletionOnce(provider, model, openaiMessages, {
+        maxTokens: 300,
+      });
+      if (!result.ok) {
+        lastErr = result.detail;
+        markCooled(coolKey);
+        continue;
+      }
+      const trimmed = result.content.trim();
+      // 「无」= 无可提取信息，归一为空串
+      const summary = trimmed === "无" ? "" : trimmed;
+      return Response.json({ ok: true, summary }, { status: 200 });
     }
-    const trimmed = result.content.trim();
-    // 「无」= 无可提取信息，归一为空串
-    const summary = trimmed === "无" ? "" : trimmed;
-    return Response.json({ ok: true, summary }, { status: 200 });
-  }
 
-  return Response.json(
-    { error: "all-models-failed", detail: lastErr, tried: schedule.length },
-    { status: 503 },
-  );
+    return Response.json(
+      { error: "all-models-failed", detail: lastErr, tried: schedule.length },
+      { status: 503 },
+    );
+  } catch {
+    // 调度/上游未预期异常：统一 500 JSON
+    return Response.json({ error: "internal" }, { status: 500 });
+  }
 }

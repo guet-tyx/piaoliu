@@ -7,6 +7,8 @@
  * 全部人工维护文案（NFR-2：禁止生成式发言）。
  */
 
+import { pickRandom } from "@/lib/random";
+
 export type HostTrigger = "enter" | "per3" | "idle";
 
 /** 主持人台词（按角色分组，每时机一个台词池） */
@@ -107,6 +109,5 @@ export function hostLinesOf(channelId: string): HostLines | undefined {
 
 /** 从台词池随机取一条（稳定的运行期随机） */
 export function pickLine(lines: string[]): string {
-  if (lines.length === 0) return "";
-  return lines[Math.floor(Math.random() * lines.length)];
+  return pickRandom(lines) ?? "";
 }

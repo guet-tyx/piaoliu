@@ -2,7 +2,8 @@
 
 import { useEffect, useRef } from "react";
 import type { Track } from "@/types/music";
-import { usePlayerStore, type PlayMode } from "@/stores/player";
+import { usePlayerStore } from "@/stores/player";
+import { restorePlayerState, bindPlayerPersistence } from "@/lib/player/persist";
 
 /**
  * useAudioPlayer：连接 Zustand 播放器状态与原生 <audio> 的桥梁。
@@ -13,7 +14,7 @@ import { usePlayerStore, type PlayMode } from "@/stores/player";
  * - timeupdate / loadedmetadata → 回写进度到 store
  * - ended → 按播放模式分派（FR-3）：loop 本曲重播 / shuffle·order 走 store.next()
  * - error → 切换下一个音频源，全部失败则置 failed
- * - 持久化：drift-player-state（v2：曲目/播放态/音量/静音/模式/弹幕开关）+ drift-favorites
+ * - 持久化（drift-player-state + 曲目/歌单收藏）已拆至 lib/player/persist.ts
  * 所有事件监听在 cleanup 中移除（pause + 全量 removeEventListener + unsubscribe），
  * StrictMode 双挂载下也安全，避免内存泄漏。
  */
@@ -138,144 +139,9 @@ export function useAudioPlayer() {
   }, [volume, muted]);
 
   // 播放状态持久化：挂载后恢复（不自动播放），变更时写回 localStorage
+  // （V2.7 拆至 lib/player/persist.ts；聊天页由 usePlayerPersistence 挂载，刷新后频道上下文保持）
   useEffect(() => {
-    const KEY = "drift-player-state";
-    const FAV_KEY = "drift-favorites";
-    const PLAY_MODES: PlayMode[] = ["order", "loop", "shuffle"];
-    try {
-      const raw = localStorage.getItem(KEY);
-      if (raw) {
-        const saved = JSON.parse(raw) as {
-          currentIndex?: unknown;
-          volume?: unknown;
-          muted?: unknown;
-          playMode?: unknown;
-          danmakuOn?: unknown;
-          hostBubbleOn?: unknown;
-          hostVoiceOn?: unknown;
-        };
-        const { tracks: list } = usePlayerStore.getState();
-        const patch: {
-          currentIndex?: number;
-          volume?: number;
-          muted?: boolean;
-          playMode?: PlayMode;
-          danmakuOn?: boolean;
-          hostBubbleOn?: boolean;
-          hostVoiceOn?: boolean;
-        } = {};
-        if (
-          typeof saved.currentIndex === "number" &&
-          saved.currentIndex >= 0 &&
-          saved.currentIndex < list.length
-        ) {
-          patch.currentIndex = saved.currentIndex;
-        }
-        if (
-          typeof saved.volume === "number" &&
-          saved.volume >= 0 &&
-          saved.volume <= 1
-        ) {
-          patch.volume = saved.volume;
-        }
-        if (typeof saved.muted === "boolean") patch.muted = saved.muted;
-        if (
-          typeof saved.playMode === "string" &&
-          PLAY_MODES.includes(saved.playMode as PlayMode)
-        ) {
-          patch.playMode = saved.playMode as PlayMode;
-        }
-        if (typeof saved.danmakuOn === "boolean") patch.danmakuOn = saved.danmakuOn;
-        if (typeof saved.hostBubbleOn === "boolean") patch.hostBubbleOn = saved.hostBubbleOn;
-        if (typeof saved.hostVoiceOn === "boolean") patch.hostVoiceOn = saved.hostVoiceOn;
-        // 只恢复 UI 状态；isPlaying 强制 false，避免浏览器拦截自动播放
-        usePlayerStore.setState({ ...patch, isPlaying: false });
-      }
-    } catch {
-      // 损坏数据忽略
-    }
-    try {
-      const favRaw = localStorage.getItem(FAV_KEY);
-      if (favRaw) {
-        const fav: unknown = JSON.parse(favRaw);
-        if (Array.isArray(fav)) {
-          usePlayerStore.setState({
-            likedIds: fav.filter((x): x is string => typeof x === "string"),
-          });
-        }
-      }
-    } catch {
-      // 损坏数据忽略
-    }
-    // P1-03：歌单收藏独立 key（与曲目收藏并存）
-    try {
-      const plFavRaw = localStorage.getItem("drift-fav-playlists");
-      if (plFavRaw) {
-        const fav: unknown = JSON.parse(plFavRaw);
-        if (Array.isArray(fav)) {
-          usePlayerStore.setState({
-            likedPlaylistIds: fav.filter((x): x is string => typeof x === "string"),
-          });
-        }
-      }
-    } catch {
-      // 损坏数据忽略
-    }
-    const unsubscribe = usePlayerStore.subscribe((state, prev) => {
-      // 仅持久化字段变化时写入（避免 setProgress 高频触发）
-      if (
-        state.currentIndex === prev.currentIndex &&
-        state.isPlaying === prev.isPlaying &&
-        state.volume === prev.volume &&
-        state.muted === prev.muted &&
-        state.playMode === prev.playMode &&
-        state.danmakuOn === prev.danmakuOn &&
-        state.hostBubbleOn === prev.hostBubbleOn &&
-        state.hostVoiceOn === prev.hostVoiceOn
-      ) {
-        return;
-      }
-      try {
-        localStorage.setItem(
-          KEY,
-          JSON.stringify({
-            currentIndex: state.currentIndex,
-            isPlaying: state.isPlaying,
-            volume: state.volume,
-            muted: state.muted,
-            playMode: state.playMode,
-            danmakuOn: state.danmakuOn,
-            hostBubbleOn: state.hostBubbleOn,
-            hostVoiceOn: state.hostVoiceOn,
-          }),
-        );
-      } catch {
-        // 隐私模式等场景忽略写入失败
-      }
-    });
-    const unsubscribeFav = usePlayerStore.subscribe((state, prev) => {
-      if (state.likedIds === prev.likedIds) return;
-      try {
-        localStorage.setItem(FAV_KEY, JSON.stringify(state.likedIds));
-      } catch {
-        // 隐私模式等场景忽略写入失败
-      }
-    });
-    const unsubscribePlFav = usePlayerStore.subscribe((state, prev) => {
-      if (state.likedPlaylistIds === prev.likedPlaylistIds) return;
-      try {
-        localStorage.setItem(
-          "drift-fav-playlists",
-          JSON.stringify(state.likedPlaylistIds),
-        );
-      } catch {
-        // 隐私模式等场景忽略写入失败
-      }
-    });
-    return () => {
-      unsubscribe();
-      unsubscribeFav();
-      unsubscribePlFav();
-    };
+    restorePlayerState();
+    return bindPlayerPersistence();
   }, []);
 }

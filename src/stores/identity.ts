@@ -15,8 +15,11 @@ import {
 import { ensureAnonSession, isSupabaseReady } from "@/lib/supabase/anon";
 import { getSupabase } from "@/lib/supabase/client";
 import { useDanmakuStore } from "@/stores/danmaku";
+import { readStorage, writeStorage, STORAGE } from "@/lib/storage";
+import { pickRandom } from "@/lib/random";
 import { SKINS, titleOf } from "@/data/collection";
 import {
+  BOND_MILESTONE_KINDS,
   SHIO_RESPONSES,
   type ShioLine,
   type ShioResponseKind,
@@ -33,42 +36,22 @@ interface ResponseRecord {
   at: number;
 }
 
-const RESPONSES_KEY = "drift-responses-recent";
-
-function readResponses(): ResponseRecord[] {
-  try {
-    const raw = localStorage.getItem(RESPONSES_KEY);
-    return raw ? (JSON.parse(raw) as ResponseRecord[]) : [];
-  } catch {
-    return [];
-  }
-}
-
-function writeResponses(records: ResponseRecord[]) {
-  try {
-    localStorage.setItem(RESPONSES_KEY, JSON.stringify(records));
-  } catch {
-    // 隐私模式等场景忽略写入失败
-  }
-}
-
 /** 选取行为回应台词（同类 7 天不重复；池耗尽时兜底随机） */
 function pickResponse(kind: ShioResponseKind): ShioLine {
-  const records = readResponses();
+  const records = readStorage<ResponseRecord[]>(STORAGE.responsesRecent, []);
   const cutoff = Date.now() - 7 * 24 * 3600 * 1000;
   const used = new Set(
     records.filter((r) => r.kind === kind && r.at > cutoff).map((r) => r.lineId),
   );
   const pool = SHIO_RESPONSES[kind].filter((l) => !used.has(l.id));
-  const line = (pool.length > 0 ? pool : SHIO_RESPONSES[kind])[
-    Math.floor(Math.random() * pool.length)
-  ];
+  // 池耗尽时回退整池首句（保持原语义：同类 7 天不重复是尽力而为）
+  const line = pickRandom(pool) ?? SHIO_RESPONSES[kind][0];
   records.push({ kind, lineId: line.id, at: Date.now() });
   // 每类保留最近 14 条，防无限增长
   const trimmed = records
     .filter((r) => r.kind === kind)
     .slice(-14);
-  writeResponses([
+  writeStorage(STORAGE.responsesRecent, [
     ...records.filter((r) => r.kind !== kind),
     ...trimmed,
   ]);
@@ -159,11 +142,7 @@ export const useIdentityStore = create<IdentityState>()((set, get) => ({
     if (!skin || sailor.level < skin.unlockLevel) return false;
     sailor.bottleStyle = skinId;
     // 本地模拟直接持久化（真实模式由 RPC 同步）
-    try {
-      localStorage.setItem("drift-sailor", JSON.stringify(sailor));
-    } catch {
-      // 忽略
-    }
+    writeStorage(STORAGE.sailor, sailor);
     set({ sailor: { ...sailor } });
     return true;
   },
@@ -174,9 +153,10 @@ export const useIdentityStore = create<IdentityState>()((set, get) => ({
     if (sailor) {
       set({ sailor, title: titleOf(sailor.level) });
       // 羁绊里程碑（V2.0）：跨过 10/20/30 触发汐专属回应（7 天去重复用现有机制）
-      for (const milestone of [10, 20, 30]) {
+      for (const kind of BOND_MILESTONE_KINDS) {
+        const milestone = Number(kind.split("-")[1]);
         if (prev < milestone && sailor.bondValue >= milestone) {
-          get().respond(`bond-${milestone}` as ShioResponseKind);
+          get().respond(kind);
         }
       }
     }
@@ -197,11 +177,7 @@ export const useIdentityStore = create<IdentityState>()((set, get) => ({
     const fresh = checkBadges(stats, sailor.badges);
     if (fresh.length > 0) {
       sailor.badges = [...sailor.badges, ...fresh];
-      try {
-        localStorage.setItem("drift-sailor", JSON.stringify(sailor));
-      } catch {
-        // 忽略
-      }
+      writeStorage(STORAGE.sailor, sailor);
       set({ sailor: { ...sailor } });
     }
   },
@@ -231,11 +207,7 @@ export const useIdentityStore = create<IdentityState>()((set, get) => ({
     const fresh = checkBadges(stats, sailor.badges);
     if (fresh.length > 0) {
       sailor.badges = [...sailor.badges, ...fresh];
-      try {
-        localStorage.setItem("drift-sailor", JSON.stringify(sailor));
-      } catch {
-        // 忽略
-      }
+      writeStorage(STORAGE.sailor, sailor);
       set({ sailor: { ...sailor } });
     }
   },

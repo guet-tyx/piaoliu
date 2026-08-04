@@ -2,6 +2,7 @@ import { personaOf } from "@/data/chat-personas";
 import { isSafeText } from "@/lib/api/moderation";
 import { mimoConfigured, synthesizeSpeech } from "@/lib/tts/mimo";
 import { MAX_TTS_TEXT } from "@/lib/chat/limits";
+import type { TtsApiRequest } from "@/types/api";
 
 /**
  * TTS 语音合成代理（2026-08-04）：
@@ -20,13 +21,14 @@ export async function POST(req: Request) {
     return Response.json({ error: "no-key" }, { status: 503 });
   }
 
-  let body: { roleId?: string; text?: string; probe?: boolean } | null = null;
+  let body: TtsApiRequest | null = null;
   try {
     body = await req.json();
   } catch {
     return Response.json({ error: "bad-request" }, { status: 400 });
   }
-  const { roleId, text, probe } = body ?? {};
+  if (!body) return Response.json({ error: "bad-request" }, { status: 400 });
+  const { roleId, text, probe } = body;
 
   if (probe === true) {
     return Response.json({ ok: true }, { status: 200 });
@@ -44,18 +46,23 @@ export async function POST(req: Request) {
   // 音色按角色绑定（personaOf 未知角色兜底汐，与聊天行为一致）；MiMo 用自然语言指令控制音色
   const voicePrompt = personaOf(roleId).voicePrompt;
 
-  const result = await synthesizeSpeech({ text, voicePrompt });
-  if (!result.ok) {
-    if (result.detail === "no-key") {
-      return Response.json({ error: "no-key" }, { status: 503 });
+  try {
+    const result = await synthesizeSpeech({ text, voicePrompt });
+    if (!result.ok) {
+      if (result.detail === "no-key") {
+        return Response.json({ error: "no-key" }, { status: 503 });
+      }
+      return Response.json({ error: "tts-failed", detail: result.detail }, { status: 502 });
     }
-    return Response.json({ error: "tts-failed", detail: result.detail }, { status: 502 });
-  }
 
-  return new Response(result.audio, {
-    headers: {
-      "Content-Type": result.mime,
-      "Cache-Control": "public, max-age=86400",
-    },
-  });
+    return new Response(result.audio, {
+      headers: {
+        "Content-Type": result.mime,
+        "Cache-Control": "public, max-age=86400",
+      },
+    });
+  } catch {
+    // 未预期异常：统一 500 JSON（避免裸抛 → 非 JSON 500）
+    return Response.json({ error: "internal" }, { status: 500 });
+  }
 }

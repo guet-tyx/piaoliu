@@ -133,6 +133,9 @@ export type ShioResponseKind =
   | "bond-20"
   | "bond-30";
 
+/** 羁绊里程碑 kind（跨过阈值触发汐专属回应；与 SHIO_RESPONSES 键集合对齐，消除 identity.ts 硬编码） */
+export const BOND_MILESTONE_KINDS = ["bond-10", "bond-20", "bond-30"] as const satisfies readonly ShioResponseKind[];
+
 export const SHIO_RESPONSES: Record<ShioResponseKind, ShioLine[]> = {
   listen3: [
     { id: "r-l1", text: "三首歌连成一条航线了。你今晚想漂远一点吗？" },

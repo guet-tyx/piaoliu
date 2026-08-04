@@ -4,6 +4,10 @@
 export const MAX_HISTORY = 12;
 /** 单条用户文本长度上限 */
 export const MAX_TEXT = 200;
+/** 聊天消息 localStorage 存储上限（防无限增长；远超当前用量，裁剪最旧消息） */
+export const MAX_STORED_MESSAGES = 300;
+/** 单次 /api/chat 请求体消息条数上限（防异常大包；正常客户端只发最近 MAX_HISTORY 条） */
+export const MAX_API_MESSAGES = 200;
 /** 对话自动总结：首次触发所需总消息数（约 10 轮） */
 export const MIN_SUMMARY_MSGS = 20;
 /** 对话自动总结：每次提取的消息块大小 */

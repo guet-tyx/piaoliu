@@ -1,4 +1,5 @@
 import type { Track } from "@/types/music";
+import { pickRandom } from "@/lib/random";
 
 /**
  * 私人 FM 推荐引擎（P2-03，MVP 纯函数）
@@ -25,11 +26,10 @@ function pickWeighted(candidates: Track[], lastLikedTag?: string): Track | null 
   if (candidates.length === 0) return null;
   if (lastLikedTag) {
     const same = candidates.filter((t) => t.tag === lastLikedTag);
-    if (same.length > 0) {
-      return same[Math.floor(Math.random() * same.length)];
-    }
+    const hit = pickRandom(same);
+    if (hit) return hit;
   }
-  return candidates[Math.floor(Math.random() * candidates.length)];
+  return pickRandom(candidates);
 }
 
 /** 推荐一首：返回推荐曲目，并给出更新后的状态（含 recommendedIds 累加） */
@@ -57,22 +57,19 @@ export function recommendNext(state: FmState, allTracks: Track[]): {
     const byLikeTag = allTracks.filter(
       (t) => likedTags.has(t.tag) && !recommendedSet.has(t.id),
     );
-    track = byLikeTag.length > 0
-      ? byLikeTag[Math.floor(Math.random() * byLikeTag.length)]
-      : null;
+    track = pickRandom(byLikeTag);
   }
 
   // 3. 未推荐过的任意曲目（兜底）
   if (!track) {
     const remaining = allTracks.filter((t) => !recommendedSet.has(t.id));
-    track = remaining.length > 0
-      ? remaining[Math.floor(Math.random() * remaining.length)]
-      : null;
+    track = pickRandom(remaining);
   }
 
   // 4. 全部推荐过一轮 → 允许从全曲库随机（清空 recommended 重置语义由调用方决定）
   if (!track) {
-    track = allTracks[Math.floor(Math.random() * allTracks.length)];
+    // 顶部已保证 allTracks 非空，pickRandom 不会为 null
+    track = pickRandom(allTracks) ?? allTracks[0];
   }
 
   const id = track.id;

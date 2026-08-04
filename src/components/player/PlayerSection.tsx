@@ -11,6 +11,7 @@ import { useDanmakuStore } from "@/stores/danmaku";
 import { publishDanmaku } from "@/lib/realtime/danmakuChannel";
 import { avatarColor } from "@/lib/realtime/types";
 import { isSafeText } from "@/lib/api/moderation";
+import { formatDuration } from "@/data/music-utils";
 import { SectionHead } from "@/components/shared/SectionHead";
 import { Reveal } from "@/components/shared/Reveal";
 import { CHANNELS } from "@/data/channels";
@@ -41,11 +42,6 @@ const EQ_BARS = Array.from({ length: 32 }, (_, i) => ({
   h: 22 + ((i * 37) % 67),
   d: -(((i * 97) % 110) / 100),
 }));
-
-function formatTime(s: number): string {
-  const t = Math.floor(s || 0);
-  return `${Math.floor(t / 60)}:${String(t % 60).padStart(2, "0")}`;
-}
 
 /** 音量/静音图标（内联 SVG，与按钮文字风格统一） */
 function VolIcon({ muted }: { muted: boolean }) {
@@ -251,8 +247,8 @@ export function PlayerSection() {
               onChange={(e) => seekTo(Number(e.target.value))}
             />
             <div className={styles.timeRow}>
-              <span>{formatTime(currentTime)}</span>
-              <span>{duration > 0 ? formatTime(duration) : "--:--"}</span>
+              <span>{formatDuration(currentTime)}</span>
+              <span>{duration > 0 ? formatDuration(duration) : "--:--"}</span>
             </div>
 
             <div className={styles.nowCtrl}>

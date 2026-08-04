@@ -22,9 +22,3 @@ export interface ChatSummary {
   text: string;
   covered: number;
 }
-
-/** 一次完整的会话上下文（Route Handler 入参） */
-export interface ChatRequest {
-  roleId: string;
-  messages: ChatMessage[];
-}

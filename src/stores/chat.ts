@@ -2,109 +2,36 @@
 
 import { create } from "zustand";
 import type { ChatMessage, ChatStatus, ChatSummary } from "@/types/chat";
+import type { ChatApiError, SummarizeApiResponse } from "@/types/api";
 import { isSafeText } from "@/lib/api/moderation";
 import { localReply } from "@/lib/chat/local";
-import { MAX_HISTORY, MAX_TEXT } from "@/lib/chat/limits";
+import { consumeSSE } from "@/lib/chat/sse";
+import { sleep, typewriter, THINK_DELAY_BASE, THINK_DELAY_JITTER } from "@/lib/chat/typing";
+import { fetchWithTimeout } from "@/lib/net/fetchWithTimeout";
+import { MAX_HISTORY, MAX_STORED_MESSAGES, MAX_TEXT } from "@/lib/chat/limits";
 import { nextSummaryChunk, formatSummaryChunk } from "@/lib/chat/summarize";
 import { splitStickerMessages, stickerToModelText } from "@/lib/chat/split";
+import { chatKey, chatSummaryKey, readStorage, writeStorage } from "@/lib/storage";
 import { stickerOf } from "@/data/stickers";
-
-/** localStorage 键：每角色独立会话（消息 + 对话总结摘要分 key 存储） */
-const CHAT_KEY_PREFIX = "drift-chat";
-const SUMMARY_KEY_PREFIX = "drift-chat-summary";
 
 /** 无摘要的初始态（只读共享引用，更新时总是创建新对象） */
 const EMPTY_SUMMARY: ChatSummary = { text: "", covered: 0 };
+
+/** 摘要记录字段校验（缺任一字段视为损坏，回退无摘要，PRD 异常处理） */
+const isChatSummary = (v: unknown): boolean => {
+  const s = v as Partial<ChatSummary>;
+  return typeof s?.text === "string" && typeof s?.covered === "number";
+};
 
 function genId(): string {
   // 运行期 action 内随机（非渲染期，SSR 安全）
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 }
-function chatKey(roleId: string): string {
-  return `${CHAT_KEY_PREFIX}-${roleId}`;
-}
-function summaryKey(roleId: string): string {
-  return `${SUMMARY_KEY_PREFIX}-${roleId}`;
-}
-function readLocal(roleId: string): ChatMessage[] {
-  try {
-    const raw = localStorage.getItem(chatKey(roleId));
-    return raw ? (JSON.parse(raw) as ChatMessage[]) : [];
-  } catch {
-    return [];
-  }
-}
-function writeLocal(roleId: string, msgs: ChatMessage[]) {
-  try {
-    localStorage.setItem(chatKey(roleId), JSON.stringify(msgs));
-  } catch {
-    // 隐私模式等忽略写入失败
-  }
-}
-/** 读摘要记录；数据损坏/缺字段时静默忽略，等价于无摘要（PRD 异常处理） */
-function readSummaryLocal(roleId: string): ChatSummary {
-  try {
-    const raw = localStorage.getItem(summaryKey(roleId));
-    if (!raw) return EMPTY_SUMMARY;
-    const parsed = JSON.parse(raw) as Partial<ChatSummary>;
-    if (typeof parsed?.text !== "string" || typeof parsed?.covered !== "number") {
-      return EMPTY_SUMMARY;
-    }
-    return { text: parsed.text, covered: parsed.covered };
-  } catch {
-    return EMPTY_SUMMARY;
-  }
-}
-function writeSummaryLocal(roleId: string, summary: ChatSummary) {
-  try {
-    localStorage.setItem(summaryKey(roleId), JSON.stringify(summary));
-  } catch {
-    // 隐私模式等忽略写入失败
-  }
-}
 
-/**
- * 解析 OpenAI 兼容 SSE（data: {json} / data: [DONE]），逐 delta 回调。
- * 返回累计完整文本。
- */
-async function consumeSSE(
-  res: Response,
-  onDelta: (text: string) => void,
-): Promise<string> {
-  const reader = res.body?.getReader();
-  if (!reader) return "";
-  const decoder = new TextDecoder();
-  let buffer = "";
-  let full = "";
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    buffer += decoder.decode(value, { stream: true });
-    const parts = buffer.split("\n\n");
-    buffer = parts.pop() ?? "";
-    for (const part of parts) {
-      for (const line of part.split("\n")) {
-        const m = line.match(/^data:\s*(.*)$/);
-        if (!m) continue;
-        const payload = m[1].trim();
-        if (!payload || payload === "[DONE]") continue;
-        try {
-          const json = JSON.parse(payload);
-          const delta = json?.choices?.[0]?.delta?.content ?? "";
-          if (delta) {
-            full += delta;
-            onDelta(delta);
-          }
-        } catch {
-          // 忽略不完整片段
-        }
-      }
-    }
-  }
-  return full;
-}
-
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+/** SSE 停顿看门狗：超过该毫秒无新 delta 视为上游卡死 → abort，以部分文本收尾 */
+const SSE_STALL_MS = 30_000;
+/** 单次上游请求首字节超时（SSE 流建立后的停顿由上方看门狗负责） */
+const FETCH_TIMEOUT_MS = 30_000;
 
 /**
  * 角色 AI 聊天（V2.3 基础设施，V2.4 全屏聊天页使用）：
@@ -151,16 +78,21 @@ let apiReadyCache: boolean | null = null;
 /** 对话自动总结防并发：每个角色同时只允许一个 in-flight 提取请求（fire-and-forget） */
 const summarizingRoles = new Set<string>();
 
+/** AI 回合防重入：每个角色同时只允许一个进行中的回合（UI busy 双保险） */
+const busyRoles = new Set<string>();
+
 export const useChatStore = create<ChatState>()((set, get) => {
   /** 更新某角色消息列表并持久化 */
   const commitMessages = (roleId: string, msgs: ChatMessage[]) => {
-    set((s) => ({ messages: { ...s.messages, [roleId]: msgs } }));
-    writeLocal(roleId, msgs);
+    // 存储上限：只保留最近 MAX_STORED_MESSAGES 条（最旧的通常已被摘要覆盖，PRD 异常处理）
+    const capped = msgs.length > MAX_STORED_MESSAGES ? msgs.slice(-MAX_STORED_MESSAGES) : msgs;
+    set((s) => ({ messages: { ...s.messages, [roleId]: capped } }));
+    writeStorage(chatKey(roleId), capped);
   };
   /** 更新某角色摘要并持久化 */
   const commitSummary = (roleId: string, summary: ChatSummary) => {
     set((s) => ({ summaries: { ...s.summaries, [roleId]: summary } }));
-    writeSummaryLocal(roleId, summary);
+    writeStorage(chatSummaryKey(roleId), summary);
   };
 
   /**
@@ -185,13 +117,16 @@ export const useChatStore = create<ChatState>()((set, get) => {
         commitSummary(roleId, advanced);
         return;
       }
-      const res = await fetch("/api/chat/summarize", {
+      const res = await fetchWithTimeout("/api/chat/summarize", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ roleId, messages: block }),
       });
       if (!res.ok) return; // 失败不推进，静默等下次
-      const data = (await res.json().catch(() => null)) as { summary?: string } | null;
+      const data = (await res.json().catch(() => null)) as SummarizeApiResponse | null;
+      // 竞态守卫：提取期间对话被编辑/清空/再总结过（covered 已推进）则放弃本次提交
+      const current = get().summaries[roleId] ?? EMPTY_SUMMARY;
+      if (current.covered !== summary.covered) return;
       const gained = data?.summary?.trim() ?? "";
       const text = gained ? (summary.text ? `${summary.text}\n${gained}` : gained) : summary.text;
       commitSummary(roleId, { text, covered: chunk.end });
@@ -264,14 +199,20 @@ export const useChatStore = create<ChatState>()((set, get) => {
       messages: modelContext.slice(-MAX_HISTORY),
       ...(summaryText ? { summary: summaryText } : {}),
     };
-    const res = await fetch("/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
+    const controller = new AbortController();
+    const res = await fetchWithTimeout(
+      "/api/chat",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+        signal: controller.signal,
+      },
+      FETCH_TIMEOUT_MS,
+    );
     if (res.status === 503) {
       // no-key / 全部模型失败：记忆并降级
-      const data = (await res.json().catch(() => null)) as { error?: string } | null;
+      const data = (await res.json().catch(() => null)) as ChatApiError | null;
       if (data?.error === "no-key") apiReadyCache = false;
       return false;
     }
@@ -282,16 +223,32 @@ export const useChatStore = create<ChatState>()((set, get) => {
     appendDraft(roleId, msgId, draftIndex);
     set((s) => ({ status: { ...s.status, [roleId]: "streaming" } }));
 
-    const full = await consumeSSE(res, (delta) => {
-      set((s) => ({
-        messages: {
-          ...s.messages,
-          [roleId]: (s.messages[roleId] ?? []).map((m) =>
-            m.id === msgId ? { ...m, text: m.text + delta } : m,
-          ),
-        },
-      }));
-    });
+    // 停顿看门狗：超过 SSE_STALL_MS 无新 delta → abort，以部分文本收尾
+    let stallTimer: ReturnType<typeof setTimeout> | null = null;
+    const resetStall = () => {
+      if (stallTimer) clearTimeout(stallTimer);
+      stallTimer = setTimeout(() => controller.abort(), SSE_STALL_MS);
+    };
+    resetStall();
+    let full = "";
+    try {
+      full = await consumeSSE(res, (delta) => {
+        resetStall();
+        set((s) => ({
+          messages: {
+            ...s.messages,
+            [roleId]: (s.messages[roleId] ?? []).map((m) =>
+              m.id === msgId ? { ...m, text: m.text + delta } : m,
+            ),
+          },
+        }));
+      });
+    } catch {
+      // 流中断（网络 / 停顿看门狗 abort）：用已收到的部分文本收尾，不降级本地
+      // （修复旧 bug：截断草稿残留 + 本地回复二次插入重复）
+    } finally {
+      if (stallTimer) clearTimeout(stallTimer);
+    }
     // 收敛最终文本：含贴纸 token 时拆为独立贴纸消息（R5.2）
     finalizeReply(roleId, msgId, full);
     // 空流：上游 200 但全程无内容（如 V4-Flash 间歇空流）。
@@ -303,10 +260,10 @@ export const useChatStore = create<ChatState>()((set, get) => {
           [roleId]: (s.messages[roleId] ?? []).filter((m) => m.id !== msgId),
         },
       }));
-      writeLocal(roleId, get().messages[roleId] ?? []);
+      writeStorage(chatKey(roleId), get().messages[roleId] ?? []);
       return false;
     }
-    writeLocal(roleId, get().messages[roleId] ?? []);
+    writeStorage(chatKey(roleId), get().messages[roleId] ?? []);
     return true;
   };
 
@@ -316,16 +273,13 @@ export const useChatStore = create<ChatState>()((set, get) => {
     text: string,
     draftIndex?: number,
   ) => {
-    await sleep(400 + Math.random() * 500);
+    await sleep(THINK_DELAY_BASE + Math.random() * THINK_DELAY_JITTER);
     const reply = localReply(roleId, text);
     const msgId = genId();
     appendDraft(roleId, msgId, draftIndex);
     set((s) => ({ status: { ...s.status, [roleId]: "streaming" } }));
-    // 逐字打字机（模拟流式）
-    const step = 2;
-    for (let i = 0; i < reply.length; i += step) {
-      await sleep(28);
-      const chunk = reply.slice(0, i + step);
+    // 逐字打字机（模拟流式；每段触发 set 增量，最终由 typewriter 返回全文）
+    await typewriter(reply, 2, (chunk) => {
       set((s) => ({
         messages: {
           ...s.messages,
@@ -334,10 +288,10 @@ export const useChatStore = create<ChatState>()((set, get) => {
           ),
         },
       }));
-    }
+    });
     // 收敛最终回复（含贴纸 token 时拆为独立贴纸消息，R5.2）
     finalizeReply(roleId, msgId, reply);
-    writeLocal(roleId, get().messages[roleId] ?? []);
+    writeStorage(chatKey(roleId), get().messages[roleId] ?? []);
   };
 
   /**
@@ -350,26 +304,33 @@ export const useChatStore = create<ChatState>()((set, get) => {
     history: ChatMessage[],
     draftIndex?: number,
   ): Promise<boolean> => {
-    set((s) => ({ status: { ...s.status, [roleId]: "thinking" } }));
-    const prompt =
-      [...history].reverse().find((m) => m.role === "user")?.text ?? "";
-    /** 降级路径：本地回复池（保证可玩性） */
-    const degrade = async () => {
-      await replyFromLocal(roleId, prompt, draftIndex);
-      return true;
-    };
-
-    if (apiReadyCache === false) {
-      // 记忆过 no-key：直接本地降级（V2.4 横幅提示 degraded）
-      return degrade();
-    }
+    // 防重入：同角色同时只允许一个进行中的回合（UI busy 已禁用按钮，双保险）
+    if (busyRoles.has(roleId)) return false;
+    busyRoles.add(roleId);
     try {
-      const done = await streamFromApi(roleId, history, draftIndex);
-      // 503 no-key / 全部模型失败 / 网络异常 / 空流：一律降级本地
-      if (!done) return degrade();
-      return false;
-    } catch {
-      return degrade();
+      set((s) => ({ status: { ...s.status, [roleId]: "thinking" } }));
+      const prompt =
+        [...history].reverse().find((m) => m.role === "user")?.text ?? "";
+      /** 降级路径：本地回复池（保证可玩性） */
+      const degrade = async () => {
+        await replyFromLocal(roleId, prompt, draftIndex);
+        return true;
+      };
+
+      if (apiReadyCache === false) {
+        // 记忆过 no-key：直接本地降级（V2.4 横幅提示 degraded）
+        return degrade();
+      }
+      try {
+        const done = await streamFromApi(roleId, history, draftIndex);
+        // 503 no-key / 全部模型失败 / 网络异常 / 空流：一律降级本地
+        if (!done) return degrade();
+        return false;
+      } catch {
+        return degrade();
+      }
+    } finally {
+      busyRoles.delete(roleId);
     }
   };
 
@@ -380,16 +341,23 @@ export const useChatStore = create<ChatState>()((set, get) => {
 
     restore: (roleId) => {
       if (!(roleId in get().messages)) {
-        set((s) => ({ messages: { ...s.messages, [roleId]: readLocal(roleId) } }));
+        set((s) => ({
+          messages: { ...s.messages, [roleId]: readStorage<ChatMessage[]>(chatKey(roleId), []) },
+        }));
       }
       if (!(roleId in get().summaries)) {
-        set((s) => ({ summaries: { ...s.summaries, [roleId]: readSummaryLocal(roleId) } }));
+        set((s) => ({
+          summaries: {
+            ...s.summaries,
+            [roleId]: readStorage<ChatSummary>(chatSummaryKey(roleId), EMPTY_SUMMARY, isChatSummary),
+          },
+        }));
       }
     },
 
     probe: async () => {
       try {
-        const res = await fetch("/api/chat", {
+        const res = await fetchWithTimeout("/api/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ messages: [], probe: true }),
@@ -399,7 +367,7 @@ export const useChatStore = create<ChatState>()((set, get) => {
           return true;
         }
         if (res.status === 503) {
-          const data = (await res.json().catch(() => null)) as { error?: string } | null;
+          const data = (await res.json().catch(() => null)) as ChatApiError | null;
           if (data?.error === "no-key") apiReadyCache = false;
         }
         return false;

@@ -2,9 +2,10 @@ import { create } from "zustand";
 import type { UgcPlaylist } from "@/types/music";
 import { TRACKS } from "@/data/tracks";
 import { PLAYLISTS } from "@/data/playlists";
+import { readStorage, writeStorage, STORAGE } from "@/lib/storage";
 
 /** localStorage 键（P2-02 UGC 歌单） */
-export const UGC_KEY = "drift-ugc-playlists";
+export const UGC_KEY = STORAGE.ugcPlaylists;
 
 /** 限制规则（P2-02） */
 export const UGC_LIMITS = {
@@ -35,23 +36,6 @@ interface UgcPlaylistsState {
   }) => string;
   /** 删除歌单（无返回：不存在则静默） */
   removeById: (id: string) => void;
-}
-
-function readJson<T>(key: string): T | null {
-  try {
-    const raw = localStorage.getItem(key);
-    return raw ? (JSON.parse(raw) as T) : null;
-  } catch {
-    return null;
-  }
-}
-
-function writeJson(key: string, value: unknown): void {
-  try {
-    localStorage.setItem(key, JSON.stringify(value));
-  } catch {
-    // 隐私模式等场景忽略写入失败
-  }
 }
 
 /** 把 localStorage 读出的数据补齐缺省字段（跨版本迁移兜底） */
@@ -139,7 +123,7 @@ export const useUgcPlaylistsStore = create<UgcPlaylistsState>()((set, get) => ({
     });
     const next = [ugc, ...get().playlists];
     set({ playlists: next });
-    writeJson(UGC_KEY, next);
+    writeStorage(UGC_KEY, next);
     return ugc.id;
   },
 
@@ -147,12 +131,12 @@ export const useUgcPlaylistsStore = create<UgcPlaylistsState>()((set, get) => ({
     const next = get().playlists.filter((p) => p.id !== id);
     if (next.length === get().playlists.length) return;
     set({ playlists: next });
-    writeJson(UGC_KEY, next);
+    writeStorage(UGC_KEY, next);
   },
 }));
 
 /** 恢复本地数据（挂载时由 SDK 边界调用；store 内不直接读 localStorage 以保 node 可测） */
 export function bootstrapUgc(): void {
-  const raw = readJson<unknown>(UGC_KEY);
+  const raw = readStorage<unknown>(UGC_KEY, null);
   useUgcPlaylistsStore.setState({ playlists: sanitizeLoaded(raw), ready: true });
 }

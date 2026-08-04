@@ -1,4 +1,5 @@
 import { providerBaseUrl, providerKey, type LLMProvider } from "@/lib/llm/providers";
+import { fetchWithTimeout } from "@/lib/net/fetchWithTimeout";
 
 /** 发送给上游的 OpenAI 兼容消息（system + user/assistant） */
 export interface ChatCompletionMessage {
@@ -26,7 +27,7 @@ export async function callChatCompletions(
 ): Promise<UpstreamResult> {
   const url = `${providerBaseUrl(provider)}/chat/completions`;
   try {
-    const upstream = await fetch(url, {
+    const upstream = await fetchWithTimeout(url, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${providerKey(provider)}`,
@@ -77,7 +78,7 @@ export async function callChatCompletionOnce(
 ): Promise<UpstreamOnceResult> {
   const url = `${providerBaseUrl(provider)}/chat/completions`;
   try {
-    const upstream = await fetch(url, {
+    const upstream = await fetchWithTimeout(url, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${providerKey(provider)}`,

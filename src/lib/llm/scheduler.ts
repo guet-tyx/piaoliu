@@ -1,4 +1,5 @@
 import { providerBaseUrl, providerKey, type LLMProvider } from "@/lib/llm/providers";
+import { fetchWithTimeout } from "@/lib/net/fetchWithTimeout";
 
 /**
  * 多 Provider 调度器（V2.6 从 route.ts 拆出，纯逻辑可单测）：
@@ -31,9 +32,9 @@ async function fetchPool(p: LLMProvider): Promise<string[]> {
   const cached = poolCache.get(p.id);
   if (cached && Date.now() - cached.at < POOL_TTL) return cached.ids;
   try {
-    const res = await fetch(`${providerBaseUrl(p)}/models`, {
+    const res = await fetchWithTimeout(`${providerBaseUrl(p)}/models`, {
       headers: { Authorization: `Bearer ${providerKey(p)}` },
-    });
+    }, 15_000);
     if (res.ok) {
       const data = (await res.json()) as { data?: { id?: string }[] };
       const ids = (data?.data ?? [])

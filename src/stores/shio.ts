@@ -1,42 +1,13 @@
 import { create } from "zustand";
 import { CHARACTER_LINES, shioSlotOf, type ShioLine, type ShioSlot } from "@/data/shio-lines";
-
-/** localStorage 键前缀：每个角色独立选句持久化（V2.2 由单键 drift-greeting 迁移） */
-const GREETING_KEY_PREFIX = "drift-greeting";
-
-/** 角色 id → 本地键 */
-function greetingKey(roleId: string): string {
-  return `${GREETING_KEY_PREFIX}-${roleId}`;
-}
+import { greetingKey, readStorage, writeStorage } from "@/lib/storage";
+import { localDate } from "@/lib/time";
+import { pickRandom } from "@/lib/random";
 
 interface SavedGreeting {
   /** 本地日期 YYYY-MM-DD（同日不重复） */
   date: string;
   lineId: string;
-}
-
-function localDate(): string {
-  const d = new Date();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${d.getFullYear()}-${m}-${day}`;
-}
-
-function readSaved(roleId: string): SavedGreeting | null {
-  try {
-    const raw = localStorage.getItem(greetingKey(roleId));
-    return raw ? (JSON.parse(raw) as SavedGreeting) : null;
-  } catch {
-    return null;
-  }
-}
-
-function writeSaved(roleId: string, g: SavedGreeting) {
-  try {
-    localStorage.setItem(greetingKey(roleId), JSON.stringify(g));
-  } catch {
-    // 隐私模式等场景忽略写入失败
-  }
 }
 
 /** 角色的单日问候（含时段） */
@@ -65,7 +36,7 @@ export const useShioStore = create<ShioState>()((set) => ({
     if (!poolBySlot) return; // 未知角色直接跳过（防数据漂移）
 
     const today = localDate();
-    const saved = readSaved(roleId);
+    const saved = readStorage<SavedGreeting>(greetingKey(roleId), null);
     const slot = shioSlotOf(new Date().getHours());
 
     if (saved && saved.date === today) {
@@ -77,8 +48,8 @@ export const useShioStore = create<ShioState>()((set) => ({
 
     // 新的一天：按当前时段随机选句（运行期随机，非渲染期）
     const pool = poolBySlot[slot];
-    const line = pool[Math.floor(Math.random() * pool.length)];
-    writeSaved(roleId, { date: today, lineId: line.id });
+    const line = pickRandom(pool) ?? pool[0];
+    writeStorage(greetingKey(roleId), { date: today, lineId: line.id });
     set((s) => ({ greetings: { ...s.greetings, [roleId]: { line, slot } } }));
   },
 }));

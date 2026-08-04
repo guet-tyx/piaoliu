@@ -22,9 +22,12 @@ function barHeight(count: number, max: number): number {
 export function ReportPage() {
   // 周报数据为客户端专属（localStorage），SSR 渲染空态，effect 后计算（避免水合冲突）
   const [report, setReport] = useState<WeeklyReport | null>(null);
+  const [failed, setFailed] = useState(false);
   useEffect(() => {
     // 外部源（localStorage/Supabase RPC）初始化，SSR 空态安全，水合后更新
-    fetchWeeklyReport().then(setReport);
+    fetchWeeklyReport()
+      .then(setReport)
+      .catch(() => setFailed(true)); // 失败显示错误态，避免永挂「正在整理…」
   }, []);
 
   const maxDay = report
@@ -39,7 +42,9 @@ export function ReportPage() {
         subtitle="每周一份，记录你这周的航线。匿名，只属于你。"
       />
 
-      {report === null ? (
+      {failed ? (
+        <p className={styles.empty}>周报整理遇到问题，稍后再来看看。</p>
+      ) : report === null ? (
         <p className={styles.empty}>正在整理本周的星海…</p>
       ) : !report.hasData ? (
         <div className={styles.empty}>

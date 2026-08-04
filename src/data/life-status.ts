@@ -5,6 +5,7 @@
  */
 
 import { CHANNELS } from "@/data/channels";
+import { pickRandom } from "@/lib/random";
 
 export interface LifeStatus {
   /** 全局唯一 key（轮换时用于避开连续重复） */
@@ -138,9 +139,12 @@ export function pickLifeStatus(
   if (!pool) return FALLBACK;
   const list = night ? pool.night : pool.day;
   const src = list.length === 0 ? [FALLBACK] : list;
-  const candidates = src.filter((s) => s.key !== excludeKey);
-  const pick = candidates.length > 0 ? candidates : src;
-  return pick[Math.floor(Math.random() * pick.length)];
+  // 避开当前（excludeKey）；池中只有一条时允许重复（深夜即此情形）
+  const picked = pickRandom(src, {
+    keyOf: (s) => s.key,
+    exclude: excludeKey ? [excludeKey] : [],
+  });
+  return picked ?? FALLBACK;
 }
 
 /** 轮换间隔（ms）：白天 30s / 深夜 22-0 45s / 午夜 0-6 60s */

@@ -17,6 +17,8 @@ export type TtsSynthesizeResult =
   | { ok: true; audio: ArrayBuffer; mime: string }
   | { ok: false; detail: string };
 
+import { fetchWithTimeout } from "@/lib/net/fetchWithTimeout";
+
 const DEFAULT_BASE_URL = "https://api.xiaomimimo.com/v1";
 const DEFAULT_MODEL = "mimo-v2.5-tts";
 
@@ -44,7 +46,7 @@ export async function synthesizeSpeech(options: {
   const model = (process.env.MIMO_TTS_MODEL ?? DEFAULT_MODEL).trim();
 
   try {
-    const upstream = await fetch(`${base}/chat/completions`, {
+    const upstream = await fetchWithTimeout(`${base}/chat/completions`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${key}`,

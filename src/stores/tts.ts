@@ -5,6 +5,7 @@ import { personaOf } from "@/data/chat-personas";
 import { ttsTextOf } from "@/lib/tts/clean";
 import { createLruCache } from "@/lib/tts/cache";
 import { fallbackVoiceParams } from "@/lib/tts/fallback";
+import { fetchWithTimeout } from "@/lib/net/fetchWithTimeout";
 import { MAX_TTS_TEXT, TTS_CACHE_MAX } from "@/lib/chat/limits";
 
 /**
@@ -47,6 +48,14 @@ const cache = createLruCache<string, string>(TTS_CACHE_MAX, (url) => {
 });
 /** 错误 3s 自动恢复计时器 */
 let errorTimer: ReturnType<typeof setTimeout> | null = null;
+
+/** 朗读请求递增序号：旧请求晚到时凭序号丢弃（修复「旧请求覆盖新请求」竞态） */
+let speakSeq = 0;
+/** 进行中的 TTS fetch（stop / 新 speak 时 abort，防止 in-flight 响应晚到播放） */
+let activeFetch: AbortController | null = null;
+
+/** TTS fetch 首字节超时（合成偶发慢；超过则视为失败走兜底） */
+const TTS_FETCH_TIMEOUT_MS = 30_000;
 
 function scheduleErrorReset(key: string) {
   if (errorTimer) clearTimeout(errorTimer);
@@ -119,7 +128,7 @@ export const useTtsStore = create<TtsState>()((set, get) => {
 
     probe: async () => {
       try {
-        const res = await fetch("/api/chat/tts", {
+        const res = await fetchWithTimeout("/api/chat/tts", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ probe: true }),
@@ -139,9 +148,10 @@ export const useTtsStore = create<TtsState>()((set, get) => {
         get().stop();
         return;
       }
-      // 一次只允许一条：停掉任何进行中的播放
+      // 一次只允许一条：停掉任何进行中的播放/请求
       get().stop();
 
+      const seq = ++speakSeq;
       const voicePrompt = personaOf(roleId).voicePrompt;
       const cacheKey = `${clean}|${voicePrompt}`;
       const cached = cache.get(cacheKey);
@@ -151,12 +161,20 @@ export const useTtsStore = create<TtsState>()((set, get) => {
       }
 
       set({ loadingKey: key, errorKey: null, errorText: null });
+      const controller = new AbortController();
+      activeFetch = controller;
       try {
-        const res = await fetch("/api/chat/tts", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ roleId, text: clean }),
-        });
+        const res = await fetchWithTimeout(
+          "/api/chat/tts",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ roleId, text: clean }),
+            signal: controller.signal,
+          },
+          TTS_FETCH_TIMEOUT_MS,
+        );
+        if (seq !== speakSeq) return; // 期间已被新的 speak/stop 取代：丢弃
         if (res.status === 503) {
           // 未配 key / 全部模型失败 → 降级浏览器语音
           set({ available: false, loadingKey: null });
@@ -171,17 +189,29 @@ export const useTtsStore = create<TtsState>()((set, get) => {
         }
         set({ available: true });
         const blob = await res.blob();
+        if (seq !== speakSeq) return; // blob 解析期间被取代：丢弃
         const url = URL.createObjectURL(blob);
         cache.set(cacheKey, url);
+        if (seq !== speakSeq) {
+          URL.revokeObjectURL(url); // 已被取代：不播放，释放刚创建的 URL
+          return;
+        }
         playUrl(key, url);
       } catch {
+        if (seq !== speakSeq) return; // 被取代后的 abort 错误：不降级不报错
         // 网络异常 → 浏览器语音兜底
         set({ available: false, loadingKey: null });
         speakFallback(key, clean, roleId);
+      } finally {
+        if (activeFetch === controller) activeFetch = null;
       }
     },
 
     stop: () => {
+      // 使所有 in-flight speak 失效并中止其 fetch（旧请求晚到不播放）
+      speakSeq += 1;
+      activeFetch?.abort();
+      activeFetch = null;
       if (audio) {
         audio.pause();
         audio.removeAttribute("src");

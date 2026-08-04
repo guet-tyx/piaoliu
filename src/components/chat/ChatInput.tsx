@@ -3,11 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 import { useChatStore } from "@/stores/chat";
 import { personaOf } from "@/data/chat-personas";
+import { MAX_TEXT } from "@/lib/chat/limits";
 import { MusicPicker } from "@/components/chat/MusicPicker";
 import { StickerPicker } from "@/components/chat/StickerPicker";
 import styles from "./ChatInput.module.css";
 
-const MAX_TEXT = 200;
 /** 接近上限提示阈值（字数变黄） */
 const WARN_AT = 160;
 /** 多行 textarea 最大高度（约 6 行） */

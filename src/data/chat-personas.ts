@@ -6,6 +6,7 @@
  */
 
 import { stickerPromptFor } from "@/data/stickers";
+import { DEFAULT_ROLE_ID } from "@/data/roles";
 
 export interface ChatPersona {
   roleId: string;
@@ -102,7 +103,11 @@ export const CHAT_PERSONAS: ChatPersona[] = [
   },
 ];
 
-/** 按角色 id 取 persona（未知角色兜底汐） */
+/** 按角色 id 取 persona（未知角色兜底默认汐，统一走 roles.ts 的 DEFAULT_ROLE_ID） */
 export function personaOf(roleId: string): ChatPersona {
-  return CHAT_PERSONAS.find((p) => p.roleId === roleId) ?? CHAT_PERSONAS[0];
+  return (
+    CHAT_PERSONAS.find((p) => p.roleId === roleId) ??
+    CHAT_PERSONAS.find((p) => p.roleId === DEFAULT_ROLE_ID) ??
+    CHAT_PERSONAS[0]
+  );
 }

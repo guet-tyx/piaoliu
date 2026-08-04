@@ -1,7 +1,8 @@
 "use client";
 
 import { create } from "zustand";
-import { lifePoolOf, pickLifeStatus, type LifeStatus } from "@/data/life-status";
+import { lifePoolOf, pickLifeStatus, isNightHour, type LifeStatus } from "@/data/life-status";
+import { lifeStatusKey, readStorage, writeStorage } from "@/lib/storage";
 
 /**
  * 角色生活状态 store（PRD 需求③）：
@@ -29,44 +30,27 @@ export interface LifeStatusStore {
   setJustBack: (roleId: string, justBack: boolean) => void;
 }
 
-const KEY_PREFIX = "drift-life-status";
-
-function lifeKey(roleId: string): string {
-  return `${KEY_PREFIX}-${roleId}`;
-}
-
 /** 读持久化状态；无记录/损坏/缺字段 → null（调用方兜底随机） */
 function readLocal(roleId: string): LifeStatusState | null {
-  try {
-    const raw = localStorage.getItem(lifeKey(roleId));
-    if (!raw) return null;
-    const p = JSON.parse(raw) as Partial<LifeStatusState>;
-    if (
-      typeof p?.key === "string" &&
-      typeof p?.icon === "string" &&
-      typeof p?.text === "string" &&
-      typeof p?.at === "number"
-    ) {
-      return { key: p.key, icon: p.icon, text: p.text, at: p.at };
-    }
-    return null;
-  } catch {
-    return null;
-  }
+  return readStorage<LifeStatusState>(lifeStatusKey(roleId), null, (v): boolean => {
+    const s = v as Partial<LifeStatusState>;
+    return (
+      typeof s?.key === "string" &&
+      typeof s?.icon === "string" &&
+      typeof s?.text === "string" &&
+      typeof s?.at === "number"
+    );
+  });
 }
 
 function writeLocal(roleId: string, state: LifeStatusState) {
-  try {
-    localStorage.setItem(lifeKey(roleId), JSON.stringify(state));
-  } catch {
-    // 隐私模式等忽略写入失败
-  }
+  writeStorage(lifeStatusKey(roleId), state);
 }
 
 export const useLifeStatusStore = create<LifeStatusStore>()((set, get) => {
   /** 随机初始状态（按当前时段选池：深夜用安静池） */
   const randomOf = (roleId: string): LifeStatus =>
-    pickLifeStatus(lifePoolOf(roleId), undefined, new Date().getHours() < 6);
+    pickLifeStatus(lifePoolOf(roleId), undefined, isNightHour(new Date()));
 
   return {
     byRole: {},

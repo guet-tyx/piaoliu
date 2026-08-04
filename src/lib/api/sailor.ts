@@ -2,6 +2,8 @@ import { getSupabase } from "@/lib/supabase/client";
 import { isSupabaseReady } from "@/lib/supabase/anon";
 import { randomAnonMark } from "@/data/anon-marks";
 import { isSafeText } from "@/lib/api/moderation";
+import { readStorage, writeStorage, STORAGE } from "@/lib/storage";
+import { localDate } from "@/lib/time";
 import {
   levelOfBond,
   pendingBadges,
@@ -14,15 +16,16 @@ export const GUEST_ID = "local-guest";
 /** 系统预热瓶署名（冷启动内容投放） */
 export const SYSTEM_ID = "system";
 
-const SAILOR_KEY = "drift-sailor";
+/** 键名统一走 src/lib/storage.ts 注册表（键集中声明，杜绝散落字面量） */
+const SAILOR_KEY = STORAGE.sailor;
 /** 行为统计（徽章判定/羁绊数据源；真实模式由 action_logs 聚合） */
-const STATS_KEY = "drift-stats";
+const STATS_KEY = STORAGE.stats;
 /** 按天行为活动（V2.0 周报「本周」统计源） */
-const DAILY_KEY = "drift-daily-activity";
+const DAILY_KEY = STORAGE.dailyActivity;
 /** 找回码映射（本地模拟；真实模式以 recovery_hash 服务端校验） */
-const RECOVERY_KEY = "drift-recovery";
+const RECOVERY_KEY = STORAGE.recovery;
 /** 每日一次的行为去重记录（航行 1 天/听歌 3 首等） */
-const DAILY_BOND_KEY = "drift-bond-daily";
+const DAILY_BOND_KEY = STORAGE.bondDaily;
 
 interface SailorStatsState extends SailorStats {
   /** 每首歌播放次数（V2.0 周报热门航线源） */
@@ -33,54 +36,25 @@ interface SailorStatsState extends SailorStats {
   updatedAt: number;
 }
 
-/* ---------- 本地存储工具 ---------- */
-
-function readJson<T>(key: string, fallback: T): T {
-  try {
-    const raw = localStorage.getItem(key);
-    return raw ? (JSON.parse(raw) as T) : fallback;
-  } catch {
-    return fallback;
-  }
-}
-
-function writeJson(key: string, value: unknown) {
-  try {
-    localStorage.setItem(key, JSON.stringify(value));
-  } catch {
-    // 隐私模式等场景忽略写入失败
-  }
-}
-
-function localDate(): string {
-  const d = new Date();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${d.getFullYear()}-${m}-${day}`;
-}
-
-/* ---------- 船员证 ---------- */
+/* ---------- 本地存储（统一 readStorage/writeStorage） ---------- */
 
 function readLocal(): Sailor | null {
-  try {
-    const raw = localStorage.getItem(SAILOR_KEY);
-    if (!raw) return null;
-    const s = JSON.parse(raw) as Sailor;
-    if (typeof s.anonMark !== "string") return null;
-    // 兼容旧数据（V1.2 新增字段缺省）
-    s.bottleStyle = s.bottleStyle ?? "paper";
-    s.bondValue = s.bondValue ?? 0;
-    s.level = s.level ?? levelOfBond(s.bondValue ?? 0);
-    s.nickname = s.nickname ?? null;
-    s.badges = s.badges ?? [];
-    return s;
-  } catch {
-    return null;
-  }
+  const s = readStorage<Sailor>(SAILOR_KEY, null, (v): boolean => {
+    if (typeof v !== "object" || v === null) return false;
+    return typeof (v as { anonMark?: unknown }).anonMark === "string";
+  });
+  if (!s) return null;
+  // 兼容旧数据（V1.2 新增字段缺省）
+  s.bottleStyle = s.bottleStyle ?? "paper";
+  s.bondValue = s.bondValue ?? 0;
+  s.level = s.level ?? levelOfBond(s.bondValue ?? 0);
+  s.nickname = s.nickname ?? null;
+  s.badges = s.badges ?? [];
+  return s;
 }
 
 function writeLocal(s: Sailor) {
-  writeJson(SAILOR_KEY, s);
+  writeStorage(SAILOR_KEY, s);
 }
 
 /** 本地游客船员证（同步版，供 UI 初始渲染兜底） */
@@ -166,7 +140,7 @@ export async function updateNickname(nickname: string): Promise<RenameResult> {
 
 export function readStats(): SailorStatsState {
   // 兼容旧结构（V2.0 前无 trackCounts/listenByDay）：缺省字段合并默认值
-  const raw = readJson<Partial<SailorStatsState>>(STATS_KEY, {});
+  const raw = readStorage<Partial<SailorStatsState>>(STATS_KEY, {});
   return {
     launched: raw.launched ?? 0,
     picked: raw.picked ?? 0,
@@ -180,12 +154,12 @@ export function readStats(): SailorStatsState {
 }
 
 function writeStats(s: SailorStatsState) {
-  writeJson(STATS_KEY, s);
+  writeStorage(STATS_KEY, s);
 }
 
 /** 按天活动记录（周报「本周」聚合源） */
 export function readDailyActivity(): DailyActivity[] {
-  return readJson<DailyActivity[]>(DAILY_KEY, []);
+  return readStorage<DailyActivity[]>(DAILY_KEY, []);
 }
 
 function bumpDaily(kind: "launched" | "picked" | "replied" | "listen") {
@@ -208,7 +182,7 @@ function bumpDaily(kind: "launched" | "picked" | "replied" | "listen") {
     ? list.map((d) => (d.date === today ? cur : d))
     : [...list, cur];
   // 只保留最近 60 天（防无限增长）
-  writeJson(DAILY_KEY, next.slice(-60));
+  writeStorage(DAILY_KEY, next.slice(-60));
 }
 
 /** 行为计数（投瓶/拾瓶/回信），返回最新统计 */
@@ -267,11 +241,11 @@ export async function earnBond(kind: BondKind, oncePerDay = false): Promise<Sail
     const sailor = readLocal();
     if (!sailor) return null;
     if (oncePerDay) {
-      const daily = readJson<Record<string, string>>(DAILY_BOND_KEY, {});
+      const daily = readStorage<Record<string, string>>(DAILY_BOND_KEY, {});
       const today = localDate();
       if (daily[kind] === today) return sailor;
       daily[kind] = today;
-      writeJson(DAILY_BOND_KEY, daily);
+      writeStorage(DAILY_BOND_KEY, daily);
     }
     sailor.bondValue += 1;
     sailor.level = levelOfBond(sailor.bondValue);
@@ -321,9 +295,10 @@ export async function genRecoveryCode(): Promise<string | null> {
     if (!sailor) return null;
     const code = genCode();
     const record: RecoveryRecord = { code, sailor: { ...sailor }, createdAt: Date.now() };
-    const records = readJson<RecoveryRecord[]>(RECOVERY_KEY, []);
+    const records = readStorage<RecoveryRecord[]>(RECOVERY_KEY, []);
     records.push(record);
-    writeJson(RECOVERY_KEY, records);
+    // 找回码快照只保留最近 3 份（防无限增长；真实模式服务端只存最新哈希）
+    writeStorage(RECOVERY_KEY, records.slice(-3));
     return code;
   }
   const sb = getSupabase();
@@ -342,7 +317,7 @@ type ClaimResult =
 export async function claimRecoveryCode(code: string): Promise<ClaimResult> {
   const normalized = code.trim().toUpperCase();
   if (!isSupabaseReady()) {
-    const records = readJson<RecoveryRecord[]>(RECOVERY_KEY, []);
+    const records = readStorage<RecoveryRecord[]>(RECOVERY_KEY, []);
     const hit = records.find((r) => r.code === normalized);
     if (!hit) return { ok: false, reason: "invalid" };
     const sailor: Sailor = { ...hit.sailor, id: GUEST_ID, badges: [...hit.sailor.badges] };
