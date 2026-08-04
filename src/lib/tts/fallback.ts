@@ -1,0 +1,27 @@
+/**
+ * Web Speech API 兜底音色参数（2026-08-04）：
+ * 未配置 MiMo key 时，用浏览器 speechSynthesis（zh-CN）朗读，
+ * 通过 pitch/rate 微调让 4 位角色听感有所区分（近似音色，非 MiMo 精调）。
+ * 纯函数，node 可单测。
+ */
+
+export interface FallbackVoiceParams {
+  lang: string;
+  pitch: number;
+  rate: number;
+}
+
+/** 各角色兜底参数：pitch 音调 / rate 语速（汐轻声慢、朔空元气快、悠空灵缓、流明平缓） */
+const PARAMS: Record<string, FallbackVoiceParams> = {
+  sio: { lang: "zh-CN", pitch: 1.05, rate: 0.95 },
+  lumen: { lang: "zh-CN", pitch: 0.95, rate: 0.92 },
+  soku: { lang: "zh-CN", pitch: 1.15, rate: 1.08 },
+  yoe: { lang: "zh-CN", pitch: 0.9, rate: 0.85 },
+};
+
+/** 未知角色兜底（对齐 personaOf：默认汐） */
+const DEFAULT_PARAMS: FallbackVoiceParams = PARAMS.sio;
+
+export function fallbackVoiceParams(roleId: string): FallbackVoiceParams {
+  return PARAMS[roleId] ?? DEFAULT_PARAMS;
+}

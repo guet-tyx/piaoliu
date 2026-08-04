@@ -23,6 +23,7 @@ import { FmProgress } from "./FmProgress";
 import { SleepTimer } from "./SleepTimer";
 import { HostBubble } from "./HostBubble";
 import { HostToggle } from "./HostToggle";
+import { VoiceToggle } from "./VoiceToggle";
 import styles from "./PlayerSection.module.css";
 
 /** 播放模式展示元数据（FR-3） */
@@ -317,6 +318,8 @@ export function PlayerSection() {
               <SleepTimer />
               {/* P3-01 主持人开关 */}
               <HostToggle />
+              {/* TTS：主持人语音开关（与文字气泡开关并列，PRD 需求② §2.4） */}
+              <VoiceToggle />
             </div>
 
             {/* 发弹幕（FR-10.2）：同曲频道广播，1-50 字，敏感词拦截 */}

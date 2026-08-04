@@ -202,6 +202,25 @@
   animation: var(--kf-blink) 1s steps(1) infinite;
 }
 
+/* TTS 朗读进度条（AI 气泡底部细条，播放中显示，PRD §4.2） */
+.ttsBar {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 5px;
+  height: 2px;
+  border-radius: 999px;
+  background: rgba(123, 177, 255, .16);
+  overflow: hidden;
+  pointer-events: none;
+}
+.ttsBar i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--chat-accent), var(--chat-accent-2));
+}
+
 /* 思考中：三点跳动 */
 .thinking { padding: 10px 12px; }
 .dots {

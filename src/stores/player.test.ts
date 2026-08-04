@@ -19,6 +19,8 @@ function resetStore() {
     fmRecommendedIds: [],
     sleepDeadline: null,
     sleepMode: null,
+    hostBubbleOn: true,
+    hostVoiceOn: true,
     danmakuOn: true,
     volume: 1,
     muted: false,
@@ -196,5 +198,17 @@ describe("player store · 定时关闭（P2-04）", () => {
     usePlayerStore.getState().setSleepTimer("after", 500);
     const s1 = usePlayerStore.getState();
     expect(s1.sleepDeadline).toBeLessThanOrEqual(Date.now() + 120 * 60 * 1000);
+  });
+});
+
+describe("player store · 主持人语音开关（TTS）", () => {
+  beforeEach(resetStore);
+
+  it("默认开启，toggleHostVoice 翻转", () => {
+    expect(usePlayerStore.getState().hostVoiceOn).toBe(true);
+    usePlayerStore.getState().toggleHostVoice();
+    expect(usePlayerStore.getState().hostVoiceOn).toBe(false);
+    usePlayerStore.getState().toggleHostVoice();
+    expect(usePlayerStore.getState().hostVoiceOn).toBe(true);
   });
 });

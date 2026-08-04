@@ -1,0 +1,22 @@
+/* 主持人语音开关（TTS，PRD 需求② §2.4）：仿 HostToggle 胶囊 */
+
+.toggle {
+  border: 1px solid var(--line-panel);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--ink-2);
+  font-size: 13px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+.toggle:hover {
+  border-color: var(--ice);
+  color: var(--ice);
+}
+.toggle.on {
+  border-color: var(--ice);
+  color: var(--ice);
+  background: rgba(123, 177, 255, 0.12);
+}

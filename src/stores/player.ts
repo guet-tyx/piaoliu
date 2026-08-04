@@ -43,6 +43,8 @@ interface PlayerState {
   sleepMode: "after" | "track" | null;
   /** 主持人气泡开关（P3-01，仿 danmakuOn 持久化） */
   hostBubbleOn: boolean;
+  /** 主持人语音开关（TTS：主持人台词语音播报，PRD 需求② §2.4） */
+  hostVoiceOn: boolean;
   /** 弹幕开关（FR-5，真实控制弹幕层显隐） */
   danmakuOn: boolean;
   /** 音量 0-1（FR-2） */
@@ -90,6 +92,8 @@ interface PlayerState {
   toggleDanmaku: () => void;
   /** 主持人气泡开关切换（P3-01） */
   toggleHostBubble: () => void;
+  /** 主持人语音开关切换（TTS） */
+  toggleHostVoice: () => void;
   /** 进度条拖动跳转（播放不中断） */
   seekTo: (seconds: number) => void;
   /** 音量设置 0-1 */
@@ -117,6 +121,7 @@ export const usePlayerStore = create<PlayerState>()((set, get) => ({
   sleepDeadline: null,
   sleepMode: null,
   hostBubbleOn: true,
+  hostVoiceOn: true,
   danmakuOn: true,
   volume: 1,
   muted: false,
@@ -235,6 +240,7 @@ export const usePlayerStore = create<PlayerState>()((set, get) => ({
     })),
   toggleDanmaku: () => set((s) => ({ danmakuOn: !s.danmakuOn })),
   toggleHostBubble: () => set((s) => ({ hostBubbleOn: !s.hostBubbleOn })),
+  toggleHostVoice: () => set((s) => ({ hostVoiceOn: !s.hostVoiceOn })),
   seekTo: (seconds) =>
     set((s) => ({
       currentTime: seconds,

@@ -152,6 +152,7 @@ export function useAudioPlayer() {
           playMode?: unknown;
           danmakuOn?: unknown;
           hostBubbleOn?: unknown;
+          hostVoiceOn?: unknown;
         };
         const { tracks: list } = usePlayerStore.getState();
         const patch: {
@@ -161,6 +162,7 @@ export function useAudioPlayer() {
           playMode?: PlayMode;
           danmakuOn?: boolean;
           hostBubbleOn?: boolean;
+          hostVoiceOn?: boolean;
         } = {};
         if (
           typeof saved.currentIndex === "number" &&
@@ -185,6 +187,7 @@ export function useAudioPlayer() {
         }
         if (typeof saved.danmakuOn === "boolean") patch.danmakuOn = saved.danmakuOn;
         if (typeof saved.hostBubbleOn === "boolean") patch.hostBubbleOn = saved.hostBubbleOn;
+        if (typeof saved.hostVoiceOn === "boolean") patch.hostVoiceOn = saved.hostVoiceOn;
         // 只恢复 UI 状态；isPlaying 强制 false，避免浏览器拦截自动播放
         usePlayerStore.setState({ ...patch, isPlaying: false });
       }
@@ -227,7 +230,8 @@ export function useAudioPlayer() {
         state.muted === prev.muted &&
         state.playMode === prev.playMode &&
         state.danmakuOn === prev.danmakuOn &&
-        state.hostBubbleOn === prev.hostBubbleOn
+        state.hostBubbleOn === prev.hostBubbleOn &&
+        state.hostVoiceOn === prev.hostVoiceOn
       ) {
         return;
       }
@@ -242,6 +246,7 @@ export function useAudioPlayer() {
             playMode: state.playMode,
             danmakuOn: state.danmakuOn,
             hostBubbleOn: state.hostBubbleOn,
+            hostVoiceOn: state.hostVoiceOn,
           }),
         );
       } catch {

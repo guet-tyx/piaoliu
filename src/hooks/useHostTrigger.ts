@@ -2,12 +2,15 @@
 
 import { useEffect, useRef, useState } from "react";
 import { usePlayerStore } from "@/stores/player";
+import { useTtsStore } from "@/stores/tts";
 import { hostLinesOf, pickLine, type HostTrigger } from "@/data/host-lines";
 
 /** 每 3 首曲目触发一次介绍 */
 const PER3_COUNT = 3;
 /** 60 秒无操作触发 idle */
 const IDLE_MS = 60_000;
+/** 主持语音朗读 key 序号（唯一即可；UI 不展示主持播放态，仅用于单例互斥） */
+let hostSpeakSeq = 0;
 
 interface HostBubbleState {
   /** 当前气泡台词（null=隐藏） */
@@ -30,6 +33,7 @@ export function useHostTrigger() {
   const currentIndex = usePlayerStore((s) => s.currentIndex);
   const isPlaying = usePlayerStore((s) => s.isPlaying);
   const hostBubbleOn = usePlayerStore((s) => s.hostBubbleOn);
+  const hostVoiceOn = usePlayerStore((s) => s.hostVoiceOn);
 
   const [state, setState] = useState<HostBubbleState>({
     text: null,
@@ -48,7 +52,18 @@ export function useHostTrigger() {
       trigger,
       bubbleKey: s.bubbleKey + 1,
     }));
+    // TTS 语音播报：语音开关打开时与气泡同步朗读（角色音色，PRD 需求② §2.4）。
+    // 用 getState() 读取而非闭包订阅值，保持 showLine 稳定（避免 exhaustive-deps 连锁告警）
+    if (usePlayerStore.getState().hostVoiceOn) {
+      hostSpeakSeq += 1;
+      void useTtsStore.getState().speak(`host-${hostSpeakSeq}`, line, host.roleId);
+    }
   };
+
+  // 语音开关关闭 → 停止正在播放的主持语音（PRD：只显示文字气泡）
+  useEffect(() => {
+    if (!hostVoiceOn) useTtsStore.getState().stop();
+  }, [hostVoiceOn]);
 
   // enter：频道切换
   const prevChannelRef = useRef<string | null>(channelId);

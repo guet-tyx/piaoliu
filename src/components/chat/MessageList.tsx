@@ -8,6 +8,7 @@ import type { ChatPersona } from "@/data/chat-personas";
 import { TRACKS } from "@/data/tracks";
 import { stickerOf, type Sticker } from "@/data/stickers";
 import { useChatStore } from "@/stores/chat";
+import { useTtsStore } from "@/stores/tts";
 import { MessageActions } from "@/components/chat/MessageActions";
 import { MessageEditInput } from "@/components/chat/MessageEditInput";
 import { PlaylistRecommendCard } from "@/components/chat/PlaylistRecommendCard";
@@ -218,6 +219,10 @@ interface MessageRowProps {
   busy: boolean;
   /** 是否处于编辑模式（仅用户消息） */
   isEditing: boolean;
+  /** TTS：本条 AI 回复是否正在朗读（气泡底部细进度条） */
+  playing: boolean;
+  /** TTS 播放进度 0-100（Web Speech 兜底无进度时为 0） */
+  playPct: number;
   onStartEdit: () => void;
   onEditSave: (text: string) => void;
   onEditCancel: () => void;
@@ -239,6 +244,8 @@ function MessageRow({
   streaming,
   busy,
   isEditing,
+  playing,
+  playPct,
   onStartEdit,
   onEditSave,
   onEditCancel,
@@ -283,6 +290,7 @@ function MessageRow({
               <StickerCard stickerId={message.sticker as string} />
               <span className={styles.timeUser}>{formatTime(message.at)}</span>
               <MessageActions
+                roleId={roleId}
                 message={message}
                 visible={hovered}
                 busy={busy}
@@ -304,6 +312,7 @@ function MessageRow({
               <div className={styles.msgText}>{renderMarkdownText(message.text, message.id)}</div>
               <span className={styles.timeUser}>{formatTime(message.at)}</span>
               <MessageActions
+                roleId={roleId}
                 message={message}
                 visible={hovered}
                 busy={busy}
@@ -343,6 +352,7 @@ function MessageRow({
         <span className={styles.timeAi}>{formatTime(message.at)}</span>
         {streaming && <i className={styles.cursor} aria-hidden="true" />}
         <MessageActions
+          roleId={roleId}
           message={message}
           visible={hovered}
           busy={busy}
@@ -351,6 +361,12 @@ function MessageRow({
           onCopy={onCopy}
           onDelete={onDelete}
         />
+        {/* TTS 朗读进度：气泡底部细进度条（Web Speech 兜底无进度不显示） */}
+        {playing && playPct > 0 && (
+          <span className={styles.ttsBar} aria-hidden="true">
+            <i style={{ width: `${playPct}%` }} />
+          </span>
+        )}
       </div>
     </div>
   );
@@ -369,6 +385,10 @@ export function MessageList({
   const status = useChatStore((s) => s.status[roleId] ?? ("idle" as ChatStatus));
   /** Summarize：早期对话摘要（非空时列表底部显示折叠提示，对用户低干扰） */
   const summary = useChatStore((s) => s.summaries[roleId]?.text ?? "");
+  /** TTS：正在朗读的消息与进度（AI 气泡进度条用） */
+  const ttsPlayingKey = useTtsStore((s) => s.playingKey);
+  const ttsProgress = useTtsStore((s) => s.progress);
+  const ttsDuration = useTtsStore((s) => s.duration);
   const persona = personaOf(roleId);
   const editMessage = useChatStore((s) => s.editMessage);
   const deleteMessage = useChatStore((s) => s.deleteMessage);
@@ -428,6 +448,14 @@ export function MessageList({
     document.addEventListener("mousedown", onDocClick);
     return () => document.removeEventListener("mousedown", onDocClick);
   }, [summaryOpen]);
+
+  // TTS：挂载时探测 MiMo 可用性；离开页面停止播放并释放音频（PRD 异常处理）
+  useEffect(() => {
+    void useTtsStore.getState().probe();
+    return () => {
+      useTtsStore.getState().stop();
+    };
+  }, []);
 
   const handleScroll = () => {
     const el = listRef.current;
@@ -516,6 +544,12 @@ export function MessageList({
                     streaming={status === "streaming" && m.id === lastId}
                     busy={busy}
                     isEditing={editingId === m.id && !m.sticker}
+                    playing={ttsPlayingKey === m.id}
+                    playPct={
+                      ttsPlayingKey === m.id && ttsDuration > 0
+                        ? Math.min(100, (ttsProgress / ttsDuration) * 100)
+                        : 0
+                    }
                     onStartEdit={() => setEditingId(m.id)}
                     onEditSave={handleEditSave}
                     onEditCancel={() => setEditingId(null)}
@@ -599,6 +633,19 @@ export function MessageList({
               }}
             >
               ✏️ 编辑消息
+            </button>
+          )}
+          {sheetMsg?.role === "assistant" && !sheetMsg.sticker && (
+            <button
+              type="button"
+              className={styles.sheetItem}
+              onClick={() => {
+                const m = sheetMsg;
+                setSheetMsg(null);
+                if (m) void useTtsStore.getState().speak(m.id, m.text, roleId);
+              }}
+            >
+              🔊 朗读
             </button>
           )}
           {sheetMsg?.role === "assistant" && !sheetMsg.sticker && (

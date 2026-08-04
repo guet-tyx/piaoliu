@@ -145,8 +145,8 @@ export function ChatInput({ roleId, draft, onDraftChange, onDegraded, inputRef }
             type="button"
             className={styles.toolBtn}
             onClick={handleVoice}
-            aria-label="语音（即将上线）"
-            title="语音 · 即将上线"
+            aria-label="语音（语音输入即将上线）"
+            title="语音输入 · 即将上线"
           >
             🎤
           </button>
@@ -180,7 +180,7 @@ export function ChatInput({ roleId, draft, onDraftChange, onDegraded, inputRef }
 
       {voiceHint && (
         <p className={styles.voiceHint} role="status">
-          🎤 语音功能即将上线，先打字聊聊天吧。
+          🎤 语音输入即将上线，先试试朗读功能吧（点 AI 回复上的 🔊）。
         </p>
       )}
       {err && <p className={styles.err}>{err}</p>}

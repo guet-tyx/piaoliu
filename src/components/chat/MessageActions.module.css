@@ -58,3 +58,13 @@
   background: rgba(248, 113, 113, .34);
   color: #fecaca;
 }
+
+/* TTS 朗读出错态（⚠️）：红底提示 */
+.err {
+  background: rgba(248, 113, 113, .2);
+  color: #fca5a5;
+}
+.err:hover:not(:disabled) {
+  background: rgba(248, 113, 113, .32);
+  color: #fecaca;
+}
