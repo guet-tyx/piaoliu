@@ -4,13 +4,15 @@
  * - base: https://api.xiaomimimo.com/v1（api.mimo.xiaomi.com 域名不存在）
  * - 端点: POST {base}/chat/completions + 模型 mimo-v2.5-tts
  * - 消息须含 assistant 角色：user 消息放音色指令，assistant 消息放要朗读的文本
+ * - 预置音色：audio.voice 传中文音色 id（冰糖/茉莉/苏打/白桦），人物音色从此区分
+ * - voicedesign：模型 mimo-v2.5-tts-voicedesign，user 消息直接传音色描述（无需 audio.voice）
  * - 返回 JSON: choices[0].message.audio.data = base64 WAV
  * 端点/字段集中在本文件，官方文档如有出入只改这里。
  *
  * env：
  * - MIMO_API_KEY   必填，MiMo 平台 API key
  * - MIMO_BASE_URL  默认 https://api.xiaomimimo.com/v1
- * - MIMO_TTS_MODEL 默认 mimo-v2.5-tts
+ * - MIMO_TTS_MODEL 默认 mimo-v2.5-tts（预置音色模型；voicedesign 恒用 voicedesign 模型）
  */
 
 export type TtsSynthesizeResult =
@@ -21,6 +23,8 @@ import { fetchWithTimeout } from "@/lib/net/fetchWithTimeout";
 
 const DEFAULT_BASE_URL = "https://api.xiaomimimo.com/v1";
 const DEFAULT_MODEL = "mimo-v2.5-tts";
+/** voicedesign 文本设计音色模型（音色由 voicePrompt 文本描述生成，无需预置 id） */
+const VOICE_DESIGN_MODEL = "mimo-v2.5-tts-voicedesign";
 
 export function mimoConfigured(): boolean {
   return (process.env.MIMO_API_KEY ?? "").trim().length > 0;
@@ -39,11 +43,23 @@ export function ttsAudioBase64Of(body: unknown): string | null {
 export async function synthesizeSpeech(options: {
   text: string;
   voicePrompt: string;
+  /** MiMo 预置音色 id（冰糖/茉莉/苏打/白桦）；缺省则纯文本控制（保持旧行为） */
+  voiceId?: string;
+  /** true → voicedesign 文本设计音色（voicePrompt 即音色描述，无预置 id） */
+  voiceDesign?: boolean;
 }): Promise<TtsSynthesizeResult> {
   const key = (process.env.MIMO_API_KEY ?? "").trim();
   if (!key) return { ok: false, detail: "no-key" };
   const base = (process.env.MIMO_BASE_URL ?? DEFAULT_BASE_URL).replace(/\/$/, "");
-  const model = (process.env.MIMO_TTS_MODEL ?? DEFAULT_MODEL).trim();
+  const model = options.voiceDesign
+    ? VOICE_DESIGN_MODEL
+    : (process.env.MIMO_TTS_MODEL ?? DEFAULT_MODEL).trim();
+  // 预置音色：音色指令 = 朗读包装 + 风格描述；voicedesign：音色描述本体即 user 消息
+  const userContent = options.voiceDesign
+    ? options.voicePrompt
+    : `请用以下音色朗读，只输出 assistant 消息里的内容：${options.voicePrompt}`;
+  const audio: Record<string, string> = { format: "wav" };
+  if (options.voiceId) audio.voice = options.voiceId;
 
   try {
     const upstream = await fetchWithTimeout(`${base}/chat/completions`, {
@@ -55,9 +71,10 @@ export async function synthesizeSpeech(options: {
       body: JSON.stringify({
         model,
         messages: [
-          { role: "user", content: `请用以下音色朗读，只输出 assistant 消息里的内容：${options.voicePrompt}` },
+          { role: "user", content: userContent },
           { role: "assistant", content: options.text },
         ],
+        audio,
       }),
     });
     if (!upstream.ok) {
@@ -75,8 +92,8 @@ export async function synthesizeSpeech(options: {
       return { ok: false, detail: "mimo/tts empty-audio" };
     }
     // 拷贝为 ArrayBuffer 背书（避免 Uint8Array<ArrayBufferLike> 无法作 BodyInit）
-    const audio = new Uint8Array(buf);
-    return { ok: true, audio: audio.buffer, mime: "audio/wav" };
+    const wav = new Uint8Array(buf);
+    return { ok: true, audio: wav.buffer, mime: "audio/wav" };
   } catch (e) {
     const cause = (e as Error & { cause?: unknown })?.cause;
     const detail = `mimo/tts ${String(e)} cause=${JSON.stringify(cause)?.slice(0, 200) ?? "null"}`;

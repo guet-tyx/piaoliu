@@ -152,8 +152,12 @@ export const useTtsStore = create<TtsState>()((set, get) => {
       get().stop();
 
       const seq = ++speakSeq;
-      const voicePrompt = personaOf(roleId).voicePrompt;
-      const cacheKey = `${clean}|${voicePrompt}`;
+      const persona = personaOf(roleId);
+      // 缓存键含音色身份（预置 id / voicedesign 标记 + 描述），避免换音色后串出旧音频
+      const voiceIdentity = persona.voiceDesign
+        ? `design:${persona.voicePrompt}`
+        : `preset:${persona.voiceId ?? ""}:${persona.voicePrompt}`;
+      const cacheKey = `${clean}|${voiceIdentity}`;
       const cached = cache.get(cacheKey);
       if (cached) {
         playUrl(key, cached);

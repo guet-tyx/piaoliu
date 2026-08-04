@@ -22,8 +22,19 @@ export interface ChatPersona {
   /** 空态问候签名，如「—— 汐 · 星海版限定」 */
   signature: string;
   /**
+   * MiMo 预置音色 id（V2.5 中文音色：冰糖/茉莉=女声，苏打/白桦=男声）。
+   * 会作为 audio.voice 传给 TTS 请求；voiceDesign=true 时忽略。
+   */
+  voiceId?: string;
+  /**
+   * true → 用 mimo-v2.5-tts-voicedesign 文本设计音色（voicePrompt 即音色描述，
+   * 音色最独特，代价是兼容模式一次性返回）。false/缺省 → 预置音色（voiceId）。
+   */
+  voiceDesign?: boolean;
+  /**
    * TTS 音色指令（MiMo 用自然语言控制音色/语气/语速，聊天朗读与电台主持语音共用）。
-   * 会作为 user 消息拼进 TTS 请求；想换音色只改这里，一处维护。
+   * 预置音色时作为风格指令拼进 user 消息；voicedesign 时即音色描述本体。
+   * 想换音色只改这里，一处维护。
    */
   voicePrompt: string;
 }
@@ -36,7 +47,9 @@ export const CHAT_PERSONAS: ChatPersona[] = [
     avatar: "/images/avatar-sio.png",
     image: "/images/character-main.webp",
     signature: "—— 汐 · 星海版限定",
-    voicePrompt: "温柔清澈的少女声，轻声细语，带一点夜晚的宁静感",
+    // 预置音色「冰糖」= 清亮甜美女声；风格指令聚焦温柔俏皮
+    voiceId: "冰糖",
+    voicePrompt: "甜美清澈的少女声，温柔中带俏皮，轻声细语，带一点夜晚电台的宁静与淘气感，句尾轻轻上扬",
     // 角色传记式 prompt（人机感 P0-①）：以「我是谁」开头而非「回复规则」清单，让模型代入人格而非被约束。
     system:
       `# 角色设定
@@ -80,7 +93,9 @@ export const CHAT_PERSONAS: ChatPersona[] = [
     avatar: "/images/avatar-lumen.png",
     image: "/images/lumen-main.webp",
     signature: "—— 流明 · 星海版限定",
-    voicePrompt: "知性沉稳的年轻女声，冷静简洁，语气平缓",
+    // 预置音色「茉莉」= 柔润知性女声；风格指令聚焦沉稳克制（与汐的清亮俏皮明显区分）
+    voiceId: "茉莉",
+    voicePrompt: "知性沉稳的年轻女声，冷静克制，语气平缓可靠，像灯塔守夜人一样安定，叙述感强，情绪起伏小",
     system:
       `# 角色设定
 你是「流明」，星海中央灯塔的守望者，能把一整片星图译成旋律，用光的单位命名自己。灯塔的光一直亮着，而你负责在人们需要的时候，把光指给他们看。
@@ -123,7 +138,9 @@ export const CHAT_PERSONAS: ChatPersona[] = [
     avatar: "/images/avatar-soku.png",
     image: "/images/soku-main.webp",
     signature: "—— 朔空 · 星海版限定",
-    voicePrompt: "元气活泼的少女声，热情明亮，带一点调皮感",
+    // 朔空是夜航 DJ 男声：预置音色「苏打」= 元气明亮男声（修复此前误配少女声）
+    voiceId: "苏打",
+    voicePrompt: "元气明亮的青年男声，语速偏快，热情带一点玩梗自嗨的兴奋感，像凌晨电台的夜航 DJ 报歌打碟",
     system:
       `# 角色设定
 你是「朔空」，凌晨三点上线的夜航 DJ，自称「星海第一打碟手」。耳机就是你的人生装备，节拍是你打招呼的方式，凌晨三点电台永远为睡不着的人留着位子。
@@ -166,7 +183,9 @@ export const CHAT_PERSONAS: ChatPersona[] = [
     avatar: "/images/avatar-yoe.png",
     image: "/images/yoe-main.webp",
     signature: "—— 悠 · 星海版限定",
-    voicePrompt: "空灵神秘的女声，带一点慵懒和朦胧感",
+    // 悠用 voicedesign 文本设计音色（空灵神秘），避开与汐/流明共用女性预置音色，音色最独特
+    voiceDesign: true,
+    voicePrompt: "空灵神秘的年轻女声，声线偏轻、慵懒朦胧，像夜晚的占卜师低声解读星图，语速慢半拍、带呼吸感",
     system:
       `# 角色设定
 你是「悠」，星海暗面的占卜师，用星座连线解读歌单，是失眠者之友。七十九张星图，你总能在里面找到对应心事的那一张。语气神秘而温柔，带着玄妙的占卜感。

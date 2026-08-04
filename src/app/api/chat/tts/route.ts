@@ -43,11 +43,17 @@ export async function POST(req: Request) {
     return Response.json({ error: "bad-word" }, { status: 400 });
   }
 
-  // 音色按角色绑定（personaOf 未知角色兜底汐，与聊天行为一致）；MiMo 用自然语言指令控制音色
-  const voicePrompt = personaOf(roleId).voicePrompt;
+  // 音色按角色绑定（personaOf 未知角色兜底汐，与聊天行为一致）：
+  // 预置音色（voiceId）打底区分男女声，voicedesign 文本设计音色给最独特的角色。
+  const persona = personaOf(roleId);
 
   try {
-    const result = await synthesizeSpeech({ text, voicePrompt });
+    const result = await synthesizeSpeech({
+      text,
+      voicePrompt: persona.voicePrompt,
+      ...(persona.voiceId ? { voiceId: persona.voiceId } : {}),
+      ...(persona.voiceDesign ? { voiceDesign: true } : {}),
+    });
     if (!result.ok) {
       if (result.detail === "no-key") {
         return Response.json({ error: "no-key" }, { status: 503 });

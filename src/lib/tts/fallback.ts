@@ -13,11 +13,12 @@ export interface FallbackVoiceParams {
   rate: number;
 }
 
-/** 各角色兜底参数：pitch 音调 / rate 语速（汐轻声慢、朔空元气快、悠空灵缓、流明平缓） */
+/** 各角色兜底参数：pitch 音调 / rate 语速（汐轻声慢、流明平缓、朔空低沉男声快、悠空灵缓） */
 const PARAMS: Record<string, FallbackVoiceParams> = {
   sio: { lang: "zh-CN", pitch: 1.05, rate: 0.95 },
   lumen: { lang: "zh-CN", pitch: 0.95, rate: 0.92 },
-  soku: { lang: "zh-CN", pitch: 1.15, rate: 1.08 },
+  // 朔空是夜航 DJ 男声：低 pitch 显男低音，rate 快保持元气话痨（与 MiMo 预置「苏打」听感方向一致）
+  soku: { lang: "zh-CN", pitch: 0.85, rate: 1.08 },
   yoe: { lang: "zh-CN", pitch: 0.9, rate: 0.85 },
 };
 
