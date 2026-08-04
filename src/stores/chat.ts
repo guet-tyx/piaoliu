@@ -33,6 +33,11 @@ const SSE_STALL_MS = 30_000;
 /** 单次上游请求首字节超时（SSE 流建立后的停顿由上方看门狗负责） */
 const FETCH_TIMEOUT_MS = 30_000;
 
+/** 存储上限裁剪：只保留最近 MAX_STORED_MESSAGES 条（最旧的通常已被摘要覆盖，PRD 异常处理） */
+function capMessages(msgs: ChatMessage[]): ChatMessage[] {
+  return msgs.length > MAX_STORED_MESSAGES ? msgs.slice(-MAX_STORED_MESSAGES) : msgs;
+}
+
 /**
  * 角色 AI 聊天（V2.3 基础设施，V2.4 全屏聊天页使用）：
  * - 未配置服务端 key 时（apiReadyCache 记忆 503 no-key）走本地回复池降级；
@@ -84,8 +89,7 @@ const busyRoles = new Set<string>();
 export const useChatStore = create<ChatState>()((set, get) => {
   /** 更新某角色消息列表并持久化 */
   const commitMessages = (roleId: string, msgs: ChatMessage[]) => {
-    // 存储上限：只保留最近 MAX_STORED_MESSAGES 条（最旧的通常已被摘要覆盖，PRD 异常处理）
-    const capped = msgs.length > MAX_STORED_MESSAGES ? msgs.slice(-MAX_STORED_MESSAGES) : msgs;
+    const capped = capMessages(msgs);
     set((s) => ({ messages: { ...s.messages, [roleId]: capped } }));
     writeStorage(chatKey(roleId), capped);
   };
@@ -174,7 +178,9 @@ export const useChatStore = create<ChatState>()((set, get) => {
     set((s) => ({
       messages: {
         ...s.messages,
-        [roleId]: (s.messages[roleId] ?? []).flatMap((m) => (m.id === msgId ? replaced : [m])),
+        [roleId]: capMessages(
+          (s.messages[roleId] ?? []).flatMap((m) => (m.id === msgId ? replaced : [m])),
+        ),
       },
       status: { ...s.status, [roleId]: "idle" },
     }));
@@ -230,26 +236,22 @@ export const useChatStore = create<ChatState>()((set, get) => {
       stallTimer = setTimeout(() => controller.abort(), SSE_STALL_MS);
     };
     resetStall();
-    let full = "";
-    try {
-      full = await consumeSSE(res, (delta) => {
-        resetStall();
-        set((s) => ({
-          messages: {
-            ...s.messages,
-            [roleId]: (s.messages[roleId] ?? []).map((m) =>
-              m.id === msgId ? { ...m, text: m.text + delta } : m,
-            ),
-          },
-        }));
-      });
-    } catch {
-      // 流中断（网络 / 停顿看门狗 abort）：用已收到的部分文本收尾，不降级本地
-      // （修复旧 bug：截断草稿残留 + 本地回复二次插入重复）
-    } finally {
-      if (stallTimer) clearTimeout(stallTimer);
-    }
+    const result = await consumeSSE(res, (delta) => {
+      resetStall();
+      set((s) => ({
+        messages: {
+          ...s.messages,
+          [roleId]: (s.messages[roleId] ?? []).map((m) =>
+            m.id === msgId ? { ...m, text: m.text + delta } : m,
+          ),
+        },
+      }));
+    }).catch(() => ({ full: "", interrupted: true } as const));
+    const full = result.full;
+    if (stallTimer) clearTimeout(stallTimer);
     // 收敛最终文本：含贴纸 token 时拆为独立贴纸消息（R5.2）
+    // 流中断（result.interrupted）时 full 为已收到的部分文本，同样收尾，不降级本地
+    // （修复旧 bug：截断草稿残留 + 本地回复二次插入重复）
     finalizeReply(roleId, msgId, full);
     // 空流：上游 200 但全程无内容（如 V4-Flash 间歇空流）。
     // 移除空 AI 消息并视为失败，由 send() 降级本地回复，避免「发了没反应」。

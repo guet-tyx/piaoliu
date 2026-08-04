@@ -1,16 +1,23 @@
 /**
  * OpenAI 兼容 SSE 消费（V2.7 从 stores/chat.ts 拆出）：
- * 解析 `data: {json}` / `data: [DONE]`，逐 delta 回调，返回累计完整文本。
- * 读循环异常透传（abort / 网络中断），由调用方决定收尾策略（部分文本落盘 / 降级）。
- * 中止由调用方通过 fetch 的 AbortSignal 控制（abort 后 read 抛错）。
+ * 解析 `data: {json}` / `data: [DONE]`，逐 delta 回调。
+ * 读流中断（abort / 网络）不抛错：返回 `interrupted: true` 与已收到的部分文本，
+ * 由调用方决定收尾策略（部分文本落盘 / 降级），避免「已收到的内容因异常而丢失」。
  */
+
+export interface SseResult {
+  /** 累计完整文本（中断时为已收到的部分文本） */
+  full: string;
+  /** 是否读流中途中断（网络/abort；full 为部分内容） */
+  interrupted: boolean;
+}
 
 export async function consumeSSE(
   res: Response,
   onDelta: (text: string) => void,
-): Promise<string> {
+): Promise<SseResult> {
   const reader = res.body?.getReader();
-  if (!reader) return "";
+  if (!reader) return { full: "", interrupted: false };
   const decoder = new TextDecoder();
   let buffer = "";
   let full = "";
@@ -41,8 +48,8 @@ export async function consumeSSE(
       }
     }
   } catch {
-    // 读流中断（abort/网络）：透传给调用方收尾（已收到的部分文本在 full 中）
-    throw new Error("sse-read-failed");
+    // 读流中断（abort/网络）：保留已收到的部分文本，标记 interrupted
+    return { full, interrupted: true };
   }
-  return full;
+  return { full, interrupted: false };
 }
