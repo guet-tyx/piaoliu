@@ -23,7 +23,7 @@
  * 用法：node scripts/upload-music.mjs
  * 输出：public/music/*.mp3 + CREDITS.md 全部上传，打印可用的 MUSIC_BASE_URL。
  */
-import { readdirSync, readFileSync } from "node:fs";
+import { readdirSync, readFileSync, existsSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
@@ -31,7 +31,20 @@ import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const MUSIC_DIR = join(ROOT, "public", "music");
 
-const env = (k) => process.env[k] ?? "";
+// 加载 .env.local（node 脚本不自动读，Next.js 才自动加载）
+const envLocal = join(ROOT, ".env.local");
+if (existsSync(envLocal)) {
+  const lines = readFileSync(envLocal, "utf8").split("\n");
+  for (const line of lines) {
+    const m = line.match(/^\s*([A-Z_][A-Z0-9_]*)=(.*)$/);
+    if (m) {
+      const val = m[2].replace(/^["']|["']$/g, "").trim();
+      if (!process.env[m[1]]) process.env[m[1]] = val;
+    }
+  }
+}
+
+const env = (k) => (process.env[k] ?? "").trim();
 const endpoint = env("MUSIC_S3_ENDPOINT");
 const region = env("MUSIC_S3_REGION") || "auto";
 const accessKeyId = env("MUSIC_S3_ACCESS_KEY_ID");

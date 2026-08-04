@@ -96,6 +96,7 @@ export const TRACKS: Track[] = [
     "tag": "后摇",
     "cover": "/images/covers/cover-t05.webp",
     "src": [
+      "https://mu-1317605628.cos.ap-guangzhou.myqcloud.com/music/airship-serenity.mp3",
       "/music/airship-serenity.mp3"
     ],
     "mood": [
@@ -114,6 +115,7 @@ export const TRACKS: Track[] = [
     "tag": "后摇",
     "cover": "/images/covers/cover-t06.webp",
     "src": [
+      "https://mu-1317605628.cos.ap-guangzhou.myqcloud.com/music/how-it-begins.mp3",
       "/music/how-it-begins.mp3"
     ],
     "mood": [
@@ -132,6 +134,7 @@ export const TRACKS: Track[] = [
     "tag": "氛围",
     "cover": "/images/covers/cover-t07.webp",
     "src": [
+      "https://mu-1317605628.cos.ap-guangzhou.myqcloud.com/music/long-time-coming.mp3",
       "/music/long-time-coming.mp3"
     ],
     "mood": [
@@ -150,6 +153,7 @@ export const TRACKS: Track[] = [
     "tag": "氛围",
     "cover": "/images/covers/cover-t08.webp",
     "src": [
+      "https://mu-1317605628.cos.ap-guangzhou.myqcloud.com/music/unanswered-questions.mp3",
       "/music/unanswered-questions.mp3"
     ],
     "mood": [
@@ -168,6 +172,7 @@ export const TRACKS: Track[] = [
     "tag": "氛围",
     "cover": "/images/covers/cover-t09.webp",
     "src": [
+      "https://mu-1317605628.cos.ap-guangzhou.myqcloud.com/music/nowhere-land.mp3",
       "/music/nowhere-land.mp3"
     ],
     "mood": [
@@ -187,6 +192,7 @@ export const TRACKS: Track[] = [
     "tag": "后摇",
     "cover": "/images/covers/cover-t10.webp",
     "src": [
+      "https://mu-1317605628.cos.ap-guangzhou.myqcloud.com/music/bittersweet.mp3",
       "/music/bittersweet.mp3"
     ],
     "mood": [
@@ -206,6 +212,7 @@ export const TRACKS: Track[] = [
     "tag": "氛围",
     "cover": "/images/covers/cover-t11.webp",
     "src": [
+      "https://mu-1317605628.cos.ap-guangzhou.myqcloud.com/music/hypnothis.mp3",
       "/music/hypnothis.mp3"
     ],
     "mood": [
@@ -224,6 +231,7 @@ export const TRACKS: Track[] = [
     "tag": "日系",
     "cover": "/images/covers/cover-t12.webp",
     "src": [
+      "https://mu-1317605628.cos.ap-guangzhou.myqcloud.com/music/kawai-kitsune.mp3",
       "/music/kawai-kitsune.mp3"
     ],
     "mood": [
@@ -242,6 +250,7 @@ export const TRACKS: Track[] = [
     "tag": "日系",
     "cover": "/images/covers/cover-t13.webp",
     "src": [
+      "https://mu-1317605628.cos.ap-guangzhou.myqcloud.com/music/chipper-doodle-v2.mp3",
       "/music/chipper-doodle-v2.mp3"
     ],
     "mood": [
@@ -260,6 +269,7 @@ export const TRACKS: Track[] = [
     "tag": "日系",
     "cover": "/images/covers/cover-t14.webp",
     "src": [
+      "https://mu-1317605628.cos.ap-guangzhou.myqcloud.com/music/super-friendly.mp3",
       "/music/super-friendly.mp3"
     ],
     "mood": [
@@ -278,6 +288,7 @@ export const TRACKS: Track[] = [
     "tag": "日系",
     "cover": "/images/covers/cover-t15.webp",
     "src": [
+      "https://mu-1317605628.cos.ap-guangzhou.myqcloud.com/music/newer-wave.mp3",
       "/music/newer-wave.mp3"
     ],
     "mood": [
@@ -296,6 +307,7 @@ export const TRACKS: Track[] = [
     "tag": "日系",
     "cover": "/images/covers/cover-t16.webp",
     "src": [
+      "https://mu-1317605628.cos.ap-guangzhou.myqcloud.com/music/voxel-revolution.mp3",
       "/music/voxel-revolution.mp3"
     ],
     "mood": [
@@ -313,6 +325,7 @@ export const TRACKS: Track[] = [
     "tag": "日系",
     "cover": "/images/covers/cover-t17.webp",
     "src": [
+      "https://mu-1317605628.cos.ap-guangzhou.myqcloud.com/music/digital-lemonade.mp3",
       "/music/digital-lemonade.mp3"
     ],
     "mood": [
@@ -331,6 +344,7 @@ export const TRACKS: Track[] = [
     "tag": "日系",
     "cover": "/images/covers/cover-t18.webp",
     "src": [
+      "https://mu-1317605628.cos.ap-guangzhou.myqcloud.com/music/bit-quest.mp3",
       "/music/bit-quest.mp3"
     ],
     "mood": [
@@ -349,6 +363,7 @@ export const TRACKS: Track[] = [
     "tag": "电子",
     "cover": "/images/covers/cover-t19.webp",
     "src": [
+      "https://mu-1317605628.cos.ap-guangzhou.myqcloud.com/music/level-up.mp3",
       "/music/level-up.mp3"
     ],
     "mood": [
@@ -366,6 +381,7 @@ export const TRACKS: Track[] = [
     "tag": "日系",
     "cover": "/images/covers/cover-t20.webp",
     "src": [
+      "https://mu-1317605628.cos.ap-guangzhou.myqcloud.com/music/pinball-spring-160.mp3",
       "/music/pinball-spring-160.mp3"
     ],
     "mood": [
@@ -384,6 +400,7 @@ export const TRACKS: Track[] = [
     "tag": "日系",
     "cover": "/images/covers/cover-t21.webp",
     "src": [
+      "https://mu-1317605628.cos.ap-guangzhou.myqcloud.com/music/future-cha-cha.mp3",
       "/music/future-cha-cha.mp3"
     ],
     "mood": [
@@ -402,6 +419,7 @@ export const TRACKS: Track[] = [
     "tag": "纯音乐",
     "cover": "/images/covers/cover-t22.webp",
     "src": [
+      "https://mu-1317605628.cos.ap-guangzhou.myqcloud.com/music/andreas-theme.mp3",
       "/music/andreas-theme.mp3"
     ],
     "mood": [
@@ -419,6 +437,7 @@ export const TRACKS: Track[] = [
     "tag": "纯音乐",
     "cover": "/images/covers/cover-t23.webp",
     "src": [
+      "https://mu-1317605628.cos.ap-guangzhou.myqcloud.com/music/balloon-game.mp3",
       "/music/balloon-game.mp3"
     ],
     "mood": [
@@ -437,6 +456,7 @@ export const TRACKS: Track[] = [
     "tag": "纯音乐",
     "cover": "/images/covers/cover-t24.webp",
     "src": [
+      "https://mu-1317605628.cos.ap-guangzhou.myqcloud.com/music/brain-dance.mp3",
       "/music/brain-dance.mp3"
     ],
     "mood": [
@@ -455,6 +475,7 @@ export const TRACKS: Track[] = [
     "tag": "纯音乐",
     "cover": "/images/covers/cover-t25.webp",
     "src": [
+      "https://mu-1317605628.cos.ap-guangzhou.myqcloud.com/music/one-sly-move.mp3",
       "/music/one-sly-move.mp3"
     ],
     "mood": [
@@ -472,6 +493,7 @@ export const TRACKS: Track[] = [
     "tag": "轻音乐",
     "cover": "/images/covers/cover-t26.webp",
     "src": [
+      "https://mu-1317605628.cos.ap-guangzhou.myqcloud.com/music/getting-it-done.mp3",
       "/music/getting-it-done.mp3"
     ],
     "mood": [
@@ -490,6 +512,7 @@ export const TRACKS: Track[] = [
     "tag": "纯音乐",
     "cover": "/images/covers/cover-t27.webp",
     "src": [
+      "https://mu-1317605628.cos.ap-guangzhou.myqcloud.com/music/floating-cities.mp3",
       "/music/floating-cities.mp3"
     ],
     "mood": [
@@ -509,6 +532,7 @@ export const TRACKS: Track[] = [
     "tag": "纯音乐",
     "cover": "/images/covers/cover-t28.webp",
     "src": [
+      "https://mu-1317605628.cos.ap-guangzhou.myqcloud.com/music/pamgaea.mp3",
       "/music/pamgaea.mp3"
     ],
     "mood": [
@@ -527,6 +551,7 @@ export const TRACKS: Track[] = [
     "tag": "轻音乐",
     "cover": "/images/covers/cover-t29.webp",
     "src": [
+      "https://mu-1317605628.cos.ap-guangzhou.myqcloud.com/music/laser-groove.mp3",
       "/music/laser-groove.mp3"
     ],
     "mood": [
@@ -545,6 +570,7 @@ export const TRACKS: Track[] = [
     "tag": "氛围",
     "cover": "/images/covers/cover-t30.webp",
     "src": [
+      "https://mu-1317605628.cos.ap-guangzhou.myqcloud.com/music/killing-time.mp3",
       "/music/killing-time.mp3"
     ],
     "mood": [
@@ -563,6 +589,7 @@ export const TRACKS: Track[] = [
     "tag": "环境",
     "cover": "/images/covers/cover-t31.webp",
     "src": [
+      "https://mu-1317605628.cos.ap-guangzhou.myqcloud.com/music/exit-the-premises.mp3",
       "/music/exit-the-premises.mp3"
     ],
     "mood": [
@@ -582,6 +609,7 @@ export const TRACKS: Track[] = [
     "tag": "环境",
     "cover": "/images/covers/cover-t32.webp",
     "src": [
+      "https://mu-1317605628.cos.ap-guangzhou.myqcloud.com/music/cut-and-run.mp3",
       "/music/cut-and-run.mp3"
     ],
     "mood": [
@@ -600,6 +628,7 @@ export const TRACKS: Track[] = [
     "tag": "钢琴",
     "cover": "/images/covers/cover-t33.webp",
     "src": [
+      "https://mu-1317605628.cos.ap-guangzhou.myqcloud.com/music/rhinoceros.mp3",
       "/music/rhinoceros.mp3"
     ],
     "mood": [
@@ -618,6 +647,7 @@ export const TRACKS: Track[] = [
     "tag": "环境",
     "cover": "/images/covers/cover-t34.webp",
     "src": [
+      "https://mu-1317605628.cos.ap-guangzhou.myqcloud.com/music/blippy-trance.mp3",
       "/music/blippy-trance.mp3"
     ],
     "mood": [
@@ -637,6 +667,7 @@ export const TRACKS: Track[] = [
     "tag": "氛围",
     "cover": "/images/covers/cover-t35.webp",
     "src": [
+      "https://mu-1317605628.cos.ap-guangzhou.myqcloud.com/music/ethernight-club.mp3",
       "/music/ethernight-club.mp3"
     ],
     "mood": [
@@ -656,6 +687,7 @@ export const TRACKS: Track[] = [
     "tag": "电子",
     "cover": "/images/covers/cover-t36.webp",
     "src": [
+      "https://mu-1317605628.cos.ap-guangzhou.myqcloud.com/music/blip-stream.mp3",
       "/music/blip-stream.mp3"
     ],
     "mood": [
@@ -674,6 +706,7 @@ export const TRACKS: Track[] = [
     "tag": "电子",
     "cover": "/images/covers/cover-t37.webp",
     "src": [
+      "https://mu-1317605628.cos.ap-guangzhou.myqcloud.com/music/cyborg-ninja.mp3",
       "/music/cyborg-ninja.mp3"
     ],
     "mood": [
@@ -691,6 +724,7 @@ export const TRACKS: Track[] = [
     "tag": "电子",
     "cover": "/images/covers/cover-t38.webp",
     "src": [
+      "https://mu-1317605628.cos.ap-guangzhou.myqcloud.com/music/cipher.mp3",
       "/music/cipher.mp3"
     ],
     "mood": [
@@ -709,6 +743,7 @@ export const TRACKS: Track[] = [
     "tag": "电子",
     "cover": "/images/covers/cover-t39.webp",
     "src": [
+      "https://mu-1317605628.cos.ap-guangzhou.myqcloud.com/music/reformat.mp3",
       "/music/reformat.mp3"
     ],
     "mood": [
@@ -726,6 +761,7 @@ export const TRACKS: Track[] = [
     "tag": "电子",
     "cover": "/images/covers/cover-t40.webp",
     "src": [
+      "https://mu-1317605628.cos.ap-guangzhou.myqcloud.com/music/laserpack.mp3",
       "/music/laserpack.mp3"
     ],
     "mood": [
@@ -743,6 +779,7 @@ export const TRACKS: Track[] = [
     "tag": "电子",
     "cover": "/images/covers/cover-t41.webp",
     "src": [
+      "https://mu-1317605628.cos.ap-guangzhou.myqcloud.com/music/shiny-tech.mp3",
       "/music/shiny-tech.mp3"
     ],
     "mood": [
@@ -762,6 +799,7 @@ export const TRACKS: Track[] = [
     "tag": "电子",
     "cover": "/images/covers/cover-t42.webp",
     "src": [
+      "https://mu-1317605628.cos.ap-guangzhou.myqcloud.com/music/robobozo.mp3",
       "/music/robobozo.mp3"
     ],
     "mood": [
@@ -780,6 +818,7 @@ export const TRACKS: Track[] = [
     "tag": "电子",
     "cover": "/images/covers/cover-t43.webp",
     "src": [
+      "https://mu-1317605628.cos.ap-guangzhou.myqcloud.com/music/ouroboros.mp3",
       "/music/ouroboros.mp3"
     ],
     "mood": [
@@ -799,6 +838,7 @@ export const TRACKS: Track[] = [
     "tag": "电子",
     "cover": "/images/covers/cover-t44.webp",
     "src": [
+      "https://mu-1317605628.cos.ap-guangzhou.myqcloud.com/music/cut-trance.mp3",
       "/music/cut-trance.mp3"
     ],
     "mood": [
@@ -816,6 +856,7 @@ export const TRACKS: Track[] = [
     "tag": "动漫OST",
     "cover": "/images/covers/cover-t45.webp",
     "src": [
+      "https://mu-1317605628.cos.ap-guangzhou.myqcloud.com/music/morgana-rides.mp3",
       "/music/morgana-rides.mp3"
     ],
     "mood": [
@@ -834,6 +875,7 @@ export const TRACKS: Track[] = [
     "tag": "动漫OST",
     "cover": "/images/covers/cover-t46.webp",
     "src": [
+      "https://mu-1317605628.cos.ap-guangzhou.myqcloud.com/music/adventures-in-adventureland.mp3",
       "/music/adventures-in-adventureland.mp3"
     ],
     "mood": [
@@ -852,6 +894,7 @@ export const TRACKS: Track[] = [
     "tag": "动漫OST",
     "cover": "/images/covers/cover-t47.webp",
     "src": [
+      "https://mu-1317605628.cos.ap-guangzhou.myqcloud.com/music/cruising-for-goblins.mp3",
       "/music/cruising-for-goblins.mp3"
     ],
     "mood": [
@@ -870,6 +913,7 @@ export const TRACKS: Track[] = [
     "tag": "动漫OST",
     "cover": "/images/covers/cover-t48.webp",
     "src": [
+      "https://mu-1317605628.cos.ap-guangzhou.myqcloud.com/music/video-dungeon-boss.mp3",
       "/music/video-dungeon-boss.mp3"
     ],
     "mood": [
@@ -888,6 +932,7 @@ export const TRACKS: Track[] = [
     "tag": "动漫OST",
     "cover": "/images/covers/cover-t49.webp",
     "src": [
+      "https://mu-1317605628.cos.ap-guangzhou.myqcloud.com/music/overworld.mp3",
       "/music/overworld.mp3"
     ],
     "mood": [
@@ -906,6 +951,7 @@ export const TRACKS: Track[] = [
     "tag": "动漫OST",
     "cover": "/images/covers/cover-t50.webp",
     "src": [
+      "https://mu-1317605628.cos.ap-guangzhou.myqcloud.com/music/obliteration.mp3",
       "/music/obliteration.mp3"
     ],
     "mood": [
@@ -924,6 +970,7 @@ export const TRACKS: Track[] = [
     "tag": "动漫OST",
     "cover": "/images/covers/cover-t51.webp",
     "src": [
+      "https://mu-1317605628.cos.ap-guangzhou.myqcloud.com/music/bit-shift.mp3",
       "/music/bit-shift.mp3"
     ],
     "mood": [
@@ -943,6 +990,7 @@ export const TRACKS: Track[] = [
     "tag": "动漫OST",
     "cover": "/images/covers/cover-t52.webp",
     "src": [
+      "https://mu-1317605628.cos.ap-guangzhou.myqcloud.com/music/mega-hyper-ultrastorm.mp3",
       "/music/mega-hyper-ultrastorm.mp3"
     ],
     "mood": [
