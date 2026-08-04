@@ -7,7 +7,10 @@
  *   时长从 public/music/CREDITS.md 表格解析（避免手敲出错），
  *   中文曲名/风格/情绪/场景由下方 MAPPING 定义（星海电台风格命名）。
  *
- * 用法：node scripts/gen-tracks.mjs
+ * 用法：
+ *   node scripts/gen-tracks.mjs                     # 本地路径（/music/xxx.mp3）
+ *   MUSIC_BASE_URL=https://cdn.example.com/music node scripts/gen-tracks.mjs
+ *                                                   # CDN 模式：src[0]=远程、src[1]=本地兜底
  * 输出：src/data/tracks.ts（直接覆盖）
  */
 import { readFileSync, writeFileSync } from "node:fs";
@@ -15,6 +18,16 @@ import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
+
+/** 曲库 CDN 前缀（可选）：设置后新曲 src[0] 用 CDN 地址、src[1] 保留本地兜底（Vercel 部署用） */
+const MUSIC_BASE_URL = (process.env.MUSIC_BASE_URL ?? "").replace(/\/+$/, "");
+
+/** 新曲 src：CDN 模式 → [远程, 本地兜底]；否则 [本地] */
+function musicSrc(file) {
+  return MUSIC_BASE_URL
+    ? [`${MUSIC_BASE_URL}/${file}`, `/music/${file}`]
+    : [`/music/${file}`];
+}
 
 /** 主曲目（t01-t04，保持现有内容不变） */
 const MAIN_TRACKS = [
@@ -168,7 +181,7 @@ const generated = MAPPING.map(([file, t, tag, mood, scene], i) => {
     s: `Kevin MacLeod · ${tag}`, // CC BY 4.0 署名
     tag,
     cover: `/images/covers/cover-${id}.webp`,
-    src: [`/music/${file}`],
+    src: musicSrc(file),
     mood,
     scene,
     duration: durations.get(file),
@@ -195,8 +208,8 @@ const out = `import type { Track } from "@/types/music";
 /**
  * 星海电台曲目（52 首）
  * - t01-t04：原型保留曲目（本地音频优先，incompetech / SoundHelix 兜底）
- * - t05-t52：Kevin MacLeod（incompetech.com）CC BY 4.0，本地 /music/ 直放；
- *   中文曲名为星海电台风格命名，原曲名与时长见 public/music/CREDITS.md
+ * - t05-t52：Kevin MacLeod（incompetech.com）CC BY 4.0，原曲名与时长见 public/music/CREDITS.md
+ *   音频来源：未设 MUSIC_BASE_URL 时本地 /music/ 直放；设为 CDN 前缀时走远程 + 本地兜底
  * - 本文件由 scripts/gen-tracks.mjs 生成，勿手改数据段
  */
 export const TRACKS: Track[] = ${JSON.stringify(tracks, null, 2)};

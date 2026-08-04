@@ -3,8 +3,8 @@ import type { Track } from "@/types/music";
 /**
  * 星海电台曲目（52 首）
  * - t01-t04：原型保留曲目（本地音频优先，incompetech / SoundHelix 兜底）
- * - t05-t52：Kevin MacLeod（incompetech.com）CC BY 4.0，本地 /music/ 直放；
- *   中文曲名为星海电台风格命名，原曲名与时长见 public/music/CREDITS.md
+ * - t05-t52：Kevin MacLeod（incompetech.com）CC BY 4.0，原曲名与时长见 public/music/CREDITS.md
+ *   音频来源：未设 MUSIC_BASE_URL 时本地 /music/ 直放；设为 CDN 前缀时走远程 + 本地兜底
  * - 本文件由 scripts/gen-tracks.mjs 生成，勿手改数据段
  */
 export const TRACKS: Track[] = [
