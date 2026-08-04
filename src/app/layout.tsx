@@ -5,6 +5,7 @@ import { Footer } from "@/components/layout/Footer";
 import { ParticleRails } from "@/components/shared/ParticleRails";
 import { StarSeaBg } from "@/components/shared/StarSeaBg";
 import { ScrollChrome } from "@/components/shared/ScrollChrome";
+import { PlayerBridge } from "@/components/player/PlayerBridge";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -27,6 +28,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <ParticleRails />
         {/* 滚动叙事：顶部进度条 + 返回顶部（fixed 层） */}
         <ScrollChrome />
+        {/* 全局电台引擎：音频桥接常驻，路由切换音乐不中断（V3.2） */}
+        <PlayerBridge />
         <Topbar />
         {children}
         <Footer />

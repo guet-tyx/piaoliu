@@ -139,7 +139,8 @@ export function useAudioPlayer() {
   }, [volume, muted]);
 
   // 播放状态持久化：挂载后恢复（不自动播放），变更时写回 localStorage
-  // （V2.7 拆至 lib/player/persist.ts；聊天页由 usePlayerPersistence 挂载，刷新后频道上下文保持）
+  // （V2.7 拆至 lib/player/persist.ts；V3.2 起 useAudioPlayer 由根布局 PlayerBridge 全局挂载，
+  // 恢复/写回对全站生效——首页、聊天页及其它页面刷新后频道上下文都保持）
   useEffect(() => {
     restorePlayerState();
     return bindPlayerPersistence();

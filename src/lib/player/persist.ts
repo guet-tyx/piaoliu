@@ -6,8 +6,8 @@ import { readStorage, writeStorage, STORAGE } from "@/lib/storage";
  * 播放器状态持久化（V2.7 从 useAudioPlayer 拆出）：
  * - restorePlayerState：从 localStorage 恢复 UI 状态（不自动播放，防浏览器拦截）；
  * - bindPlayerPersistence：订阅变更写回（仅持久化字段变化时写入，避免 setProgress 高频触发）。
- * 任意页面可挂载（首页 PlayerSection / 聊天页 usePlayerPersistence），
- * 解决聊天页整页刷新后频道上下文丢失、频道联动开场白失效的问题。
+ * 任意页面常驻生效（V3.2 起由根布局 PlayerBridge → useAudioPlayer 全局挂载），
+ * 解决路由切换/整页刷新后频道上下文丢失、频道联动开场白失效的问题。
  */
 
 const PLAY_MODES: PlayMode[] = ["order", "loop", "shuffle"];

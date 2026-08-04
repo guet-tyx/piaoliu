@@ -3,7 +3,6 @@
 import { useState } from "react";
 import type { CSSProperties } from "react";
 import { usePlayerStore, type PlayMode } from "@/stores/player";
-import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 import { useBondTracker } from "@/hooks/useBondTracker";
 import { useTrackDanmaku } from "@/hooks/useTrackDanmaku";
 import { usePresence } from "@/hooks/usePresence";
@@ -64,7 +63,8 @@ function VolIcon({ muted }: { muted: boolean }) {
  * 同船共听（FR-10）：在线人数 + 匿名头像流 + 发弹幕入口
  */
 export function PlayerSection() {
-  useAudioPlayer();
+  // 音频桥接/收听追踪/弹幕订阅已提升至根布局 PlayerBridge（V3.2 全局电台引擎），
+  // 路由切换不中断播放；本组件保留纯 UI + 同船 presence 展示。
   useBondTracker();
   useTrackDanmaku();
   const peers = usePresence();

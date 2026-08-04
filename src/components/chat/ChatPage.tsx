@@ -7,7 +7,6 @@ import { useChatStore } from "@/stores/chat";
 import { TRACKS } from "@/data/tracks";
 import { todayTrackIndex } from "@/lib/chat/format";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
-import { usePlayerPersistence } from "@/hooks/usePlayerPersistence";
 import { ChatHeader } from "@/components/chat/ChatHeader";
 import { MessageList } from "@/components/chat/MessageList";
 import { ChatInput } from "@/components/chat/ChatInput";
@@ -40,8 +39,8 @@ export function ChatPage({ roleId, initialDraft }: ChatPageProps) {
   const reduced = usePrefersReducedMotion();
   const restore = useChatStore((s) => s.restore);
   const probe = useChatStore((s) => s.probe);
-  /** 播放器状态持久化（V2.7）：聊天页无 PlayerSection，刷新后恢复频道上下文，频道联动开场白生效 */
-  usePlayerPersistence();
+  // 播放器状态持久化已由根布局 PlayerBridge（V3.2 全局电台引擎）接管，聊天页无需再挂载；
+  // 刷新后频道上下文由全局 restorePlayerState 恢复，频道联动开场白保持生效。
   /** R5.3 角色聊天背景图（未知角色兜底汐） */
   const bgSrc = `/images/chat-bg-${ROLE_BG.includes(roleId) ? roleId : "sio"}.webp`;
 
