@@ -1,15 +1,20 @@
 "use client";
 
 import { create } from "zustand";
-import type { ChatMessage, ChatStatus } from "@/types/chat";
+import type { ChatMessage, ChatStatus, ChatSummary } from "@/types/chat";
 import { isSafeText } from "@/lib/api/moderation";
 import { localReply } from "@/lib/chat/local";
 import { MAX_HISTORY, MAX_TEXT } from "@/lib/chat/limits";
+import { nextSummaryChunk, formatSummaryChunk } from "@/lib/chat/summarize";
 import { splitStickerMessages, stickerToModelText } from "@/lib/chat/split";
 import { stickerOf } from "@/data/stickers";
 
-/** localStorage 键：每角色独立会话 */
+/** localStorage 键：每角色独立会话（消息 + 对话总结摘要分 key 存储） */
 const CHAT_KEY_PREFIX = "drift-chat";
+const SUMMARY_KEY_PREFIX = "drift-chat-summary";
+
+/** 无摘要的初始态（只读共享引用，更新时总是创建新对象） */
+const EMPTY_SUMMARY: ChatSummary = { text: "", covered: 0 };
 
 function genId(): string {
   // 运行期 action 内随机（非渲染期，SSR 安全）
@@ -17,6 +22,9 @@ function genId(): string {
 }
 function chatKey(roleId: string): string {
   return `${CHAT_KEY_PREFIX}-${roleId}`;
+}
+function summaryKey(roleId: string): string {
+  return `${SUMMARY_KEY_PREFIX}-${roleId}`;
 }
 function readLocal(roleId: string): ChatMessage[] {
   try {
@@ -29,6 +37,27 @@ function readLocal(roleId: string): ChatMessage[] {
 function writeLocal(roleId: string, msgs: ChatMessage[]) {
   try {
     localStorage.setItem(chatKey(roleId), JSON.stringify(msgs));
+  } catch {
+    // 隐私模式等忽略写入失败
+  }
+}
+/** 读摘要记录；数据损坏/缺字段时静默忽略，等价于无摘要（PRD 异常处理） */
+function readSummaryLocal(roleId: string): ChatSummary {
+  try {
+    const raw = localStorage.getItem(summaryKey(roleId));
+    if (!raw) return EMPTY_SUMMARY;
+    const parsed = JSON.parse(raw) as Partial<ChatSummary>;
+    if (typeof parsed?.text !== "string" || typeof parsed?.covered !== "number") {
+      return EMPTY_SUMMARY;
+    }
+    return { text: parsed.text, covered: parsed.covered };
+  } catch {
+    return EMPTY_SUMMARY;
+  }
+}
+function writeSummaryLocal(roleId: string, summary: ChatSummary) {
+  try {
+    localStorage.setItem(summaryKey(roleId), JSON.stringify(summary));
   } catch {
     // 隐私模式等忽略写入失败
   }
@@ -86,6 +115,8 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 export interface ChatState {
   messages: Record<string, ChatMessage[]>;
   status: Record<string, ChatStatus>;
+  /** 对话自动总结：每角色的累积摘要（随聊天持久化，清空时重置） */
+  summaries: Record<string, ChatSummary>;
   /** 挂载时按需从 localStorage 恢复某角色（V2.4 页内只跑一次） */
   restore: (roleId: string) => void;
   /** 发送消息；ok.degraded 表示 AI 已降级为本地回复池（供错误横幅提示，V2.4） */
@@ -117,11 +148,58 @@ export interface ChatState {
 /** 服务端 key 就绪缓存：首次 503 no-key 后记忆，避免每次空请求 */
 let apiReadyCache: boolean | null = null;
 
+/** 对话自动总结防并发：每个角色同时只允许一个 in-flight 提取请求（fire-and-forget） */
+const summarizingRoles = new Set<string>();
+
 export const useChatStore = create<ChatState>()((set, get) => {
   /** 更新某角色消息列表并持久化 */
   const commitMessages = (roleId: string, msgs: ChatMessage[]) => {
     set((s) => ({ messages: { ...s.messages, [roleId]: msgs } }));
     writeLocal(roleId, msgs);
+  };
+  /** 更新某角色摘要并持久化 */
+  const commitSummary = (roleId: string, summary: ChatSummary) => {
+    set((s) => ({ summaries: { ...s.summaries, [roleId]: summary } }));
+    writeSummaryLocal(roleId, summary);
+  };
+
+  /**
+   * 对话自动总结（Summarize）：达到阈值后异步提取新的一块早期对话并增量追加进摘要。
+   * fire-and-forget 不阻塞消息发送；失败（503 no-key / 网络 / 全模型失败）不推进 covered，
+   * 下次发送自动重试；提取为空仅推进 covered（不发空摘要，PRD 异常处理）。
+   */
+  const maybeSummarize = async (roleId: string) => {
+    if (summarizingRoles.has(roleId)) return;
+    const msgs = get().messages[roleId] ?? [];
+    const summary = get().summaries[roleId] ?? EMPTY_SUMMARY;
+    const chunk = nextSummaryChunk(msgs, summary.covered);
+    if (!chunk) return;
+
+    summarizingRoles.add(roleId);
+    try {
+      const block = msgs.slice(chunk.start, chunk.end);
+      // 整块无文本（纯贴纸）：无可提取内容，仅推进计数
+      const chunkText = formatSummaryChunk(block);
+      const advanced = { ...summary, covered: chunk.end };
+      if (!chunkText) {
+        commitSummary(roleId, advanced);
+        return;
+      }
+      const res = await fetch("/api/chat/summarize", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ roleId, messages: block }),
+      });
+      if (!res.ok) return; // 失败不推进，静默等下次
+      const data = (await res.json().catch(() => null)) as { summary?: string } | null;
+      const gained = data?.summary?.trim() ?? "";
+      const text = gained ? (summary.text ? `${summary.text}\n${gained}` : gained) : summary.text;
+      commitSummary(roleId, { text, covered: chunk.end });
+    } catch {
+      // 网络异常：静默，不推进
+    } finally {
+      summarizingRoles.delete(roleId);
+    }
   };
 
   /**
@@ -179,7 +257,13 @@ export const useChatStore = create<ChatState>()((set, get) => {
     const modelContext = context.map((m) =>
       m.sticker ? { ...m, text: stickerToModelText(m.sticker), sticker: undefined } : m,
     );
-    const body = { roleId, messages: modelContext.slice(-MAX_HISTORY) };
+    // 非空摘要随请求携带，由服务端注入 system（Summarize：retry 路径同样生效）
+    const summaryText = get().summaries[roleId]?.text ?? "";
+    const body = {
+      roleId,
+      messages: modelContext.slice(-MAX_HISTORY),
+      ...(summaryText ? { summary: summaryText } : {}),
+    };
     const res = await fetch("/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -292,10 +376,14 @@ export const useChatStore = create<ChatState>()((set, get) => {
   return {
     messages: {},
     status: {},
+    summaries: {},
 
     restore: (roleId) => {
       if (!(roleId in get().messages)) {
         set((s) => ({ messages: { ...s.messages, [roleId]: readLocal(roleId) } }));
+      }
+      if (!(roleId in get().summaries)) {
+        set((s) => ({ summaries: { ...s.summaries, [roleId]: readSummaryLocal(roleId) } }));
       }
     },
 
@@ -328,6 +416,8 @@ export const useChatStore = create<ChatState>()((set, get) => {
 
       const userMsg: ChatMessage = { id: genId(), role: "user", text: trimmed, at: Date.now() };
       commitMessages(roleId, [...(get().messages[roleId] ?? []), userMsg]);
+      // 后台触发对话总结（fire-and-forget，不阻塞本轮回复）
+      void maybeSummarize(roleId);
       // 完整列表作为上下文（末尾即刚发的用户消息）
       const degraded = await startReply(roleId, [...(get().messages[roleId] ?? [])]);
       return { ok: true, degraded };
@@ -344,6 +434,7 @@ export const useChatStore = create<ChatState>()((set, get) => {
         sticker: stickerId,
       };
       commitMessages(roleId, [...(get().messages[roleId] ?? []), userMsg]);
+      void maybeSummarize(roleId);
       const degraded = await startReply(roleId, [...(get().messages[roleId] ?? [])]);
       return { ok: true, degraded };
     },
@@ -395,6 +486,8 @@ export const useChatStore = create<ChatState>()((set, get) => {
 
     clear: (roleId) => {
       commitMessages(roleId, []);
+      // 清空对话同时清除摘要并重置计数（PRD §3.3）
+      commitSummary(roleId, EMPTY_SUMMARY);
     },
   };
 });

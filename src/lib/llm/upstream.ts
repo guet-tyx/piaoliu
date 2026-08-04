@@ -54,3 +54,57 @@ export async function callChatCompletions(
     return { ok: false, detail };
   }
 }
+
+export type UpstreamOnceResult =
+  | { ok: true; content: string }
+  | { ok: false; detail: string };
+
+export interface CompletionOnceOptions {
+  /** 输出上限（对话自动总结等短文场景默认 300 足够） */
+  maxTokens?: number;
+}
+
+/**
+ * 单次非流式 chat/completions（对话自动总结等「一次性产出短文」场景）：
+ * 复用与 callChatCompletions 相同的鉴权/参数/失败日志，stream: false 直接解析
+ * JSON choices[0].message.content。失败返回详情，调用方按调度器冷却。
+ */
+export async function callChatCompletionOnce(
+  provider: LLMProvider,
+  model: string,
+  messages: ChatCompletionMessage[],
+  options: CompletionOnceOptions = {},
+): Promise<UpstreamOnceResult> {
+  const url = `${providerBaseUrl(provider)}/chat/completions`;
+  try {
+    const upstream = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${providerKey(provider)}`,
+        "Content-Type": "application/json",
+        ...(provider.extraHeaders ?? {}),
+      },
+      body: JSON.stringify({
+        model,
+        messages,
+        stream: false,
+        temperature: provider.temperature ?? DEFAULT_TEMPERATURE,
+        max_tokens: options.maxTokens ?? DEFAULT_MAX_TOKENS,
+      }),
+    });
+    if (!upstream.ok) {
+      const detail = `${provider.name}/${model} status=${upstream.status}`;
+      console.warn(`[llm] ${detail}`);
+      return { ok: false, detail };
+    }
+    const data = (await upstream.json()) as {
+      choices?: { message?: { content?: string } }[];
+    };
+    const content = data?.choices?.[0]?.message?.content ?? "";
+    return { ok: true, content };
+  } catch (e) {
+    const detail = `${provider.name}/${model} ${String(e)}`;
+    console.warn(`[llm] ${detail}`);
+    return { ok: false, detail };
+  }
+}

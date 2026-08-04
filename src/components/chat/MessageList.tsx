@@ -367,6 +367,8 @@ export function MessageList({
 }: MessageListProps) {
   const messages = useChatStore((s) => s.messages[roleId] ?? EMPTY_MESSAGES);
   const status = useChatStore((s) => s.status[roleId] ?? ("idle" as ChatStatus));
+  /** Summarize：早期对话摘要（非空时列表底部显示折叠提示，对用户低干扰） */
+  const summary = useChatStore((s) => s.summaries[roleId]?.text ?? "");
   const persona = personaOf(roleId);
   const editMessage = useChatStore((s) => s.editMessage);
   const deleteMessage = useChatStore((s) => s.deleteMessage);
@@ -383,6 +385,9 @@ export function MessageList({
   const [confirmMsg, setConfirmMsg] = useState<ChatMessage | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const toastTimer = useRef<number | null>(null);
+  /** Summarize：摘要折叠态（默认折叠，展开后点击其他区域收起，PRD §3.2） */
+  const [summaryOpen, setSummaryOpen] = useState(false);
+  const summaryRef = useRef<HTMLDivElement | null>(null);
   const busy = status === "thinking" || status === "streaming";
 
   /** 居中底部 Toast，2 秒自动消失 */
@@ -411,6 +416,18 @@ export function MessageList({
     },
     [],
   );
+
+  // 摘要展开后，点击摘要框外任意区域折叠（PRD §3.2）
+  useEffect(() => {
+    if (!summaryOpen) return;
+    const onDocClick = (e: MouseEvent) => {
+      if (summaryRef.current && !summaryRef.current.contains(e.target as Node)) {
+        setSummaryOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", onDocClick);
+    return () => document.removeEventListener("mousedown", onDocClick);
+  }, [summaryOpen]);
 
   const handleScroll = () => {
     const el = listRef.current;
@@ -524,6 +541,35 @@ export function MessageList({
                       <i />
                     </span>
                   </div>
+                </div>
+              )}
+
+              {/* 对话自动总结：底部折叠摘要提示（滚动到底可见，PRD §3.2） */}
+              {summary && (
+                <div className={styles.summaryBox} ref={summaryRef}>
+                  <button
+                    type="button"
+                    className={styles.summaryToggle}
+                    onClick={() => setSummaryOpen((v) => !v)}
+                    aria-expanded={summaryOpen}
+                  >
+                    📝 已压缩早期对话摘要
+                    <span className={styles.summaryArrow} aria-hidden="true">
+                      {summaryOpen ? "▲" : "▼"}
+                    </span>
+                  </button>
+                  {summaryOpen && (
+                    <div className={styles.summaryBody}>
+                      <p className={styles.summaryText}>{summary}</p>
+                      <button
+                        type="button"
+                        className={styles.summaryFold}
+                        onClick={() => setSummaryOpen(false)}
+                      >
+                        收起
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
             </>

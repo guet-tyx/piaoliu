@@ -43,13 +43,19 @@ export async function POST(req: Request) {
     return Response.json({ error: "no-key" }, { status: 503 });
   }
 
-  let body: { roleId?: string; messages?: ChatMessage[]; probe?: boolean };
+  let body: {
+    roleId?: string;
+    messages?: ChatMessage[];
+    probe?: boolean;
+    /** 对话自动总结：早期对话摘要（非空时注入 system，修复长对话失忆） */
+    summary?: string;
+  };
   try {
     body = await req.json();
   } catch {
     return Response.json({ error: "bad-request" }, { status: 400 });
   }
-  const { roleId, messages, probe } = body ?? {};
+  const { roleId, messages, probe, summary } = body ?? {};
   if (probe === true) {
     // 连通性探测：确认至少一个 provider 就绪，不调用模型
     return Response.json({ ok: true, providers: providers.map((p) => p.id) }, { status: 200 });
@@ -69,8 +75,12 @@ export async function POST(req: Request) {
   }
 
   const persona = personaOf(roleId);
+  // 摘要注入：作为「早期对话记忆」拼进 system，让模型记住窗口之外的关键事实（Summarize）
+  const memoryNote = summary
+    ? `\n\n## 早期对话记忆（以下为更早之前聊过的内容摘要，请记住这些事实）\n${summary}`
+    : "";
   const openaiMessages = [
-    { role: "system", content: persona.system + RECOMMEND_PROMPT },
+    { role: "system", content: persona.system + RECOMMEND_PROMPT + memoryNote },
     ...recent.map((m) => ({ role: m.role, content: m.text })),
   ];
 

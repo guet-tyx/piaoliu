@@ -479,3 +479,60 @@
   box-shadow: 0 16px 40px -16px rgba(5, 12, 30, .8);
   animation: var(--kf-rise) .25s ease;
 }
+
+/* ============ 对话自动总结：底部折叠摘要提示（PRD §3.2） ============ */
+.summaryBox {
+  margin: 6px auto 0;
+  max-width: 92%;
+  text-align: center;
+}
+.summaryToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--line);
+  background: rgba(13, 21, 40, .6);
+  color: var(--ink-3);
+  font-size: .74rem;
+  letter-spacing: .06em;
+  border-radius: 999px;
+  padding: 5px 14px;
+  cursor: pointer;
+  transition: color .2s ease, border-color .2s ease;
+}
+.summaryToggle:hover {
+  color: var(--ink-2);
+  border-color: rgba(123, 177, 255, .3);
+}
+.summaryArrow { font-size: .6rem; }
+.summaryBody {
+  margin-top: 8px;
+  padding: 10px 14px;
+  border: 1px solid rgba(123, 177, 255, .16);
+  border-radius: 12px;
+  background: rgba(13, 21, 40, .72);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  text-align: left;
+  animation: var(--kf-msgRise) .25s ease;
+}
+.summaryText {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: .78rem;
+  line-height: 1.7;
+  color: var(--ink-2);
+}
+.summaryFold {
+  display: block;
+  margin: 8px auto 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink-3);
+  font-size: .72rem;
+  letter-spacing: .1em;
+  cursor: pointer;
+  padding: 2px 8px;
+}
+.summaryFold:hover { color: var(--ink); }

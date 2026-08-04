@@ -4,3 +4,7 @@
 export const MAX_HISTORY = 12;
 /** 单条用户文本长度上限 */
 export const MAX_TEXT = 200;
+/** 对话自动总结：首次触发所需总消息数（约 10 轮） */
+export const MIN_SUMMARY_MSGS = 20;
+/** 对话自动总结：每次提取的消息块大小 */
+export const SUMMARY_CHUNK = 10;
