@@ -11,7 +11,8 @@ export type PlayMode = "order" | "loop" | "shuffle";
 export type PlaySource =
   | { type: "library" }
   | { type: "playlist"; id: string }
-  | { type: "channel"; id: string };
+  | { type: "channel"; id: string }
+  | { type: "colisten" };
 
 /**
  * 播放器状态中枢

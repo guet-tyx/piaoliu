@@ -14,6 +14,7 @@ import {
 } from "@/lib/api/comments";
 import { isSafeText } from "@/lib/api/moderation";
 import { playTrackSnapshot } from "@/lib/player/playSnapshot";
+import { openCoListenRoom } from "@/lib/colisten/openRoom";
 import { timeAgo } from "@/lib/time";
 import { getOrCreateSailor } from "@/lib/api/sailor";
 import { reportQuest } from "@/lib/api/quests";
@@ -152,13 +153,23 @@ export function SongWallPage({ track }: SongWallPageProps) {
           </p>
           <p className={styles.trackSub}>{track.s}</p>
         </div>
-        <button
-          type="button"
-          className={styles.playBtn}
-          onClick={() => playTrackSnapshot(snapshot)}
-        >
-          ▶ 播放这首歌
-        </button>
+        <div className={styles.trackActions}>
+          {/* P2 星海共听：以这首歌开房 */}
+          <button
+            type="button"
+            className={styles.colistenBtn}
+            onClick={() => void openCoListenRoom(snapshot)}
+          >
+            🎧 共听这首歌
+          </button>
+          <button
+            type="button"
+            className={styles.playBtn}
+            onClick={() => playTrackSnapshot(snapshot)}
+          >
+            ▶ 播放这首歌
+          </button>
+        </div>
       </Reveal>
 
       {/* 感想列表 */}

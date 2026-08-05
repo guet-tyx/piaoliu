@@ -14,6 +14,7 @@ import { isSafeText } from "@/lib/api/moderation";
 import { formatDuration } from "@/data/music-utils";
 import { SectionHead } from "@/components/shared/SectionHead";
 import { Reveal } from "@/components/shared/Reveal";
+import { openCoListenRoom } from "@/lib/colisten/openRoom";
 import { CHANNELS } from "@/data/channels";
 import { TRACKS } from "@/data/tracks";
 import { buildFmQueue } from "@/stores/player";
@@ -210,6 +211,22 @@ export function PlayerSection() {
                   查看留言
                 </Link>
               )}
+              {/* P2 星海共听：以当前歌曲开房 */}
+              <button
+                type="button"
+                className={styles.colistenEntry}
+                onClick={() =>
+                  void openCoListenRoom({
+                    id: track.id,
+                    t: track.t,
+                    tag: track.tag,
+                    s: track.s,
+                    cover: track.cover,
+                  })
+                }
+              >
+                🎧 共听
+              </button>
             </p>
             <h3 className={styles.nowTitle}>
               「{track.t}」<em className={styles.nowTag}>{track.tag}</em>

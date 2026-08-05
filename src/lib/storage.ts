@@ -55,6 +55,8 @@ export const STORAGE = {
   songComments: "drift-song-comments",
   /** 歌曲留言 5 分钟限频记录（trackId → 最近发布时间戳） */
   commentCooldown: "drift-comment-cooldown",
+  /** 星海共听房间（P2：本地模拟房间元数据） */
+  colistenRooms: "drift-colisten-rooms",
   /** 同船在线心跳（本地模拟） */
   presence: "drift-presence",
   /** 角色情感状态（人机感，每角色：drift-emotion-<roleId>） */

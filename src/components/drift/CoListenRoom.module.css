@@ -1,0 +1,408 @@
+/* 星海共听房间页（P2） */
+
+.page {
+  padding-top: 96px;
+  padding-bottom: 96px;
+}
+
+.empty {
+  padding: 40px 0;
+  text-align: center;
+  font-size: .88rem;
+  color: var(--ink-3);
+  letter-spacing: .06em;
+}
+.emptyBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+.backLink {
+  border: 1px solid var(--line-panel);
+  background: rgba(255, 255, 255, .04);
+  color: var(--ice);
+  font-size: .8rem;
+  font-weight: 700;
+  padding: 10px 22px;
+  border-radius: 999px;
+  text-decoration: none;
+  transition: all .22s ease;
+}
+.backLink:hover {
+  border-color: var(--pink);
+  color: var(--pink);
+}
+
+/* 房间头部 */
+.roomHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  max-width: 860px;
+  margin: 24px auto 0;
+  padding: 16px 20px;
+  border-radius: 18px;
+  border: 1px solid rgba(251, 114, 153, .28);
+  background: rgba(17, 26, 51, .72);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+.roomMeta { min-width: 0; }
+.roomTitle {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--ink-panel);
+  letter-spacing: .03em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.roomSub {
+  margin: 5px 0 0;
+  font-size: .74rem;
+  color: var(--ink-panel-3);
+  letter-spacing: .04em;
+}
+.leaveBtn {
+  flex: none;
+  border: 1px solid var(--line-panel);
+  background: transparent;
+  color: var(--ink-panel-2);
+  font-size: .76rem;
+  font-weight: 700;
+  padding: 8px 18px;
+  border-radius: 999px;
+  text-decoration: none;
+  transition: color .2s ease, border-color .2s ease;
+}
+.leaveBtn:hover {
+  color: var(--pink);
+  border-color: rgba(251, 114, 153, .5);
+}
+
+/* 播放器区 */
+.playerBox {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 18px;
+  max-width: 860px;
+  margin: 16px auto 0;
+  padding: 20px 22px;
+  border-radius: 20px;
+  border: 1px solid var(--line-panel);
+  background: rgba(17, 26, 51, .6);
+}
+.cover {
+  flex: none;
+  border-radius: 14px;
+  object-fit: cover;
+}
+.playerMeta {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.nowTitle {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--ink-panel);
+  letter-spacing: .03em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.nowTitle em {
+  font-style: normal;
+  font-size: .68rem;
+  font-weight: 600;
+  color: var(--ink-panel-3);
+  letter-spacing: .16em;
+  margin-left: 8px;
+}
+.nowSub {
+  margin: 0;
+  font-size: .74rem;
+  color: var(--ink-panel-2);
+  letter-spacing: .05em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ctrlRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.ctrlBtn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1.5px solid var(--line-panel);
+  background: var(--panel);
+  color: var(--ink-panel-2);
+  font-size: .72rem;
+  cursor: pointer;
+  transition: border-color .2s ease, color .2s ease;
+}
+.ctrlBtn:hover:not(:disabled) {
+  border-color: var(--blue);
+  color: var(--blue-bright);
+}
+.ctrlMain {
+  width: 50px;
+  height: 50px;
+  border: none;
+  border-radius: 50%;
+  font-size: .95rem;
+  color: #fff;
+  background: linear-gradient(120deg, var(--pink), var(--pink-deep));
+  cursor: pointer;
+  box-shadow: 0 12px 22px -10px rgba(251, 114, 153, .8);
+  transition: transform .2s ease, filter .2s ease;
+}
+.ctrlMain:hover:not(:disabled) {
+  transform: scale(1.06);
+  filter: brightness(1.06);
+}
+.ctrlBtn:disabled,
+.ctrlMain:disabled {
+  opacity: .4;
+  cursor: not-allowed;
+}
+.hostHint {
+  font-size: .68rem;
+  color: var(--ink-panel-3);
+  letter-spacing: .04em;
+}
+.voteBtn {
+  margin-left: auto;
+  border: 1px solid rgba(201, 160, 67, .5);
+  background: rgba(201, 160, 67, .08);
+  color: var(--gold);
+  font-size: .72rem;
+  font-weight: 800;
+  padding: 7px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all .2s ease;
+  font-family: inherit;
+}
+.voteBtn:hover {
+  border-color: var(--gold);
+  background: rgba(201, 160, 67, .16);
+}
+.voteBtn.voted {
+  border-color: var(--gold);
+  color: #fff;
+  background: linear-gradient(120deg, var(--gold), #a67c2e);
+}
+.progressRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.progressTrack {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--panel-2);
+  overflow: hidden;
+}
+.progressTrack i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--pink), var(--blue));
+  border-radius: 2px;
+}
+.progressTime {
+  font-size: .66rem;
+  color: var(--ink-panel-3);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 播放列表 */
+.playlist {
+  grid-column: 1 / -1;
+  border-top: 1px solid var(--line-2);
+  padding-top: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.playlistTitle {
+  margin: 0 8px 0 0;
+  font-size: .72rem;
+  font-weight: 800;
+  color: var(--ink-panel-3);
+  letter-spacing: .08em;
+}
+.playlistItem {
+  border: 1px solid var(--line-panel);
+  background: rgba(255, 255, 255, .04);
+  color: var(--ink-panel-2);
+  font-size: .7rem;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all .2s ease;
+  font-family: inherit;
+}
+.playlistItem:hover:not(:disabled) {
+  border-color: var(--blue);
+  color: var(--blue-bright);
+}
+.playlistItem.current {
+  border-color: rgba(251, 114, 153, .55);
+  color: var(--pink);
+  background: rgba(251, 114, 153, .1);
+}
+.playlistItem:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+/* 弹幕区 */
+.dmBox {
+  max-width: 860px;
+  margin: 16px auto 0;
+  padding: 18px 20px;
+  border-radius: 20px;
+  border: 1px solid var(--line-panel);
+  background: rgba(17, 26, 51, .6);
+}
+.dmTitle {
+  margin: 0 0 12px;
+  font-size: .78rem;
+  font-weight: 800;
+  color: var(--ink-panel-3);
+  letter-spacing: .06em;
+}
+.dmList {
+  min-height: 120px;
+  max-height: 260px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 6px 2px;
+}
+.dmEmpty {
+  margin: auto;
+  font-size: .76rem;
+  color: var(--ink-panel-3);
+  letter-spacing: .05em;
+}
+.dm {
+  margin: 0;
+  font-size: .8rem;
+  line-height: 1.55;
+  color: var(--ink-panel-2);
+  word-break: break-word;
+}
+.dm b {
+  font-size: .72rem;
+  font-weight: 800;
+  color: var(--blue-bright);
+  margin-right: 8px;
+}
+.dm.mine {
+  color: var(--ink-panel-3);
+}
+.dm.mine b {
+  color: var(--ink-panel-3);
+}
+.dmSend {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+.dmInput {
+  flex: 1;
+  border: 1.5px solid var(--line-panel);
+  border-radius: 999px;
+  padding: 9px 16px;
+  font-size: .8rem;
+  font-family: var(--sans);
+  color: var(--ink-panel);
+  background: var(--panel);
+  transition: border-color .2s ease;
+}
+.dmInput:focus {
+  outline: none;
+  border-color: var(--blue);
+}
+.dmBtn {
+  flex: none;
+  border: none;
+  border-radius: 999px;
+  padding: 9px 22px;
+  font-size: .78rem;
+  font-weight: 800;
+  letter-spacing: .1em;
+  color: #fff;
+  background: linear-gradient(120deg, var(--pink), var(--pink-deep));
+  cursor: pointer;
+  transition: transform .2s ease, filter .2s ease, opacity .2s ease;
+}
+.dmBtn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(1.06);
+}
+.dmBtn:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+/* 成员区 */
+.members {
+  max-width: 860px;
+  margin: 16px auto 0;
+  padding: 14px 20px;
+  border-radius: 18px;
+  border: 1px dashed var(--line-panel);
+}
+.membersTitle {
+  margin: 0 0 10px;
+  font-size: .76rem;
+  font-weight: 800;
+  color: var(--ink-panel-3);
+  letter-spacing: .06em;
+}
+.memberList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.member {
+  font-size: .72rem;
+  font-weight: 700;
+  color: var(--ink-panel-2);
+  border: 1px solid var(--line-panel);
+  background: rgba(255, 255, 255, .04);
+  padding: 5px 12px;
+  border-radius: 999px;
+  letter-spacing: .02em;
+}
+.member em {
+  font-style: normal;
+  font-size: .6rem;
+  color: var(--gold);
+  margin-left: 6px;
+}
+.member.ghost {
+  opacity: .7;
+  border-style: dashed;
+}
+
+@media (max-width: 640px) {
+  .playerBox { grid-template-columns: 1fr; }
+  .voteBtn { margin-left: 0; }
+}

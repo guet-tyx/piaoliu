@@ -194,3 +194,26 @@
   opacity: .55;
   cursor: not-allowed;
 }
+/* P2 共听这首歌 */
+.colisten {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid rgba(0, 174, 236, .45);
+  background: rgba(0, 174, 236, .06);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: .74rem;
+  font-weight: 800;
+  color: var(--blue-bright);
+  cursor: pointer;
+  transition: color .2s ease, border-color .2s ease, background .2s ease;
+  font-family: inherit;
+  flex: none;
+}
+.colisten:hover {
+  color: var(--ice);
+  border-color: var(--ice);
+  background: rgba(0, 174, 236, .12);
+}

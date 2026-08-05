@@ -62,6 +62,9 @@ export function Topbar() {
           <Link href="/playlist" className="sweepGold sweepGold--left" data-text="歌单广场">
             歌单广场
           </Link>
+          <Link href="/drift/colisten" className="sweepGold sweepGold--left" data-text="共听">
+            🎧 共听
+          </Link>
           <a href="/report" className="sweepGold sweepGold--left" data-text="周报">
             周报
           </a>

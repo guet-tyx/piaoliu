@@ -6,6 +6,7 @@ import type { CSSProperties } from "react";
 import type { DriftPost } from "@/types/social";
 import { timeAgo } from "@/lib/time";
 import { playTrackSnapshot, resolveTrackId } from "@/lib/player/playSnapshot";
+import { openCoListenRoom } from "@/lib/colisten/openRoom";
 import { topicOf } from "@/data/topics";
 import styles from "./DriftCard.module.css";
 
@@ -100,6 +101,17 @@ export function DriftCard({ post, busy, onLike, onBookmark }: DriftCardProps) {
         >
           <i>📌</i>
           <b>{bookmarked ? "已收藏" : "收藏"}</b>
+        </button>
+        {/* P2 星海共听：一键开房（以这首歌为起点） */}
+        <button
+          type="button"
+          className={styles.colisten}
+          aria-label="共听这首歌"
+          onClick={() => {
+            void openCoListenRoom(bottle.track);
+          }}
+        >
+          🎧 共听这首歌
         </button>
       </footer>
     </article>

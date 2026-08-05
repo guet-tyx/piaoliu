@@ -140,6 +140,25 @@
   border-color: var(--ice);
   background: rgba(0, 174, 236, .08);
 }
+/* P2 共听入口（与留言墙入口同列） */
+.colistenEntry {
+  font-size: .62rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  color: var(--pink-bright);
+  border: 1px solid rgba(251, 114, 153, .5);
+  background: rgba(251, 114, 153, .06);
+  padding: 3px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: color .2s ease, border-color .2s ease, background .2s ease;
+  font-family: inherit;
+}
+.colistenEntry:hover {
+  color: var(--pink);
+  border-color: var(--pink);
+  background: rgba(251, 114, 153, .12);
+}
 .nowTitle {
   font-size: 1.7rem;
   font-weight: 800;
