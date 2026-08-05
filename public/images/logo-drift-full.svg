@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 72" width="280" height="72">
+  <defs>
+    <!-- 品牌粉色渐变（音符） -->
+    <linearGradient id="noteGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FB7299"/>
+      <stop offset="100%" stop-color="#FF9BB5"/>
+    </linearGradient>
+    <!-- 音符尾部渐变（粉→蓝） -->
+    <linearGradient id="trailGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#FB7299"/>
+      <stop offset="60%" stop-color="#FB7299"/>
+      <stop offset="100%" stop-color="#00AEEC"/>
+    </linearGradient>
+    <!-- 星星发光 -->
+    <filter id="starGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1.5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- ===== 音符标志 ===== -->
+  <!-- 符头（倾斜椭圆） -->
+  <ellipse cx="28" cy="46" rx="10" ry="7.5" transform="rotate(-18, 28, 46)" fill="url(#noteGrad)"/>
+  <!-- 符干 -->
+  <line x1="36" y1="42" x2="36" y2="14" stroke="url(#noteGrad)" stroke-width="2.8" stroke-linecap="round"/>
+  <!-- 符旗（上弧） -->
+  <path d="M 36 14 Q 46 16 49 26 Q 45 21 36 21" fill="url(#noteGrad)"/>
+  <!-- 符旗（下弧，更短） -->
+  <path d="M 36 21 Q 44 23 46 30 Q 43 26 36 26" fill="url(#noteGrad)"/>
+
+  <!-- ===== 音符尾部弧线 ===== -->
+  <path d="M 36 26 Q 56 34 78 36 Q 100 38 120 36" 
+        fill="none" stroke="url(#trailGrad)" stroke-width="1.8" stroke-linecap="round" opacity="0.7"/>
+
+  <!-- ===== 尾端星星 ===== -->
+  <g transform="translate(120, 36)" filter="url(#starGlow)">
+    <!-- 四角星 -->
+    <path d="M 0 -6 L 1.5 -1.5 L 6 0 L 1.5 1.5 L 0 6 L -1.5 1.5 L -6 0 L -1.5 -1.5 Z" 
+          fill="#00AEEC" opacity="0.9"/>
+  </g>
+
+  <!-- ===== 文字部分 ===== -->
+  <!-- 漂流（中文） -->
+  <text x="80" y="38" 
+        font-family="'PingFang SC','HarmonyOS Sans SC','Microsoft YaHei','Noto Sans SC',sans-serif" 
+        font-size="30" font-weight="800" fill="#F1EDE3" letter-spacing="6">
+    漂流
+  </text>
+
+  <!-- DRIFT（英文） -->
+  <text x="80" y="58" 
+        font-family="'Segoe UI','Helvetica Neue',Arial,sans-serif" 
+        font-size="11" font-weight="500" fill="#8E99AC" letter-spacing="7">
+    DRIFT
+  </text>
+
+  <!-- 星海版小标签（点缀） -->
+  <rect x="195" y="10" width="44" height="16" rx="8" fill="rgba(0,174,236,0.12)" stroke="rgba(0,174,236,0.28)" stroke-width="0.8"/>
+  <text x="217" y="22" text-anchor="middle"
+        font-family="'PingFang SC','Microsoft YaHei',sans-serif" 
+        font-size="8" font-weight="700" fill="#008AC5" letter-spacing="2">
+    星海版
+  </text>
+</svg>

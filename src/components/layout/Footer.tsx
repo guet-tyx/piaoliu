@@ -12,10 +12,11 @@ export function Footer() {
       <div className={styles.footInner}>
         <div className={styles.footLeft}>
           <span className={styles.brandMark} aria-hidden="true">
-            <svg viewBox="0 0 24 24" width="15" height="15" fill="none">
-              <path d="M12 3v11" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-              <path d="M12 4.5 19 11h-7z" fill="currentColor" />
-              <path d="M2.5 13.5Q12 17.5 21.5 13.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            <svg viewBox="0 0 32 32" width="15" height="15" fill="none">
+              <ellipse cx="12" cy="21" rx="5" ry="3.8" transform="rotate(-18 12 21)" fill="currentColor"/>
+              <line x1="16" y1="19" x2="16" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              <path d="M16 6Q22 8 23 14Q21 11 16 11" fill="currentColor"/>
+              <path d="M16 11Q20 12 21 16Q19 14 16 14" fill="currentColor"/>
             </svg>
           </span>
           <span className={styles.footName}>漂流 DRIFT · 星海版</span>

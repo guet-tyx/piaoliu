@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <defs>
+    <linearGradient id="noteGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FB7299"/>
+      <stop offset="100%" stop-color="#FF9BB5"/>
+    </linearGradient>
+    <linearGradient id="trailGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#FB7299"/>
+      <stop offset="100%" stop-color="#00AEEC"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 符头（倾斜椭圆） -->
+  <ellipse cx="12" cy="21" rx="5" ry="3.8" transform="rotate(-18, 12, 21)" fill="url(#noteGrad)"/>
+  <!-- 符干 -->
+  <line x1="16" y1="19" x2="16" y2="6" stroke="url(#noteGrad)" stroke-width="2" stroke-linecap="round"/>
+  <!-- 符旗 -->
+  <path d="M 16 6 Q 22 8 23 14 Q 21 11 16 11" fill="url(#noteGrad)"/>
+  <path d="M 16 11 Q 20 12 21 16 Q 19 14 16 14" fill="url(#noteGrad)"/>
+
+  <!-- 尾部弧线 -->
+  <path d="M 16 14 Q 24 18 28 16" fill="none" stroke="url(#trailGrad)" stroke-width="1.2" stroke-linecap="round" opacity="0.7"/>
+
+  <!-- 尾端小星 -->
+  <path d="M 28 16 L 29 13 L 30 16 L 33 16 L 30.5 18 L 31 21 L 28 19 L 25 21 L 25.5 18 L 23 16 Z" 
+        fill="#00AEEC" opacity="0.9" transform="scale(0.45) translate(34, 20)"/>
+</svg>

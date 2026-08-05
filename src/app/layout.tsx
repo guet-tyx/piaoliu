@@ -12,6 +12,9 @@ export const metadata: Metadata = {
   title: "漂流 DRIFT · 星海版",
   description:
     "漂流 DRIFT · 星海版：戴耳机的少女，纸船，星海——漂向下一首没人听过的歌。",
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export const viewport: Viewport = {

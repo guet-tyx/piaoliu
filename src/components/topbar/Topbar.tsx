@@ -29,19 +29,13 @@ export function Topbar() {
         <a className={styles.brand} href={anchor("#top")} aria-label="漂流 DRIFT 星海版 回到顶部">
           <span className={styles.brandMark} aria-hidden="true">
             <svg viewBox="0 0 32 32" width="20" height="20" fill="none">
-              {/* 纸船主体（梯形） */}
-              <path d="M6 17 L26 17 L23 24 L9 24 Z" fill="currentColor" opacity=".18" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
-              {/* 纸船帆（三角形） */}
-              <path d="M11 17 L16 8 L21 17 Z" fill="currentColor" opacity=".25" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
-              {/* 桅杆延伸为音符干 */}
-              <path d="M16 8 L16 3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-              {/* 音符头（椭圆） */}
-              <ellipse cx="14.6" cy="4.2" rx="2.4" ry="1.7" fill="currentColor" transform="rotate(-22 14.6 4.2)" />
-              {/* 音符旗（弯曲弧线，从桅杆顶端向右延伸，发光感） */}
-              <path d="M16 3.5 C 20 3.5, 21.5 5.5, 19.5 7.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" fill="none" />
-              {/* 水面波浪（两条） */}
-              <path d="M2.5 27 Q 8 29, 13 27 T 23 27 T 29.5 27" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" fill="none" />
-              <path d="M5 30.5 Q 10 32.5, 16 30.5 T 27 30.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" fill="none" opacity=".55" />
+              {/* 音符标志（漂流 DRIFT 品牌图标） */}
+              <ellipse cx="12" cy="21" rx="5" ry="3.8" transform="rotate(-18 12 21)" fill="currentColor"/>
+              <line x1="16" y1="19" x2="16" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              <path d="M16 6Q22 8 23 14Q21 11 16 11" fill="currentColor"/>
+              <path d="M16 11Q20 12 21 16Q19 14 16 14" fill="currentColor"/>
+              <path d="M16 14Q24 18 28 16" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" opacity=".6"/>
+              <path d="M28 16L29 13L30 16L33 16L30.5 18L31 21L28 19L25 21L25.5 18L23 16Z" fill="currentColor" opacity=".8" transform="scale(.45) translate(34,20)"/>
             </svg>
           </span>
           <span className={styles.brandName}>
