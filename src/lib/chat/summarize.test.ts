@@ -101,4 +101,35 @@ describe("splitSummaryOutput 输出拆分（人机感 P2-⑧：关键记忆单�
       memories: "",
     });
   });
+
+  it("V2.8 防污染：英文推理思维链输出 → 整块作废，不注入聊天", () => {
+    const raw = [
+      'We need to extract memory: user name "uu".',
+      "Also note earlier info: user wanted to go camping.",
+      "Output categories: user info, key topics, AI recommendation, emotion state, relationship state, key memory.",
+    ].join("\n");
+    expect(splitSummaryOutput(raw)).toEqual({ summary: "", memories: "" });
+  });
+
+  it("V2.8 防污染：多行无格式的中英混合复述垃圾 → 整块作废", () => {
+    const raw = [
+      "Conversation history:",
+      "User: 周末想去露营，你觉得会碰到什么样的风景呀？",
+      "Assistant: (response about stars, recommending pl-night-postrock, etc)",
+      "Thus we have user name: uu.",
+    ].join("\n");
+    expect(splitSummaryOutput(raw)).toEqual({ summary: "", memories: "" });
+  });
+
+  it("V2.8 防污染：合法类目 + 混入英文推理行 → 英文行丢弃、中文类目保留", () => {
+    const raw = [
+      "用户信息：用户叫uu，喜欢露营",
+      'We need to extract memory: user name "uu"',
+      "关键记忆：喜欢露营；名字是uu",
+    ].join("\n");
+    expect(splitSummaryOutput(raw)).toEqual({
+      summary: "用户信息：用户叫uu，喜欢露营",
+      memories: "喜欢露营；名字是uu",
+    });
+  });
 });

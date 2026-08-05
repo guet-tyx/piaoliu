@@ -1,8 +1,10 @@
 /**
- * SSE 思维链剥离（V2.6 从 route.ts 拆出，纯逻辑可单测）：
+ * SSE 思维链剥离（V2.6 从 route.ts 拆出，纯逻辑可单测；V2.8 支持 reasoning_content）：
  * Qwen3 / MiniMax / 智谱 z1 等模型的 OpenAI 兼容流会输出 <think>…</think> 推理块，
- * 污染角色对话。方案：服务端重建 SSE 帧，仅剥离 delta.content 内的思维链。
- * 兼容标签被切碎成多帧发送（如智谱 <th / ink / >）：未完成的标签前缀先缓存，补全后剥除。
+ * 污染角色对话；agnes/DeepSeek/Qwen 等则用 delta.reasoning_content 字段下发思维链。
+ * 方案：服务端重建 SSE 帧，① 剥离 delta.content 内的思维链，② 过滤掉 reasoning_content 字段
+ * （前端只读 content，透传它纯浪费带宽）。兼容标签被切碎成多帧发送（如智谱 <th / ink / >）：
+ * 未完成的标签前缀先缓存，补全后剥除。
  */
 
 /** 思维链状态机：跨 SSE 帧持续追踪 <think>…</think>，返回剥离后的内容 */
@@ -83,12 +85,23 @@ export function stripThinking(body: ReadableStream<Uint8Array>): ReadableStream<
       }
       try {
         const json = JSON.parse(payload) as {
-          choices?: { delta?: { content?: unknown } }[];
+          choices?: { delta?: { content?: unknown; reasoning_content?: unknown } }[];
         };
         const delta = json?.choices?.[0]?.delta;
         if (delta && typeof delta.content === "string") {
-          const stripped = strip(delta.content);
-          delta.content = stripped;
+          // ① 剥离 delta.content 内的 <think>…</think>
+          delta.content = strip(delta.content);
+          // ② 过滤 reasoning_content 字段（agnes/DeepSeek/Qwen 思维链），前端不消费
+          if ("reasoning_content" in delta) delete delta.reasoning_content;
+          // 剥离后仅剩空 content → 整帧丢弃（该帧只含推理）
+          if (delta.content === "" && Object.keys(delta).length === 1) return null;
+          out.push(`data: ${JSON.stringify(json)}`);
+          continue;
+        }
+        // 纯 reasoning_content 帧：过滤后无正文则整帧丢弃
+        if (delta && "reasoning_content" in delta) {
+          delete delta.reasoning_content;
+          if (Object.keys(delta).length === 0) return null;
           out.push(`data: ${JSON.stringify(json)}`);
           continue;
         }

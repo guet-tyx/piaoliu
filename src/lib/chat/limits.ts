@@ -4,6 +4,13 @@
 export const MAX_HISTORY = 24;
 /** 单条用户文本长度上限 */
 export const MAX_TEXT = 200;
+/**
+ * 单条消息发送给模型前的截断上限（V2.8 修复）：
+ * 用户输入仍按 MAX_TEXT 校验；但历史里的 AI 回复可能超过 200 字（persona 规定分享/推荐可达 200+），
+ * 若超长回复写入历史，后续请求每次都 400 too-long → 前端永久降级本地回复池（「只会说固定话术」）。
+ * 因此历史消息超限改为「截断」而非「拒绝」，给长回复留足余量又挡住异常大包。
+ */
+export const MAX_MODEL_TEXT = 500;
 /** 聊天消息 localStorage 存储上限（防无限增长；远超当前用量，裁剪最旧消息） */
 export const MAX_STORED_MESSAGES = 300;
 /** 单次 /api/chat 请求体消息条数上限（防异常大包；正常客户端只发最近 MAX_HISTORY 条） */

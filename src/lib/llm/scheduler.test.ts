@@ -1,5 +1,12 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { buildSchedule, explicitModels, isCooled, markCooled } from "./scheduler";
+import {
+  buildSchedule,
+  explicitModels,
+  isCooled,
+  isProviderCooled,
+  markCooled,
+  markProviderCooled,
+} from "./scheduler";
 import type { LLMProvider } from "./providers";
 
 /** 构造最小 provider（唯一 id 避免模块级 poolCache/cooled 串扰） */
@@ -120,5 +127,16 @@ describe("冷却", () => {
 
   it("未冷却的 key 返回 false", () => {
     expect(isCooled("nope::x")).toBe(false);
+  });
+});
+
+describe("整家冷却（skipRestOnFail 网关短路）", () => {
+  it("markProviderCooled 后 isProviderCooled 返回 true，且模型级 key 独立不受影响", () => {
+    const gw = "freellmapi";
+    markProviderCooled(gw);
+    expect(isProviderCooled(gw)).toBe(true);
+    // 模型级冷却与整家冷却互不干扰（不同 key 命名空间）
+    expect(isCooled(`${gw}::auto`)).toBe(false);
+    expect(isProviderCooled("other")).toBe(false);
   });
 });

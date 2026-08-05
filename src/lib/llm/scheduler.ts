@@ -89,3 +89,18 @@ export function isCooled(key: string): boolean {
 export function markCooled(key: string) {
   cooled.set(key, Date.now());
 }
+
+/** 整家冷却 key（V2.8 网关短路：provider 级，key = "providerId::*"） */
+export function providerCoolKey(id: string): string {
+  return `${id}::*`;
+}
+
+/** 是否处于整家冷却期（skipRestOnFail 的 provider，如网关） */
+export function isProviderCooled(id: string): boolean {
+  return isCooled(providerCoolKey(id));
+}
+
+/** 标记整家冷却（skipRestOnFail 的 provider 任一模型失败时调用） */
+export function markProviderCooled(id: string) {
+  markCooled(providerCoolKey(id));
+}

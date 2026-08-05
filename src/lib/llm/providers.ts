@@ -25,12 +25,16 @@ export interface LLMProvider {
   supportsPool: boolean;
   /** 账户级不可用模型（硬排除，即使动态池里出现） */
   excludedModels?: string[];
+  /** 整家失败短路（V2.8 网关）：true 时该 provider 任一模型失败 → 整家冷却 5 分钟，不再试其后续模型（避免网关 auto/auto:fast 重复吃超时） */
+  skipRestOnFail?: boolean;
   /** 请求温度（默认 0.85，见 upstream.ts） */
   temperature?: number;
   /** 最大输出 token（默认 400） */
   maxTokens?: number;
   /** 附加请求头（如 OpenRouter 的站标识） */
   extraHeaders?: Record<string, string>;
+  /** 上游首字节超时（毫秒，覆盖默认 45s）。V2.8：网关兜底链慢时快速失败 → 落直连快模型 */
+  timeoutMs?: number;
 }
 
 interface ProvidersData {

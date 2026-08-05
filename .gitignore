@@ -48,3 +48,6 @@ next-env.d.ts
 
 # GUI 测试截图（临时产物）
 /gui-test-screenshots/
+
+# Supabase CLI 本地链接元数据（机器特定，勿提交）
+supabase/.temp/

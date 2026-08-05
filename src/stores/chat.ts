@@ -34,10 +34,11 @@ function genId(): string {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 }
 
-/** SSE 停顿看门狗：超过该毫秒无新 delta 视为上游卡死 → abort，以部分文本收尾 */
-const SSE_STALL_MS = 30_000;
+/** SSE 停顿看门狗：超过该毫秒无新 delta 视为上游卡死 → abort，以部分文本收尾
+ *  V2.8 30s→45s：免费聚合池慢模型（网关兜底链/推理模型）首 delta 常 >30s，30s 掐断造成「输出断了」。 */
+const SSE_STALL_MS = 45_000;
 /** 单次上游请求首字节超时（SSE 流建立后的停顿由上方看门狗负责） */
-const FETCH_TIMEOUT_MS = 30_000;
+const FETCH_TIMEOUT_MS = 45_000;
 
 /** 存储上限裁剪：只保留最近 MAX_STORED_MESSAGES 条（最旧的通常已被摘要覆盖，PRD 异常处理） */
 function capMessages(msgs: ChatMessage[]): ChatMessage[] {

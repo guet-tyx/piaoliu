@@ -39,7 +39,12 @@ export interface ChatCompletionsOptions {
  * 单次上游 chat/completions 请求（V2.6 从 route.ts 拆出）：
  * 统一 Bearer 鉴权 + SSE 流式；provider 可配置 temperature/maxTokens/extraHeaders。
  * 失败时记录 console.warn（Vercel 日志可观测）并返回失败详情。
+ *
+ * V2.8 超时 30s→45s：免费聚合池（网关兜底链 / 慢模型）响应首字节常 >30s，
+ * 30s 掐断会让慢模型空流 → 前端显示「输出断了」。45s 区分「慢但活着」与「真挂」。
  */
+const UPSTREAM_HEAD_TIMEOUT_MS = 45_000;
+
 export async function callChatCompletions(
   provider: LLMProvider,
   model: string,
@@ -48,21 +53,25 @@ export async function callChatCompletions(
 ): Promise<UpstreamResult> {
   const url = `${providerBaseUrl(provider)}/chat/completions`;
   try {
-    const upstream = await fetchWithTimeout(url, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${providerKey(provider)}`,
-        "Content-Type": "application/json",
-        ...(provider.extraHeaders ?? {}),
+    const upstream = await fetchWithTimeout(
+      url,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${providerKey(provider)}`,
+          "Content-Type": "application/json",
+          ...(provider.extraHeaders ?? {}),
+        },
+        body: JSON.stringify({
+          model,
+          messages,
+          stream: true,
+          temperature: options.temperature ?? provider.temperature ?? DEFAULT_TEMPERATURE,
+          max_tokens: provider.maxTokens ?? DEFAULT_MAX_TOKENS,
+        }),
       },
-      body: JSON.stringify({
-        model,
-        messages,
-        stream: true,
-        temperature: options.temperature ?? provider.temperature ?? DEFAULT_TEMPERATURE,
-        max_tokens: provider.maxTokens ?? DEFAULT_MAX_TOKENS,
-      }),
-    });
+      provider.timeoutMs ?? UPSTREAM_HEAD_TIMEOUT_MS,
+    );
     if (!upstream.ok || !upstream.body) {
       const detail = `${provider.name}/${model} status=${upstream.status}`;
       console.warn(`[llm] ${detail}`);
@@ -99,21 +108,25 @@ export async function callChatCompletionOnce(
 ): Promise<UpstreamOnceResult> {
   const url = `${providerBaseUrl(provider)}/chat/completions`;
   try {
-    const upstream = await fetchWithTimeout(url, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${providerKey(provider)}`,
-        "Content-Type": "application/json",
-        ...(provider.extraHeaders ?? {}),
+    const upstream = await fetchWithTimeout(
+      url,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${providerKey(provider)}`,
+          "Content-Type": "application/json",
+          ...(provider.extraHeaders ?? {}),
+        },
+        body: JSON.stringify({
+          model,
+          messages,
+          stream: false,
+          temperature: provider.temperature ?? DEFAULT_TEMPERATURE,
+          max_tokens: options.maxTokens ?? DEFAULT_MAX_TOKENS,
+        }),
       },
-      body: JSON.stringify({
-        model,
-        messages,
-        stream: false,
-        temperature: provider.temperature ?? DEFAULT_TEMPERATURE,
-        max_tokens: options.maxTokens ?? DEFAULT_MAX_TOKENS,
-      }),
-    });
+      provider.timeoutMs ?? UPSTREAM_HEAD_TIMEOUT_MS,
+    );
     if (!upstream.ok) {
       const detail = `${provider.name}/${model} status=${upstream.status}`;
       console.warn(`[llm] ${detail}`);

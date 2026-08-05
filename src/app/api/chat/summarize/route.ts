@@ -3,7 +3,7 @@ import { activeProviders } from "@/lib/llm/providers";
 import { buildSchedule, isCooled, markCooled } from "@/lib/llm/scheduler";
 import { callChatCompletionOnce } from "@/lib/llm/upstream";
 import { formatSummaryChunk, splitSummaryOutput } from "@/lib/chat/summarize";
-import { MAX_API_MESSAGES, MAX_TEXT } from "@/lib/chat/limits";
+import { MAX_API_MESSAGES, MAX_MODEL_TEXT } from "@/lib/chat/limits";
 import type { SummarizeApiRequest } from "@/types/api";
 
 /**
@@ -57,10 +57,17 @@ export async function POST(req: Request) {
   if (messages.length > MAX_API_MESSAGES) {
     return Response.json({ error: "bad-request" }, { status: 400 });
   }
+  // 归一化（与主聊天路由一致）：跳过 text 非字符串的损坏消息；超长截断而非 400 拒绝
+  // （否则一条超长 AI 回复会让 Summarize 永久 400，长对话记忆失效）
+  const clean: (typeof messages)[number][] = [];
   for (const m of messages) {
-    if (typeof m?.text !== "string" || m.text.length > MAX_TEXT) {
-      return Response.json({ error: "too-long" }, { status: 400 });
-    }
+    if (typeof m?.text !== "string") continue;
+    clean.push(m.text.length > MAX_MODEL_TEXT ? { ...m, text: m.text.slice(0, MAX_MODEL_TEXT) } : m);
+  }
+  if (clean.length === 0) {
+    return Response.json({ ok: true, summary: "" }, { status: 200 });
+  }
+  for (const m of clean) {
     // role 白名单校验：与主聊天路由一致，拒绝伪造 system 等角色
     if (m.role !== "user" && m.role !== "assistant") {
       return Response.json({ error: "bad-request" }, { status: 400 });
@@ -70,7 +77,7 @@ export async function POST(req: Request) {
     }
   }
 
-  const chunkText = formatSummaryChunk(messages);
+  const chunkText = formatSummaryChunk(clean);
   if (!chunkText) {
     // 整块都是贴纸：无可提取内容
     return Response.json({ ok: true, summary: "" }, { status: 200 });

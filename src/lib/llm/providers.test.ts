@@ -17,7 +17,9 @@ describe("providers.json 注册表数据合法性", () => {
       expect(p.baseUrlEnv).toBeTruthy();
       expect(p.modelsEnv).toBeTruthy();
       expect(p.preferredModels.length).toBeGreaterThan(0);
-      expect(p.defaultBaseUrl.startsWith("https://")).toBe(true);
+      // 远程 provider 必须 https；本地自托管网关（freellmapi）允许 http://127.0.0.1
+      const isLocalGateway = p.defaultBaseUrl.startsWith("http://127.0.0.1") || p.defaultBaseUrl.startsWith("http://localhost");
+      expect(p.defaultBaseUrl.startsWith("https://") || isLocalGateway).toBe(true);
     }
   });
 
