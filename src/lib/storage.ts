@@ -45,6 +45,10 @@ export const STORAGE = {
   replies: "drift-replies",
   /** 漂流瓶举报记录 */
   reports: "drift-reports",
+  /** 漂流广场收藏的瓶子 id 列表（P0 F-01，上限 100） */
+  bookmarks: "drift-bookmarks",
+  /** 星海关注关系列表（P0 F-04，上限 100） */
+  follows: "drift-follows",
   /** 同船在线心跳（本地模拟） */
   presence: "drift-presence",
   /** 角色情感状态（人机感，每角色：drift-emotion-<roleId>） */

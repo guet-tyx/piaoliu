@@ -34,6 +34,8 @@ const bottle = (id: string, over: Partial<Bottle> = {}): Bottle => ({
   status: "drifting",
   pickedBy: null,
   isSystem: false,
+  isPublic: false,
+  likedBy: [],
   createdAt: 1,
   repliedAt: null,
   readAt: null,

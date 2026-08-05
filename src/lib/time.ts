@@ -10,3 +10,16 @@ export function localDate(d: Date = new Date()): string {
   const day = String(d.getDate()).padStart(2, "0");
   return `${d.getFullYear()}-${m}-${day}`;
 }
+
+/** 相对时间（P0 F-01 漂流广场「2 小时前」）：刚刚 / N 分钟前 / N 小时前 / N 天前 */
+export function timeAgo(ts: number, now: number = Date.now()): string {
+  const diff = Math.max(0, now - ts);
+  const min = Math.floor(diff / 60_000);
+  if (min < 1) return "刚刚";
+  if (min < 60) return `${min} 分钟前`;
+  const hour = Math.floor(min / 60);
+  if (hour < 24) return `${hour} 小时前`;
+  const day = Math.floor(hour / 24);
+  if (day < 30) return `${day} 天前`;
+  return "30 天前";
+}

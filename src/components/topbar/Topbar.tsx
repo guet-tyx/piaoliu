@@ -53,9 +53,12 @@ export function Topbar() {
               {a.label}
             </a>
           ))}
-          <a href="/sailor" className="sweepGold sweepGold--left" data-text="船员证">
+          <Link href="/drift" className="sweepGold sweepGold--left" data-text="漂流广场">
+            🏺 漂流广场
+          </Link>
+          <Link href="/sailor" className="sweepGold sweepGold--left" data-text="船员证">
             船员证
-          </a>
+          </Link>
           <Link href="/playlist" className="sweepGold sweepGold--left" data-text="歌单广场">
             歌单广场
           </Link>

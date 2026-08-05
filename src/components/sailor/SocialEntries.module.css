@@ -1,0 +1,137 @@
+/* 船员证页社交入口区（P0 F-01 / F-04）：收藏/关注/我的漂流 */
+
+.entries {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 26px 0 4px;
+}
+
+.entry {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--line-panel);
+  background: rgba(255, 255, 255, .04);
+  color: var(--ink-2);
+  font-size: 14px;
+  font-weight: 700;
+  padding: 10px 20px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all .22s ease;
+  font-family: inherit;
+  letter-spacing: .04em;
+}
+.entry b {
+  color: var(--pink-bright);
+  font-size: 13px;
+}
+.entry:hover {
+  border-color: var(--pink);
+  color: var(--pink);
+  transform: translateY(-1px);
+}
+
+/* ---- 弹窗内容 ---- */
+.modalTitle {
+  margin: 0 0 14px;
+  font-size: 1.02rem;
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: .05em;
+}
+.followCount {
+  margin-left: 8px;
+  font-size: .7rem;
+  font-weight: 700;
+  color: var(--ink-3);
+}
+.modalEmpty {
+  margin: 24px 0;
+  font-size: .84rem;
+  color: var(--ink-3);
+  letter-spacing: .05em;
+  text-align: center;
+  line-height: 1.8;
+}
+.modalList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 52vh;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+.closeBtn {
+  display: block;
+  margin: 18px auto 0;
+  border: 1px solid var(--line-panel);
+  background: rgba(255, 255, 255, .04);
+  color: var(--ink-2);
+  font-size: .78rem;
+  font-weight: 700;
+  padding: 8px 26px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all .2s ease;
+  font-family: inherit;
+}
+.closeBtn:hover {
+  border-color: var(--pink);
+  color: var(--pink);
+}
+
+/* 关注列表 */
+.followList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.followItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--line-panel);
+  background: rgba(255, 255, 255, .03);
+}
+.followMark {
+  color: var(--pink-bright);
+  font-size: .84rem;
+  font-weight: 800;
+  text-decoration: none;
+  letter-spacing: .03em;
+}
+.followMark:hover {
+  color: var(--pink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.followTime {
+  font-size: .66rem;
+  color: var(--ink-3);
+  letter-spacing: .03em;
+}
+.unfollowBtn {
+  margin-left: auto;
+  border: 1px solid var(--line-panel);
+  background: transparent;
+  color: var(--ink-3);
+  font-size: .72rem;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all .2s ease;
+  font-family: inherit;
+  flex: none;
+}
+.unfollowBtn:hover {
+  border-color: var(--pink-deep);
+  color: var(--pink-deep);
+}

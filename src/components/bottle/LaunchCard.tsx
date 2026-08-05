@@ -28,6 +28,8 @@ export function LaunchCard() {
   const [text, setText] = useState("");
   const [phase, setPhase] = useState<"idle" | "launching" | "done">("idle");
   const [error, setError] = useState<string | null>(null);
+  // P0 F-01 公开漂流：默认匿名（仅随机拾取），勾选后进入漂流广场
+  const [isPublic, setIsPublic] = useState(false);
   // 节日活动（FR-14）：URL 测试开关优先，否则按日期自动生效
   const [event, setEvent] = useState<DriftEvent | null>(null);
   useEffect(() => {
@@ -61,7 +63,7 @@ export function LaunchCard() {
     if (!canLaunch) return;
     setError(null);
     // 活动期间投瓶使用限定瓶面样式（FR-14）
-    const result = await launch(text, snapshot, event ? event.bottleStyle : skin);
+    const result = await launch(text, snapshot, event ? event.bottleStyle : skin, isPublic);
     if (!result.ok) {
       const msg =
         result.reason === "limit"
@@ -154,6 +156,21 @@ export function LaunchCard() {
             : `再写 ${BOTTLE_TEXT_MIN - len} 字即可启航。`}
         </p>
       )}
+
+      {/* P0 F-01 公开漂流开关：默认匿名（仅随机拾取可见），勾选后进入漂流广场；公开/匿名共用每日 1 投 */}
+      <label className={styles.publicOption}>
+        <input
+          type="checkbox"
+          className={styles.publicInput}
+          checked={isPublic}
+          onChange={(e) => setIsPublic(e.target.checked)}
+        />
+        <span className={styles.publicBox} aria-hidden="true" />
+        <span className={styles.publicText}>
+          放入漂流广场
+          <small>公开，所有人都能看到这艘船和你的代号</small>
+        </span>
+      </label>
 
       {phase === "done" ? (
         <p className={styles.success}>

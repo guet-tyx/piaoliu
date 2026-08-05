@@ -8,6 +8,7 @@ import { BadgeWall } from "@/components/sailor/BadgeWall";
 import { NicknameForm } from "@/components/sailor/NicknameForm";
 import { RecoverySection } from "@/components/sailor/RecoverySection";
 import { MyPlaylists } from "@/components/sailor/MyPlaylists";
+import { SocialEntries } from "@/components/sailor/SocialEntries";
 import { useIdentityStore } from "@/stores/identity";
 import styles from "./SailorPage.module.css";
 
@@ -44,6 +45,8 @@ export function SailorPage() {
               <RecoverySection />
             </div>
           </div>
+          {/* P0 F-01/F-04：我的收藏 · 我的关注 · 我的漂流（社交入口区） */}
+          <SocialEntries />
           {/* P2-01/02：我的歌单（收藏 + 自建） */}
           <MyPlaylists />
         </>

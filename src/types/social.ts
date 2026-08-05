@@ -45,6 +45,12 @@ export interface Bottle {
   repliedAt: number | null;
   /** 投瓶人已读（星海来讯），未读为 null */
   readAt: number | null;
+  /** 是否公开漂流（P0 F-01：进入漂流广场；默认匿名仅随机拾取可见） */
+  isPublic: boolean;
+  /** 点赞者匿名代号集合（P0 F-01：按 anonMark 去重，点赞数 = 集合长度） */
+  likedBy: string[];
+  /** 话题标签（P1 预留：本轮 P0 不实现 UI） */
+  topic?: string;
 }
 
 /** 回信（对应 supabase.replies） */
@@ -110,3 +116,24 @@ export type PickResult =
 export type ReplyResult =
   | { ok: true; reply: Reply }
   | { ok: false; reason: "limit" | "bad-word" | "too-short" | "too-long" | "forbidden" | "offline" };
+
+/** 关注关系（P0 F-04 星海关注：单向、不通知、匿名保护） */
+export interface FollowRelation {
+  /** 被关注船客的匿名代号 */
+  followedMark: string;
+  /** 关注时间戳 */
+  createdAt: number;
+}
+
+/** 漂流广场条目（P0 F-01：瓶子 + 当前用户交互态 + 派生计数） */
+export interface DriftPost {
+  bottle: Bottle;
+  /** 当前用户是否已点赞 */
+  liked: boolean;
+  /** 当前用户是否已收藏 */
+  bookmarked: boolean;
+  /** 去重后的点赞数 */
+  likeCount: number;
+  /** 回信数（热门排序因子） */
+  replyCount: number;
+}

@@ -1,7 +1,7 @@
 import { getSupabase } from "@/lib/supabase/client";
 import { isSupabaseReady } from "@/lib/supabase/anon";
 import { isSafeText } from "./moderation";
-import { GUEST_ID, SYSTEM_ID } from "./sailor";
+import { getOrCreateSailor, GUEST_ID, SYSTEM_ID } from "./sailor";
 import { readStorage, writeStorage, STORAGE } from "@/lib/storage";
 import { localDate } from "@/lib/time";
 import { pickRandom } from "@/lib/random";
@@ -32,7 +32,10 @@ import type {
  */
 
 /** 系统预热瓶（冷启动内容投放，署名「星海信使」；与 supabase/seed.sql 文案一致） */
-const SYSTEM_BOTTLES: Omit<Bottle, "id" | "createdAt" | "pickedBy" | "repliedAt" | "readAt" | "status">[] = [
+const SYSTEM_BOTTLES: Omit<
+  Bottle,
+  "id" | "createdAt" | "pickedBy" | "repliedAt" | "readAt" | "status" | "isPublic" | "likedBy"
+>[] = [
   {
     authorId: SYSTEM_ID,
     text: "今晚的风很适合漂流。耳机里放一首没听过的歌，把心事交给星海。",
@@ -91,10 +94,15 @@ function genId(): string {
     : `b-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
+/** 旧版瓶数据兜底补齐（P0 F-01：旧 localStorage 无 isPublic/likedBy 字段） */
+function sanitizeBottle(b: Bottle): Bottle {
+  return { ...b, isPublic: b.isPublic === true, likedBy: Array.isArray(b.likedBy) ? b.likedBy : [] };
+}
+
 export function readPool(): Bottle[] {
   const pool = readStorage<Bottle[]>(STORAGE.bottlesPool, []);
-  if (pool.length > 0) return pool;
-  // 首次：植入系统预热瓶
+  if (pool.length > 0) return pool.map(sanitizeBottle);
+  // 首次：植入系统预热瓶（默认公开进广场，P0 F-01 设计决策：广场初始即有内容）
   const now = Date.now();
   const seeded: Bottle[] = SYSTEM_BOTTLES.map((b, i) => ({
     ...b,
@@ -103,6 +111,8 @@ export function readPool(): Bottle[] {
     pickedBy: null,
     repliedAt: null,
     readAt: null,
+    isPublic: true,
+    likedBy: [],
     createdAt: now - i * 60_000, // 错峰投递时间
   }));
   writeStorage(STORAGE.bottlesPool, seeded);
@@ -147,11 +157,12 @@ export async function getDailyLimits(): Promise<DailyLimits> {
 
 /* ---------- 公开接口 ---------- */
 
-/** 投瓶（FR-7）：限每日 1 个；内容 10-200 字 + 绑定当前播放歌曲快照；style 为瓶面样式（默认纸船，活动期间传限定样式） */
+/** 投瓶（FR-7）：限每日 1 个；内容 10-200 字 + 绑定当前播放歌曲快照；style 为瓶面样式（默认纸船，活动期间传限定样式）；isPublic 决定是否进入漂流广场（P0 F-01，默认匿名只入随机拾取池） */
 export async function launchBottle(
   text: string,
   track: TrackSnapshot,
   style?: string,
+  isPublic = false,
 ): Promise<LaunchResult> {
   const trimmed = text.trim();
   if (trimmed.length < BOTTLE_TEXT_MIN) return { ok: false, reason: "too-short" };
@@ -174,6 +185,8 @@ export async function launchBottle(
       createdAt: Date.now(),
       repliedAt: null,
       readAt: null,
+      isPublic,
+      likedBy: [],
     };
     const pool = readPool();
     pool.push(bottle);
@@ -188,6 +201,7 @@ export async function launchBottle(
     p_text: trimmed,
     p_track: track,
     p_style: style ?? "paper",
+    p_is_public: isPublic,
   });
   if (error || !data) {
     return { ok: false, reason: reasonOf(error, "offline") } as LaunchResult;
@@ -296,6 +310,67 @@ export async function markInboxRead(bottleId: string): Promise<void> {
   await sb.rpc("mark_inbox_read", { p_bottle_id: bottleId });
 }
 
+/* ---------- 漂流广场（P0 F-01） ---------- */
+
+/** 漂流广场公开瓶子流（热门/最新排序由 UI 层处理；关注 Tab 由 UI 层按 follows 过滤） */
+export async function fetchPublicBottles(): Promise<Bottle[]> {
+  if (!isSupabaseReady()) {
+    return readPool().filter((b) => b.isPublic);
+  }
+  const sb = getSupabase();
+  if (!sb) return [];
+  const { data } = await sb.rpc("fetch_drift_feed", { p_sort: "latest" });
+  return Array.isArray(data) ? data.map(mapBottleRow) : [];
+}
+
+/** 本地回信计数（bottleId → 回信数；热门排序因子；真实模式回落空表由 SQL 排序兜底） */
+export function countRepliesMap(): Record<string, number> {
+  const replies = readStorage<Reply[]>(STORAGE.replies, []);
+  const map: Record<string, number> = {};
+  for (const r of replies) {
+    if (r.bottleId) map[r.bottleId] = (map[r.bottleId] ?? 0) + 1;
+  }
+  return map;
+}
+
+/** 我投过的瓶子（P0 F-01 船员证「我的漂流」；本地按 authorId 过滤，真实走 RPC） */
+export async function fetchMyBottles(): Promise<Bottle[]> {
+  if (!isSupabaseReady()) {
+    return readPool().filter((b) => b.authorId === GUEST_ID);
+  }
+  const sb = getSupabase();
+  if (!sb) return [];
+  const { data } = await sb.rpc("get_my_bottles");
+  return Array.isArray(data) ? data.map(mapBottleRow) : [];
+}
+
+/** 点赞/取消点赞（P0 F-01）：按当前用户 anonMark 去重，同一人对同一瓶一票 */
+export async function toggleBottleLike(
+  bottleId: string,
+): Promise<{ ok: boolean; liked: boolean }> {
+  if (!isSupabaseReady()) {
+    const sailor = await getOrCreateSailor();
+    if (!sailor) return { ok: false, liked: false };
+    const mark = sailor.anonMark;
+    const pool = readPool();
+    const bottle = pool.find((b) => b.id === bottleId);
+    if (!bottle) return { ok: false, liked: false };
+    const has = bottle.likedBy.includes(mark);
+    bottle.likedBy = has
+      ? bottle.likedBy.filter((m) => m !== mark)
+      : [...bottle.likedBy, mark];
+    writePool(pool);
+    return { ok: true, liked: !has };
+  }
+
+  const sb = getSupabase();
+  if (!sb) return { ok: false, liked: false };
+  const { data, error } = await sb.rpc("toggle_like", { p_bottle_id: bottleId });
+  const r = (data ?? {}) as { liked?: boolean };
+  if (error) return { ok: false, liked: false };
+  return { ok: true, liked: r.liked === true };
+}
+
 /** 举报（NFR-1 治理入口；V1.2 支持瓶子与回信两类目标） */
 export async function reportBottle(
   targetId: string,
@@ -379,6 +454,8 @@ function mapBottleRow(row: unknown): Bottle {
     status: (r.status as Bottle["status"]) ?? "drifting",
     pickedBy: typeof r.picked_by === "string" ? r.picked_by : null,
     isSystem: r.is_system === true,
+    isPublic: r.is_public === true,
+    likedBy: Array.isArray(r.likes) ? (r.likes as unknown[]).filter((x): x is string => typeof x === "string") : [],
     createdAt: parseTs(r.created_at) ?? Date.now(),
     repliedAt: parseTs(r.replied_at),
     readAt: parseTs(r.read_at),

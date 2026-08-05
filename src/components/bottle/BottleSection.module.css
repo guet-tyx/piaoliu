@@ -251,6 +251,76 @@
   color: var(--ink-panel-3);
   letter-spacing: .04em;
 }
+/* P0 F-01 公开漂流开关（默认匿名；勾选进入漂流广场） */
+.publicOption {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin-top: 14px;
+  padding: 10px 12px;
+  border: 1px solid var(--line-panel);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .04);
+  cursor: pointer;
+  transition: border-color .2s ease, background .2s ease;
+}
+.publicOption:hover {
+  border-color: rgba(251, 114, 153, .45);
+}
+.publicInput {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+.publicInput:focus-visible + .publicBox {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+.publicBox {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin-top: 1px;
+  border-radius: 4px;
+  border: 1.5px solid var(--ink-panel-3);
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .2s ease, border-color .2s ease;
+}
+.publicInput:checked + .publicBox {
+  background: linear-gradient(120deg, var(--pink), var(--pink-deep));
+  border-color: transparent;
+}
+.publicBox::after {
+  content: "";
+  width: 8px;
+  height: 4px;
+  border-left: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  transform: rotate(-45deg) translate(1px, -1px);
+  opacity: 0;
+  transition: opacity .15s ease;
+}
+.publicInput:checked + .publicBox::after { opacity: 1; }
+.publicText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: .8rem;
+  font-weight: 700;
+  color: var(--ink-panel);
+  letter-spacing: .03em;
+}
+.publicText small {
+  font-size: .68rem;
+  font-weight: 500;
+  color: var(--ink-panel-3);
+  letter-spacing: .02em;
+}
 .success {
   display: flex;
   align-items: center;

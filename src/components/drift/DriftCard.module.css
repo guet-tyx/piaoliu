@@ -1,0 +1,169 @@
+/* 漂流广场瓶子卡片（P0 F-01）：玻璃拟态，与首页播放器卡同语言 */
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px 20px;
+  border-radius: 18px;
+  background: rgba(17, 26, 51, .72);
+  border: 1px solid var(--line-panel);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  color: var(--ink-panel);
+  transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+}
+.card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(251, 114, 153, .35);
+  box-shadow: 0 16px 36px -18px rgba(0, 0, 0, .6);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.author {
+  font-size: .82rem;
+  font-weight: 800;
+  color: var(--pink-bright);
+  letter-spacing: .04em;
+  text-decoration: none;
+  transition: color .2s ease;
+}
+.author:hover {
+  color: var(--pink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.time {
+  font-size: .68rem;
+  color: var(--ink-panel-3);
+  letter-spacing: .04em;
+  flex: none;
+}
+
+/* 正文：最多 3 行，超出省略号 */
+.text {
+  margin: 0;
+  font-size: .88rem;
+  line-height: 1.75;
+  color: var(--ink-panel-2);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+}
+
+/* 歌曲快照区 */
+.track {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, .04);
+  border: 1px solid var(--line-2);
+}
+.cover {
+  flex: none;
+  border-radius: 10px;
+  object-fit: cover;
+}
+.trackMeta {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.trackMeta b {
+  font-size: .84rem;
+  color: var(--ink-panel);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.trackMeta small {
+  font-size: .66rem;
+  color: var(--ink-panel-3);
+  letter-spacing: .03em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.playBtn {
+  flex: none;
+  margin-left: auto;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  font-size: .8rem;
+  color: #fff;
+  background: linear-gradient(120deg, var(--pink), var(--pink-deep));
+  box-shadow: 0 10px 20px -10px rgba(251, 114, 153, .8);
+  transition: transform .2s ease, filter .2s ease;
+}
+.playBtn:hover {
+  transform: scale(1.1);
+  filter: brightness(1.08);
+}
+
+/* 操作行：点赞 + 收藏 */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 2px;
+}
+.heart,
+.bookmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--line-panel);
+  background: rgba(255, 255, 255, .04);
+  border-radius: 999px;
+  padding: 6px 13px;
+  font-size: .74rem;
+  font-weight: 700;
+  color: var(--ink-panel-2);
+  cursor: pointer;
+  transition: color .2s ease, border-color .2s ease, background .2s ease;
+  font-family: inherit;
+}
+.heart i,
+.bookmark i {
+  font-style: normal;
+}
+.heart:hover {
+  border-color: rgba(251, 114, 153, .5);
+  color: var(--pink);
+}
+.heart.liked {
+  color: var(--pink);
+  border-color: rgba(251, 114, 153, .5);
+  background: rgba(251, 114, 153, .1);
+}
+/* 点赞心跳动效（全局 keyframe） */
+.heart.liked i {
+  animation: var(--kf-heartPop) .45s cubic-bezier(.34, 1.56, .64, 1);
+}
+.bookmark:hover {
+  border-color: rgba(0, 174, 236, .5);
+  color: var(--blue-bright);
+}
+.bookmark.on {
+  color: var(--blue-bright);
+  border-color: rgba(0, 174, 236, .5);
+  background: rgba(0, 174, 236, .1);
+}
+.heart:disabled,
+.bookmark:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
