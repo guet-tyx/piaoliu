@@ -63,6 +63,16 @@ export const STORAGE = {
   emotion: "drift-emotion",
   /** 角色记得的关于用户的关键记忆（人机感，每角色：drift-memories-<roleId>） */
   memories: "drift-memories",
+  /** P3 A-01 角色星海赞：判定缓存（bottleId → 点赞角色列表，30 分钟） */
+  starPraiseCache: "drift-star-praise-cache",
+  /** P3 A-01 角色星海赞：每角色每日点赞计数（上限 20） */
+  starPraiseDaily: "drift-star-praise-daily",
+  /** P3 A-01 星海赞动画已看记录（bottleId:roleId 去重，动画只播一次） */
+  starPraiseSeen: "drift-star-praise-seen",
+  /** P3 A-03 社区上下文缓存（roleId → 文本，10 分钟） */
+  communityCache: "drift-community-cache",
+  /** P3 A-04 角色已提及过的瓶子 id（同瓶最多提及 1 次） */
+  bottleWatchMentioned: "drift-bottle-watch-mentioned",
 } as const;
 
 /** 每角色独立键构造器：`${prefix}-${roleId}` */

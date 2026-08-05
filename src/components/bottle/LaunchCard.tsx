@@ -12,6 +12,8 @@ import { isSafeText } from "@/lib/api/moderation";
 import { BOTTLE_TEXT_MAX, BOTTLE_TEXT_MIN } from "@/lib/bottle/limits";
 import { getActiveEvent, getEventForTest } from "@/data/events";
 import { TOPICS } from "@/data/topics";
+import { starRoleOf } from "@/data/star-praise";
+import { watchRolePreview } from "@/lib/community/bottleWatch";
 import type { DriftEvent } from "@/data/events";
 import type { TrackSnapshot } from "@/types/social";
 import styles from "./BottleSection.module.css";
@@ -34,6 +36,8 @@ export function LaunchCard() {
   const [isPublic, setIsPublic] = useState(false);
   // P1 F-07 话题：单选，仅公开漂流可见/生效；不选不影响投瓶
   const [topic, setTopic] = useState<string | null>(null);
+  // P3 A-04 让角色看看：仅公开漂流可见；勾选后按话题/曲风自动匹配角色（兜底汐）
+  const [watch, setWatch] = useState(false);
   // 节日活动（FR-14）：URL 测试开关优先，否则按日期自动生效
   const [event, setEvent] = useState<DriftEvent | null>(null);
   useEffect(() => {
@@ -63,6 +67,10 @@ export function LaunchCard() {
         cover: "/images/cover-anime-1.png",
       };
 
+  // P3 A-04 自动匹配：勾选后由话题 → 角色，无话题按绑定的歌曲曲风，再兜底汐
+  const watchRoleId = watch ? (watchRolePreview(topic, snapshot.tag) ?? "sio") : null;
+  const watchRoleName = watchRoleId ? (starRoleOf(watchRoleId)?.name ?? "汐") : "";
+
   const onLaunch = async () => {
     if (!canLaunch) return;
     setError(null);
@@ -73,6 +81,7 @@ export function LaunchCard() {
       event ? event.bottleStyle : skin,
       isPublic,
       topic ?? undefined,
+      watchRoleId ?? undefined,
     );
     if (!result.ok) {
       const msg =
@@ -205,6 +214,27 @@ export function LaunchCard() {
             ))}
           </div>
         </div>
+      )}
+
+      {/* P3 A-04 让角色看看：勾选后角色会在聊天时提起这艘船（自动匹配角色，实时预览） */}
+      {isPublic && (
+        <label className={styles.watchOption}>
+          <input
+            type="checkbox"
+            className={styles.watchInput}
+            checked={watch}
+            onChange={(e) => setWatch(e.target.checked)}
+          />
+          <span className={styles.watchBox} aria-hidden="true" />
+          <span className={styles.watchText}>
+            让角色也看看这艘船
+            <small>
+              {watch
+                ? `${watchRoleName} 会来看这艘船（聊天时可能提起它）`
+                : "角色可能会在聊天时提起它（可选）"}
+            </small>
+          </span>
+        </label>
       )}
 
       {phase === "done" ? (

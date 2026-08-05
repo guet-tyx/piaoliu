@@ -157,13 +157,14 @@ export async function getDailyLimits(): Promise<DailyLimits> {
 
 /* ---------- 公开接口 ---------- */
 
-/** 投瓶（FR-7）：限每日 1 个；内容 10-200 字 + 绑定当前播放歌曲快照；style 为瓶面样式（默认纸船，活动期间传限定样式）；isPublic 决定是否进入漂流广场（P0 F-01，默认匿名只入随机拾取池）；topic 为话题 id（P1 F-07 公开漂流可选，默认无） */
+/** 投瓶（FR-7）：限每日 1 个；内容 10-200 字 + 绑定当前播放歌曲快照；style 为瓶面样式（默认纸船，活动期间传限定样式）；isPublic 决定是否进入漂流广场（P0 F-01，默认匿名只入随机拾取池）；topic 为话题 id（P1 F-07 公开漂流可选，默认无）；watchedBy 为 P3 A-04 角色关注的角色 id（公开漂流可选，勾选「让角色看看」后写本地瓶池；Supabase RPC 未扩展该参数，真实模式忽略） */
 export async function launchBottle(
   text: string,
   track: TrackSnapshot,
   style?: string,
   isPublic = false,
   topic?: string,
+  watchedBy?: string,
 ): Promise<LaunchResult> {
   const trimmed = text.trim();
   if (trimmed.length < BOTTLE_TEXT_MIN) return { ok: false, reason: "too-short" };
@@ -192,6 +193,8 @@ export async function launchBottle(
       isPublic,
       likedBy: [],
       topic: isPublic ? topic : undefined,
+      // P3 A-04：勾选「让角色看看」时写角色 id（仅公开漂流；本地模式生效）
+      watchedBy: isPublic && watchedBy ? watchedBy : undefined,
     };
     const pool = readPool();
     pool.push(bottle);

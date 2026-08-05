@@ -21,6 +21,10 @@ export interface ChatApiRequest {
   emotion?: EmotionState;
   /** 人机感 ⑧：角色记得的关于用户的关键记忆（跨会话持久，注入 system） */
   memories?: string;
+  /** P3 A-03 星海近况（客户端 localStorage 统计后携带；服务端中文+长度守卫后注入 system） */
+  communityContext?: string;
+  /** P3 A-04 被角色关注的用户瓶子提及（客户端挑选后携带；服务端同样守卫后注入） */
+  bottleMention?: string;
 }
 
 /** /api/chat 失败响应（no-key / bad-request / too-long / bad-word / all-models-failed） */

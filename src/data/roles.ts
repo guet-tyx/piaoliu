@@ -9,3 +9,11 @@ export type RoleId = (typeof ROLE_IDS)[number];
 
 /** 未知角色兜底：统一默认汐（与 personaOf / fallbackVoiceParams / TTS 路由契约对齐） */
 export const DEFAULT_ROLE_ID = "sio";
+
+/** P3 角色主题色（星海赞 / 茶话会主持区共用：汐粉、流明蓝、朔空橙、悠紫） */
+export const ROLE_COLOR: Record<string, string> = {
+  sio: "#FB7299",
+  lumen: "#5F9DFF",
+  soku: "#FFA94D",
+  yoe: "#B18CFF",
+};

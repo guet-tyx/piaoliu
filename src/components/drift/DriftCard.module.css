@@ -19,6 +19,12 @@
   box-shadow: 0 16px 36px -18px rgba(0, 0, 0, .6);
 }
 
+/* P3 A-01 角色星海赞：被赞卡片微弱发光（区别于普通卡片） */
+.card.starGlow {
+  border-color: rgba(251, 114, 153, .35);
+  box-shadow: 0 0 22px -8px rgba(251, 114, 153, .45), 0 16px 36px -18px rgba(0, 0, 0, .6);
+}
+
 .head {
   display: flex;
   align-items: center;
@@ -140,12 +146,49 @@
   filter: brightness(1.08);
 }
 
-/* 操作行：点赞 + 收藏 */
+/* 操作行：点赞 + 星海赞 + 收藏 */
 .actions {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 10px;
   margin-top: 2px;
+}
+
+/* P3 A-01 星海赞 chips（角色配色；hover 显示赞语） */
+.starWrap {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 0;
+}
+.starChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: .66rem;
+  font-weight: 800;
+  letter-spacing: .03em;
+  color: var(--roleColor, var(--gold));
+  border: 1px solid color-mix(in srgb, var(--roleColor, var(--gold)) 55%, transparent);
+  background: color-mix(in srgb, var(--roleColor, var(--gold)) 10%, transparent);
+  padding: 4px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+/* 新赞首次看到：角色赞从右侧滑入 */
+.starWrap.fresh .starChip {
+  animation: starSlideIn .6s cubic-bezier(.34, 1.56, .64, 1);
+}
+@keyframes starSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 .heart,
 .bookmark {

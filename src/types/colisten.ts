@@ -27,6 +27,8 @@ export interface CoListenRoom {
   lastActiveAt: number;
   /** 幽灵成员（仅本地演示多人；真实模式为空） */
   ghosts?: GhostSailor[];
+  /** P3 A-02 茶话会房间的主持角色 id（仅 AI 主持房间有；hostId = "ghost-host" 时生效） */
+  hostRole?: string;
 }
 
 /** 房间成员（在线） */

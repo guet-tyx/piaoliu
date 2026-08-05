@@ -19,6 +19,7 @@ import { splitStickerMessages, stickerToModelText } from "@/lib/chat/split";
 import { chatKey, chatSummaryKey, memoriesKey, readStorage, writeStorage } from "@/lib/storage";
 import { stickerOf } from "@/data/stickers";
 import { useEmotionStore } from "@/stores/emotion";
+import { buildCommunityPayload } from "@/lib/community/context";
 
 /** 无摘要的初始态（只读共享引用，更新时总是创建新对象） */
 const EMPTY_SUMMARY: ChatSummary = { text: "", covered: 0 };
@@ -237,12 +238,16 @@ export const useChatStore = create<ChatState>()((set, get) => {
     const memoriesText = get().memories[roleId] ?? "";
     // 人机感 ④：最新情感状态随请求携带，服务端注入「当前状态」并计算动态温度
     const emotion = useEmotionStore.getState().emotions[roleId];
+    // P3 A-03/A-04：星海近况 + 被关注瓶子提及由客户端计算随请求携带（route 是服务端，读不到 localStorage）
+    const community = buildCommunityPayload(roleId);
     const body = {
       roleId,
       messages: modelContext.slice(-MAX_HISTORY),
       ...(summaryText ? { summary: summaryText } : {}),
       ...(memoriesText ? { memories: memoriesText } : {}),
       ...(emotion ? { emotion } : {}),
+      ...(community.communityContext ? { communityContext: community.communityContext } : {}),
+      ...(community.bottleMention ? { bottleMention: community.bottleMention } : {}),
       ...(options.initiative ? { initiative: true } : {}),
     };
     const controller = new AbortController();

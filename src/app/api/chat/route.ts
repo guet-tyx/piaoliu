@@ -33,7 +33,7 @@ export async function POST(req: Request) {
     return Response.json({ error: "bad-request" }, { status: 400 });
   }
   if (!body) return Response.json({ error: "bad-request" }, { status: 400 });
-  const { roleId, messages, probe, summary, initiative, emotion, memories } = body;
+  const { roleId, messages, probe, summary, initiative, emotion, memories, communityContext, bottleMention } = body;
   if (probe === true) {
     // 连通性探测：确认至少一个 provider 就绪，不调用模型
     return Response.json({ ok: true, providers: providers.map((p) => p.id) }, { status: 200 });
@@ -97,11 +97,32 @@ export async function POST(req: Request) {
   // V2.8 语言硬约束：免费池混入英文模型（nemotron-nano 等）时会冒英文，统一注入简体中文要求
   const languageNote =
     "\n\n# 语言\n始终使用简体中文回复（除非用户明确要求其他语言）。不要夹杂英文整句，表情/语气词/歌名除外。";
+  // P3 A-03/A-04 社区上下文注入守卫：客户端（localStorage）计算后携带，服务端只做长度与中文校验，
+  // 防止脏数据/英文推理进入 system prompt（与摘要/记忆同款守卫）
+  const communityNote =
+    typeof communityContext === "string" &&
+    communityContext.length <= 200 &&
+    looksLikeChinese(communityContext.trim())
+      ? communityContext.trim()
+      : "";
+  const bottleMentionNote =
+    typeof bottleMention === "string" &&
+    bottleMention.length <= 200 &&
+    looksLikeChinese(bottleMention.trim())
+      ? bottleMention.trim()
+      : "";
   const openaiMessages: ChatCompletionMessage[] = [
     {
       role: "system",
       content:
-        persona.system + recommendPromptOf() + memoryNote + userMemoryNote + stateNote + languageNote,
+        persona.system +
+        recommendPromptOf() +
+        communityNote +
+        bottleMentionNote +
+        memoryNote +
+        userMemoryNote +
+        stateNote +
+        languageNote,
     },
     ...recent.map((m) => ({ role: m.role, content: m.text })),
   ];

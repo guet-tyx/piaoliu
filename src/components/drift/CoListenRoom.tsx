@@ -12,6 +12,15 @@ import { isSafeText } from "@/lib/api/moderation";
 import { usePlayerStore } from "@/stores/player";
 import { GHOST_DANMAKU, type CoListenRoom, type CoListenMessage } from "@/types/colisten";
 import type { Track } from "@/types/music";
+import { pickRandom } from "@/lib/random";
+import {
+  getTeahouseFor,
+  isTeahouseRoom,
+  teahouseHostBrief,
+  type HostLine,
+} from "@/lib/colisten/teahouse";
+import { teahouseLinesOf } from "@/data/teahouse-lines";
+import { CoListenRoomHost } from "./CoListenRoomHost";
 import styles from "./CoListenRoom.module.css";
 
 /** 弹幕 3 秒限流 */
@@ -52,6 +61,8 @@ export function CoListenRoom({ roomId }: CoListenRoomProps) {
   const [activePeers, setActivePeers] = useState<Set<string>>(new Set([myPeer]));
   const [isHost, setIsHost] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  /** P3 A-02 茶话会：角色旁白列表（与船客弹幕区分开） */
+  const [hostLines, setHostLines] = useState<HostLine[]>([]);
   const lastDmRef = useRef(0);
 
   const currentIndex = usePlayerStore((s) => s.currentIndex);
@@ -78,6 +89,13 @@ export function CoListenRoom({ roomId }: CoListenRoomProps) {
     return list;
   }, [room, activePeers, myPeer, isHost]);
 
+  // P3 A-02 茶话会：AI 主持判定 + 主持角色信息（房间 hostId = ghost-host 时生效）
+  const teahouse = useMemo(() => (room ? isTeahouseRoom(room) : false), [room]);
+  const hostBrief = useMemo(
+    () => (teahouse && room?.hostRole ? teahouseHostBrief(room.hostRole) : null),
+    [teahouse, room],
+  );
+
   // 挂载：加载房间 + 订阅频道 + 初始化播放器 + 心跳
   useEffect(() => {
     let alive = true;
@@ -95,7 +113,8 @@ export function CoListenRoom({ roomId }: CoListenRoomProps) {
       // 本标签页加入房间：接管播放器播放房间队列
       if (r.playlist.length > 0) {
         usePlayerStore.getState().playQueue(queue, { type: "colisten" });
-        if (r.hostId === myPeer) usePlayerStore.getState().toggle();
+        // 茶话会房间由 AI 主持：进入即自动播放（普通房间仅房主自动播放）
+        if (r.hostId === myPeer || isTeahouseRoom(r)) usePlayerStore.getState().toggle();
       }
     })();
     // 心跳（自动解散依据）
@@ -189,10 +208,80 @@ export function CoListenRoom({ roomId }: CoListenRoomProps) {
     return () => timers.forEach((t) => window.clearInterval(t));
   }, [roomId, room]);
 
-  /** 投票过半 → 广播 vote-result 并切歌 */
+  // P3 A-02 茶话会 AI 主持节奏（台词全部来自白名单，非模型生成）：
+  // 开场 3 条 → 每首歌按曲目时长自动推进（切歌时 1 条旁白）→ 每 20 分钟互动 1 条 → 窗口结束告别 2 条
+  useEffect(() => {
+    if (!teahouse || !hostBrief || !room) return;
+    const lines = teahouseLinesOf(hostBrief.roleId);
+    const push = (text: string) =>
+      setHostLines((prev) => [
+        ...prev.slice(-7),
+        {
+          key: `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+          roleId: hostBrief.roleId,
+          text,
+        },
+      ]);
+    const pushBatch = (arr: string[]) =>
+      arr.forEach((t, i) => window.setTimeout(() => push(t), 600 + i * 2400));
+
+    // 开场：进入房间即播欢迎（弹幕区不接收这些台词）
+    pushBatch(lines.opening.slice(0, 3));
+
+    // AI 房主按曲目时长自动推进；切歌时发旁白 + 广播播放状态（其余标签页同步）
+    let advanceId: number | null = null;
+    const scheduleAdvance = () => {
+      if (advanceId) window.clearTimeout(advanceId);
+      const st = usePlayerStore.getState();
+      const current = st.tracks[st.currentIndex];
+      const duration = (current?.duration ?? 200) * 1000;
+      advanceId = window.setTimeout(() => {
+        const s = usePlayerStore.getState();
+        if (s.source?.type === "colisten") {
+          s.next();
+          const nowTrack = s.tracks[s.currentIndex];
+          publishColisten({
+            type: "play-state",
+            roomId,
+            peerId: `ghost-host-${hostBrief.roleId}`,
+            track: nowTrack
+              ? { id: nowTrack.id, t: nowTrack.t, tag: nowTrack.tag, s: nowTrack.s, cover: nowTrack.cover }
+              : room.startTrack,
+            index: s.currentIndex,
+            playing: s.isPlaying,
+            currentTime: 0,
+            at: Date.now(),
+          });
+          push(pickRandom(lines.perTrack) ?? "");
+        }
+        scheduleAdvance();
+      }, duration);
+    };
+    scheduleAdvance();
+
+    // 每 20 分钟互动一条
+    const interactionId = window.setInterval(
+      () => push(pickRandom(lines.interaction) ?? ""),
+      20 * 60_000,
+    );
+
+    // 窗口结束（00:00）：告别 + 晚安（仅仍在房间内可见）
+    const endAt = getTeahouseFor(new Date())?.endAt ?? Date.now() + 2 * 3_600_000;
+    const closeId = window.setTimeout(() => pushBatch(lines.closing.slice(0, 2)), Math.max(0, endAt - Date.now()));
+
+    return () => {
+      if (advanceId) window.clearTimeout(advanceId);
+      window.clearInterval(interactionId);
+      window.clearTimeout(closeId);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [teahouse, hostBrief, roomId, room?.id]);
+
+  /** 投票过半 → 广播 vote-result 并切歌（茶话会房间由 AI 主持，投票不触发自动切歌） */
   const maybeAutoNext = useCallback(
     (nextVotes: Record<string, string>) => {
       if (!room) return;
+      if (isTeahouseRoom(room)) return;
       const memberCount = (room.ghosts?.length ?? 0) + activePeers.size;
       const up = Object.values(nextVotes).filter((v) => v === "up").length;
       if (memberCount >= 2 && up > memberCount / 2) {
@@ -315,7 +404,9 @@ export function CoListenRoom({ roomId }: CoListenRoomProps) {
         <div className={styles.roomMeta}>
           <h2 className={styles.roomTitle}>🎧 {room.title}</h2>
           <p className={styles.roomSub}>
-            {room.createdBy} 开房 · 房主 {isHost ? "你" : "其他船客"} · 👥 {members.length}
+            {teahouse && hostBrief
+              ? `${hostBrief.name} 主持 · 👥 ${members.length}`
+              : `${room.createdBy} 开房 · 房主 ${isHost ? "你" : "其他船客"} · 👥 ${members.length}`}
           </p>
         </div>
         <Link href="/drift/colisten" className={styles.leaveBtn}>
@@ -348,7 +439,11 @@ export function CoListenRoom({ roomId }: CoListenRoomProps) {
             <button type="button" className={styles.ctrlBtn} disabled={!isHost} aria-label="下一首" onClick={onNext}>
               ⏭
             </button>
-            {!isHost && <span className={styles.hostHint}>由房主控制播放</span>}
+            {!isHost && (
+              <span className={styles.hostHint}>
+                {teahouse && hostBrief ? `由${hostBrief.name}主持播放` : "由房主控制播放"}
+              </span>
+            )}
             <button type="button" className={`${styles.voteBtn}${votes[myPeer] ? ` ${styles.voted}` : ""}`} onClick={onVote}>
               🗳 切歌（{upCount}/{Math.floor(members.length / 2) + 1} 票）
             </button>
@@ -379,6 +474,9 @@ export function CoListenRoom({ roomId }: CoListenRoomProps) {
           ))}
         </div>
       </div>
+
+      {/* P3 A-02 茶话会角色主持区（独立于船客弹幕区） */}
+      {teahouse && hostBrief && <CoListenRoomHost host={hostBrief} lines={hostLines} />}
 
       {/* 弹幕区 */}
       <div className={styles.dmBox}>

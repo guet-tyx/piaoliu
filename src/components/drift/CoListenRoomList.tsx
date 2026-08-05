@@ -7,17 +7,20 @@ import { SectionHead } from "@/components/shared/SectionHead";
 import { useColistenStore } from "@/stores/colisten";
 import { usePlayerStore } from "@/stores/player";
 import { timeAgo } from "@/lib/time";
+import { TeahouseEntry } from "./TeahouseEntry";
 import styles from "./CoListenRoomList.module.css";
 
 /**
  * 星海共听房间列表（P2）：活跃房间按最近活跃降序，
  * 显示当前歌曲 + 在线人数；空态引导从歌曲处开房。
+ * P3 A-02：顶部固定展示活动窗口内的「星海茶话会」入口。
  */
 export function CoListenRoomList() {
   const rooms = useColistenStore((s) => s.rooms);
   const loading = useColistenStore((s) => s.loading);
   const refresh = useColistenStore((s) => s.refresh);
   const create = useColistenStore((s) => s.create);
+  const refreshTeahouse = useColistenStore((s) => s.refreshTeahouse);
   const [toast, setToast] = useState<string | null>(null);
 
   // 播放器当前曲（用当前播放的歌开房）
@@ -25,7 +28,8 @@ export function CoListenRoomList() {
 
   useEffect(() => {
     refresh();
-  }, [refresh]);
+    refreshTeahouse();
+  }, [refresh, refreshTeahouse]);
 
   const onCreateFromPlayer = async () => {
     if (!playerTrack) {
@@ -50,6 +54,9 @@ export function CoListenRoomList() {
         title="星海共听"
         subtitle="同一首歌，同一片星海——房间内匿名弹幕，一起听。"
       />
+
+      {/* P3 A-02 星海茶话会入口（仅活动窗口内显示） */}
+      <TeahouseEntry />
 
       <div className={styles.toolbar}>
         {playerTrack && (

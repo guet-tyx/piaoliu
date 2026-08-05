@@ -53,6 +53,8 @@ export interface Bottle {
   topic?: string;
   /** 投瓶人自定义昵称（P2 展示需求：卡片优先昵称，旧瓶/未设置时兜底 anonMark） */
   nickname?: string | null;
+  /** P3 A-04 角色关注：投瓶时勾选「让角色看看」自动匹配的角色 id（本地模式写入；Supabase RPC 未扩展，真实模式不落库） */
+  watchedBy?: string;
 }
 
 /** 回信（对应 supabase.replies） */
@@ -138,6 +140,8 @@ export interface DriftPost {
   likeCount: number;
   /** 回信数（热门排序因子） */
   replyCount: number;
+  /** P3 A-01 角色星海赞：点赞该瓶的角色 id 列表（展示态，不写入 Bottle 本体） */
+  starPraises: string[];
 }
 
 /** 歌曲留言（F-02：10-100 字匿名感想，发布后不可编辑/删除） */

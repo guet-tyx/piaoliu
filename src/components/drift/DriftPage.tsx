@@ -15,6 +15,7 @@ import {
 } from "@/lib/api/bottles";
 import { getOrCreateSailor } from "@/lib/api/sailor";
 import { useSocialStore } from "@/stores/social";
+import { ensureStarPraises } from "@/lib/community/starPraise";
 import { TOPICS } from "@/data/topics";
 import type { DriftPost } from "@/types/social";
 import styles from "./DriftPage.module.css";
@@ -74,6 +75,8 @@ export function DriftPage() {
       ]);
       if (!alive) return;
       const bookmarkIds = useSocialStore.getState().bookmarks;
+      // P3 A-01：页面加载时触发角色星海赞判定（30 分钟缓存，刷新不重复计算）
+      const praisedMap = ensureStarPraises(bottles);
       setPosts(
         bottles.map((b) => ({
           bottle: b,
@@ -81,6 +84,7 @@ export function DriftPage() {
           bookmarked: bookmarkIds.includes(b.id),
           likeCount: b.likedBy.length,
           replyCount: replyMap[b.id] ?? 0,
+          starPraises: praisedMap[b.id] ?? [],
         })),
       );
       setLoading(false);

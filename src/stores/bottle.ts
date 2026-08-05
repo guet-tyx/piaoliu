@@ -34,8 +34,8 @@ interface BottleState {
   /** 提交中（防连点） */
   busy: boolean;
   refreshInbox: () => Promise<void>;
-  /** 投瓶：isPublic=true 进入漂流广场（P0 F-01），默认匿名仅随机拾取可见；topic 公开漂流话题（P1 F-07） */
-  launch: (text: string, track: TrackSnapshot, style?: string, isPublic?: boolean, topic?: string) => Promise<LaunchResult>;
+  /** 投瓶：isPublic=true 进入漂流广场（P0 F-01），默认匿名仅随机拾取可见；topic 公开漂流话题（P1 F-07）；watchedBy 角色关注（P3 A-04，勾选「让角色看看」时传匹配到的角色 id） */
+  launch: (text: string, track: TrackSnapshot, style?: string, isPublic?: boolean, topic?: string, watchedBy?: string) => Promise<LaunchResult>;
   pick: () => Promise<PickResult>;
   reply: (bottleId: string, text: string) => Promise<ReplyResult>;
   markRead: (bottleId: string) => Promise<void>;
@@ -55,11 +55,11 @@ export const useBottleStore = create<BottleState>()((set, get) => ({
     });
   },
 
-  launch: async (text, track, style, isPublic, topic) => {
+  launch: async (text, track, style, isPublic, topic, watchedBy) => {
     if (get().busy) return { ok: false, reason: "limit" };
     set({ busy: true });
     try {
-      const result = await launchBottle(text, track, style, isPublic, topic);
+      const result = await launchBottle(text, track, style, isPublic, topic, watchedBy);
       set({ limits: await getDailyLimits() });
       return result;
     } finally {

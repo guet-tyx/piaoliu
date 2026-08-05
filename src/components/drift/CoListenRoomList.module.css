@@ -5,6 +5,87 @@
   padding-bottom: 96px;
 }
 
+/* P3 A-02 星海茶话会入口（列表页顶部，星光主题） */
+.entry {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: 720px;
+  margin: 24px auto 0;
+  padding: 16px 20px;
+  border-radius: 18px;
+  border: 1px solid rgba(251, 114, 153, .45);
+  background:
+    radial-gradient(120% 100% at 0% 0%, rgba(251, 114, 153, .14), transparent 55%),
+    rgba(17, 26, 51, .78);
+  box-shadow: 0 0 26px -10px rgba(251, 114, 153, .5);
+}
+.entryIcon {
+  flex: none;
+  font-size: 1.6rem;
+  line-height: 1;
+  animation: entryGlow 2.4s ease-in-out infinite;
+}
+@keyframes entryGlow {
+  0%,
+  100% {
+    text-shadow: 0 0 4px rgba(251, 114, 153, .35);
+  }
+  50% {
+    text-shadow: 0 0 14px rgba(251, 114, 153, .9);
+  }
+}
+.entryMeta {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.entryTitle {
+  margin: 0;
+  font-size: .92rem;
+  font-weight: 800;
+  color: var(--ink-panel);
+  letter-spacing: .03em;
+}
+.entrySub {
+  margin: 0;
+  font-size: .72rem;
+  color: var(--ink-panel-3);
+  letter-spacing: .04em;
+}
+.entryBtn {
+  border: none;
+  border-radius: 999px;
+  font-size: .78rem;
+  font-weight: 800;
+  letter-spacing: .04em;
+  color: #fff;
+  background: linear-gradient(120deg, var(--pink), var(--pink-deep));
+  cursor: pointer;
+  padding: 9px 20px;
+  box-shadow: 0 10px 20px -10px rgba(251, 114, 153, .8);
+  transition: transform .2s ease, filter .2s ease, opacity .2s ease;
+  font-family: inherit;
+  flex: none;
+  white-space: nowrap;
+}
+.entryBtn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(1.06);
+}
+.entryBtn:disabled {
+  opacity: .55;
+  cursor: wait;
+}
+.entryError {
+  margin: 2px 0 0;
+  font-size: .68rem;
+  color: var(--pink-deep);
+  letter-spacing: .04em;
+}
+
 .toolbar {
   display: flex;
   align-items: center;

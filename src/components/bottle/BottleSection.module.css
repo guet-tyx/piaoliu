@@ -359,6 +359,77 @@
   color: var(--topicColor, var(--pink));
   box-shadow: 0 0 0 1px var(--topicColor, var(--pink));
 }
+
+/* P3 A-04 让角色看看（复用公开漂流开关的视觉语言，主题色取蓝色系区分） */
+.watchOption {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin-top: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--line-panel);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .04);
+  cursor: pointer;
+  transition: border-color .2s ease, background .2s ease;
+}
+.watchOption:hover {
+  border-color: rgba(0, 174, 236, .45);
+}
+.watchInput {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+.watchInput:focus-visible + .watchBox {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+.watchBox {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin-top: 1px;
+  border-radius: 4px;
+  border: 1.5px solid var(--ink-panel-3);
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .2s ease, border-color .2s ease;
+}
+.watchInput:checked + .watchBox {
+  background: linear-gradient(120deg, var(--blue), var(--blue-deep, #0077c8));
+  border-color: transparent;
+}
+.watchBox::after {
+  content: "";
+  width: 8px;
+  height: 4px;
+  border-left: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  transform: rotate(-45deg) translate(1px, -1px);
+  opacity: 0;
+  transition: opacity .15s ease;
+}
+.watchInput:checked + .watchBox::after { opacity: 1; }
+.watchText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: .8rem;
+  font-weight: 700;
+  color: var(--ink-panel);
+  letter-spacing: .03em;
+}
+.watchText small {
+  font-size: .68rem;
+  font-weight: 500;
+  color: var(--ink-panel-3);
+  letter-spacing: .02em;
+}
 .success {
   display: flex;
   align-items: center;

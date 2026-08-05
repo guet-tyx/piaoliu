@@ -108,6 +108,8 @@ function BottleListModal({
           bookmarked: bookmarkIds.includes(b.id),
           likeCount: b.likedBy.length,
           replyCount: replyMap[b.id] ?? 0,
+          // P3 A-01 星海赞仅在漂流广场主 feed 判定；收藏/我的漂流弹窗展示态为空
+          starPraises: [],
         })),
       );
       setLoaded(true);
