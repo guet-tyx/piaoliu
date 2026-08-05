@@ -14,6 +14,7 @@ import { DockCard } from "@/components/bottle/DockCard";
 import { useIdentityStore } from "@/stores/identity";
 import { useBottleStore } from "@/stores/bottle";
 import { LAUNCH_LIMIT, PICK_LIMIT } from "@/lib/bottle/limits";
+import { markDisplayName } from "@/lib/social-name";
 import styles from "./BottleSection.module.css";
 
 /** 星海漂流三幕（崩坏3式底部切换条展示） */
@@ -99,7 +100,7 @@ export function BottleSection() {
         <p className={styles.sailorLine}>
           <SkinBoat className={styles.sailorBoat} />
           <span>
-            船客 <b>{sailor ? sailor.anonMark : "正在启航…"}</b>
+            船客 <b>{sailor ? markDisplayName(sailor.anonMark) : "正在启航…"}</b>
           </span>
           <span className={styles.limitLine}>
             今日 · 启航 {limits.launched}/{LAUNCH_LIMIT} · 拾瓶 {limits.picked}/{PICK_LIMIT}

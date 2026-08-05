@@ -11,6 +11,7 @@ import { fetchSailorFootprint } from "@/lib/api/footprint";
 import { countRepliesMap, toggleBottleLike, reportBottle } from "@/lib/api/bottles";
 import { toggleCommentLike } from "@/lib/api/comments";
 import { getOrCreateSailor } from "@/lib/api/sailor";
+import { markDisplayName } from "@/lib/social-name";
 import { useSocialStore } from "@/stores/social";
 import { TRACKS } from "@/data/tracks";
 import { timeAgo } from "@/lib/time";
@@ -66,6 +67,8 @@ export function SailorFootprintPage({ mark }: SailorFootprintPageProps) {
       bookmarked: bookmarkIds.includes(b.id),
       likeCount: b.likedBy.length,
       replyCount: replyMap[b.id] ?? 0,
+      // P3 A-01 星海赞仅在漂流广场主 feed 判定；足迹页展示态为空
+      starPraises: [],
     }));
   }, [footprint]);
 
@@ -166,7 +169,7 @@ export function SailorFootprintPage({ mark }: SailorFootprintPageProps) {
         <div className={styles.profileHead}>
           <div className={styles.avatar}>🎭</div>
           <div className={styles.profileMeta}>
-            <h2 className={styles.mark}>{sailor.anonMark}</h2>
+            <h2 className={styles.mark}>{markDisplayName(sailor.anonMark)}</h2>
             <p className={styles.titleLine}>
               {sailor.title} · Lv.{sailor.level}
               {footprint.isSelf && <em className={styles.selfTag}>这是我的足迹</em>}
@@ -302,7 +305,7 @@ export function SailorFootprintPage({ mark }: SailorFootprintPageProps) {
 
       {/* 举报原因选择 */}
       <Modal open={reportOpen} onClose={() => setReportOpen(false)}>
-        <h3 className={styles.reportTitle}>⛑️ 举报「{sailor.anonMark}」</h3>
+        <h3 className={styles.reportTitle}>⛑️ 举报「{markDisplayName(sailor.anonMark)}」</h3>
         <p className={styles.reportHint}>选择举报原因，星海会核实处理。</p>
         <div className={styles.reportList}>
           {REPORT_REASONS.map((reason) => (

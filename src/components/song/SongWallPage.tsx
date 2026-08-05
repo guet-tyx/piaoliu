@@ -14,6 +14,7 @@ import {
 } from "@/lib/api/comments";
 import { isSafeText } from "@/lib/api/moderation";
 import { playTrackSnapshot } from "@/lib/player/playSnapshot";
+import { markDisplayName } from "@/lib/social-name";
 import { openCoListenRoom } from "@/lib/colisten/openRoom";
 import { timeAgo } from "@/lib/time";
 import { getOrCreateSailor } from "@/lib/api/sailor";
@@ -185,7 +186,7 @@ export function SongWallPage({ track }: SongWallPageProps) {
               <Reveal key={c.id}>
                 <article className={styles.item}>
                   <header className={styles.itemHead}>
-                    <span className={styles.author}>🎭 {c.anonMark}</span>
+                    <span className={styles.author}>🎭 {markDisplayName(c.anonMark)}</span>
                     <span className={styles.itemRight}>
                       {c.source === "bottle" ? (
                         <em className={styles.fromBottle}>🏺 来自漂流瓶</em>

@@ -8,7 +8,7 @@ import { useBottleStore, type InboxItem } from "@/stores/bottle";
 import { useIdentityStore } from "@/stores/identity";
 import { useDanmakuStore } from "@/stores/danmaku";
 import { reportBottle } from "@/lib/api/bottles";
-import { bottleDisplayName } from "@/lib/social-name";
+import { bottleDisplayName, markDisplayName } from "@/lib/social-name";
 import styles from "./InboxModal.module.css";
 
 /**
@@ -95,7 +95,7 @@ function InboxItemView({ item }: { item: InboxItem }) {
         {replies.map((r) => (
           <div key={r.id} className={styles.reply}>
             <div className={styles.replyHead}>
-              <p className={styles.replyMark}>{r.anonMark} 的回信</p>
+              <p className={styles.replyMark}>{markDisplayName(r.anonMark)} 的回信</p>
               {/* 举报回信（NFR-1） */}
               <button
                 className={styles.reportBtn}
