@@ -13,6 +13,9 @@ alter table public.listeners
   add column if not exists channel_id text not null default '';
 
 -- ---------- 2. upsert_listener 支持频道维度 ----------
+-- 注意：必须 drop 旧 2 参版本，否则与带默认 p_channel_id 的 3 参版本
+-- 并存导致「Could not choose the best candidate function」重载歧义
+drop function if exists public.upsert_listener(text, text);
 create or replace function public.upsert_listener(p_anon_key text, p_track_id text, p_channel_id text default '')
 returns void
 language plpgsql
@@ -37,7 +40,11 @@ end;
 $$;
 
 -- ---------- 3. online_listeners 视图带出 channel_id ----------
-create or replace view public.online_listeners as
+-- 先 drop 再 create：旧列布局（无 channel_id 的早期版本）下 create or replace
+-- 不允许在中间插入列（报 cannot change name of view column "updated_at" to
+-- "channel_id"），drop 重建最稳，且保持幂等
+drop view if exists public.online_listeners;
+create view public.online_listeners as
   select anon_key, track_id, channel_id, updated_at
   from public.listeners
   where updated_at > now() - interval '60 seconds';
