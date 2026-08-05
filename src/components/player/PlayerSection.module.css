@@ -217,10 +217,13 @@
 .nowCtrl {
   display: flex;
   align-items: center;
-  gap: 14px;
+  flex-wrap: wrap; /* 按钮放不下时换行而非挤压变形 */
+  column-gap: 16px;
+  row-gap: 12px;
   margin-top: 18px;
 }
 .npSide {
+  flex: none; /* 固定尺寸按钮禁止被 flex 收缩 */
   width: 38px;
   height: 38px;
   border-radius: 50%;
@@ -240,6 +243,7 @@
   transform: scale(1.08);
 }
 .nowPlay {
+  flex: none;
   width: 52px;
   height: 52px;
   border-radius: 50%;
@@ -259,6 +263,7 @@
   filter: brightness(1.06);
 }
 .nowHeart {
+  flex: none;
   width: 38px;
   height: 38px;
   border-radius: 50%;
@@ -281,6 +286,7 @@
 .nowHeart.liked i { animation: var(--kf-heartPop) .45s cubic-bezier(.34, 1.56, .64, 1); }
 
 .dmToggle {
+  flex: none;
   margin-left: auto;
   font-size: .68rem;
   font-weight: 700;
@@ -406,6 +412,7 @@
 
 /* FR-3 播放模式按钮（与 dmToggle 同款胶囊） */
 .modeBtn {
+  flex: none;
   font-size: .68rem;
   font-weight: 700;
   color: var(--ink-panel-3);
@@ -425,6 +432,7 @@
 
 /* FR-2 音量组：静音按钮 + 滑杆 */
 .volGroup {
+  flex: none;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -451,6 +459,7 @@
 .vol {
   -webkit-appearance: none;
   appearance: none;
+  flex: none;
   width: 84px;
   height: 18px;
   margin: 0;

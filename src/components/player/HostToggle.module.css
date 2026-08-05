@@ -1,6 +1,7 @@
 /* 主持人开关（P3-01） */
 
 .toggle {
+  flex: none; /* nowCtrl 内按钮禁止收缩 */
   border: 1px solid var(--line-panel);
   background: rgba(255, 255, 255, 0.04);
   color: var(--ink-2);

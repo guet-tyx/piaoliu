@@ -3,6 +3,7 @@
 .wrap {
   position: relative;
   display: inline-block;
+  flex: none; /* nowCtrl 内按钮禁止收缩 */
 }
 
 .entry {

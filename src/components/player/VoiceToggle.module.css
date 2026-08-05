@@ -1,6 +1,7 @@
 /* 主持人语音开关（TTS，PRD 需求② §2.4）：仿 HostToggle 胶囊 */
 
 .toggle {
+  flex: none; /* nowCtrl 内按钮禁止收缩 */
   border: 1px solid var(--line-panel);
   background: rgba(255, 255, 255, 0.04);
   color: var(--ink-2);
