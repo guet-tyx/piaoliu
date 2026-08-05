@@ -1,0 +1,318 @@
+/* 船客足迹页（P1 F-03） */
+
+.page {
+  padding-top: 96px;
+  padding-bottom: 96px;
+}
+
+.empty {
+  margin-top: 56px;
+  text-align: center;
+  font-size: .88rem;
+  color: var(--ink-3);
+  letter-spacing: .07em;
+}
+
+/* 档案区 */
+.profile {
+  max-width: 720px;
+  margin: 30px auto 0;
+  padding: 24px 26px;
+  border-radius: 22px;
+  border: 1px solid rgba(251, 114, 153, .28);
+  background: rgba(17, 26, 51, .72);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.profileHead {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.avatar {
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  background: linear-gradient(135deg, rgba(251, 114, 153, .18), rgba(0, 174, 236, .18));
+  border: 1px solid var(--line-panel);
+  flex: none;
+}
+.profileMeta {
+  min-width: 0;
+}
+.mark {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--pink-bright);
+  letter-spacing: .03em;
+}
+.titleLine {
+  margin: 5px 0 0;
+  font-size: .78rem;
+  color: var(--ink-panel-2);
+  letter-spacing: .08em;
+}
+.selfTag {
+  font-style: normal;
+  font-size: .64rem;
+  font-weight: 700;
+  color: var(--gold);
+  border: 1px solid rgba(201, 160, 67, .5);
+  padding: 2px 9px;
+  border-radius: 999px;
+  margin-left: 10px;
+  letter-spacing: .04em;
+}
+
+.statsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  padding: 14px 0;
+  border-top: 1px solid var(--line-2);
+  border-bottom: 1px solid var(--line-2);
+  font-size: .76rem;
+  color: var(--ink-panel-3);
+  letter-spacing: .03em;
+}
+.statsRow b {
+  color: var(--ink-panel);
+  font-size: .84rem;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.followBtn {
+  border: none;
+  border-radius: 999px;
+  padding: 10px 24px;
+  font-size: .82rem;
+  font-weight: 800;
+  letter-spacing: .05em;
+  color: #fff;
+  background: linear-gradient(120deg, var(--pink), var(--pink-deep));
+  cursor: pointer;
+  box-shadow: 0 12px 24px -12px rgba(251, 114, 153, .7);
+  transition: transform .2s ease, filter .2s ease;
+  font-family: inherit;
+}
+.followBtn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.06);
+}
+.followBtn.following {
+  background: linear-gradient(120deg, var(--ink-panel-2), var(--ink-panel-3));
+  box-shadow: none;
+}
+.certLink {
+  font-size: .8rem;
+  font-weight: 700;
+  color: var(--blue-bright);
+  text-decoration: none;
+  padding: 9px 18px;
+  border: 1px solid rgba(0, 174, 236, .45);
+  border-radius: 999px;
+  transition: color .2s ease, border-color .2s ease;
+}
+.certLink:hover {
+  color: var(--ice);
+  border-color: var(--ice);
+}
+.reportBtn {
+  margin-left: auto;
+  border: 1px solid var(--line-panel);
+  background: transparent;
+  color: var(--ink-panel-3);
+  font-size: .74rem;
+  font-weight: 700;
+  padding: 9px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: color .2s ease, border-color .2s ease;
+  font-family: inherit;
+}
+.reportBtn:hover {
+  color: var(--pink-deep);
+  border-color: rgba(251, 114, 153, .5);
+}
+
+/* Tab */
+.tabs {
+  display: flex;
+  gap: 10px;
+  max-width: 720px;
+  margin: 26px auto 20px;
+  flex-wrap: wrap;
+}
+.tab {
+  border: 1px solid var(--line-panel);
+  background: rgba(255, 255, 255, .04);
+  color: var(--ink-2);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 8px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all .22s ease;
+  font-family: inherit;
+}
+.tab:hover {
+  border-color: var(--ice);
+  color: var(--ice);
+}
+.tab.active {
+  border-color: var(--pink);
+  background: rgba(251, 114, 153, .14);
+  color: var(--pink);
+}
+
+.list {
+  max-width: 720px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* 听歌感想条目 */
+.commentItem {
+  padding: 16px 18px;
+  border-radius: 16px;
+  border: 1px solid var(--line-panel);
+  background: rgba(17, 26, 51, .6);
+}
+.commentTrack {
+  margin: 0;
+  font-size: .8rem;
+  font-weight: 800;
+  color: var(--blue-bright);
+  letter-spacing: .03em;
+}
+.commentTrack em {
+  font-style: normal;
+  font-size: .64rem;
+  font-weight: 700;
+  color: var(--gold);
+  margin-left: 10px;
+}
+.commentText {
+  margin: 9px 0 12px;
+  font-size: .88rem;
+  line-height: 1.7;
+  color: var(--ink-panel-2);
+  word-break: break-word;
+}
+.commentFoot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.commentLike {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid var(--line-panel);
+  background: rgba(255, 255, 255, .04);
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: .72rem;
+  font-weight: 700;
+  color: var(--ink-panel-3);
+  cursor: pointer;
+  transition: color .2s ease, border-color .2s ease;
+  font-family: inherit;
+}
+.commentLike i { font-style: normal; }
+.commentLike:hover {
+  color: var(--pink);
+  border-color: rgba(251, 114, 153, .5);
+}
+.commentLike:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+.commentTime {
+  font-size: .66rem;
+  color: var(--ink-panel-3);
+}
+
+/* 关于 */
+.aboutBox {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 22px 24px;
+  border-radius: 16px;
+  border: 1px dashed var(--line-panel);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-size: .84rem;
+  color: var(--ink-panel-2);
+  letter-spacing: .03em;
+}
+.aboutBox p { margin: 0; }
+.aboutHint {
+  font-size: .72rem;
+  color: var(--ink-panel-3);
+}
+
+/* 举报弹窗 */
+.reportTitle {
+  margin: 0 0 8px;
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--ink);
+}
+.reportHint {
+  margin: 0 0 16px;
+  font-size: .76rem;
+  color: var(--ink-3);
+}
+.reportList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.reportOption {
+  text-align: left;
+  border: 1px solid var(--line-panel);
+  background: rgba(255, 255, 255, .04);
+  color: var(--ink-2);
+  font-size: .84rem;
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all .18s ease;
+  font-family: inherit;
+}
+.reportOption:hover {
+  border-color: var(--pink);
+  color: var(--pink);
+  background: rgba(251, 114, 153, .08);
+}
+.cancelBtn {
+  display: block;
+  margin: 16px auto 0;
+  border: none;
+  background: none;
+  color: var(--ink-4);
+  font-size: .76rem;
+  padding: 6px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.cancelBtn:hover {
+  color: var(--ink-2);
+}

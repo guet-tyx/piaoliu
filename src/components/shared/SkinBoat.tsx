@@ -1,6 +1,6 @@
-/** 纸船皮肤图标（FR-12）：paper 纸船 / crane 千纸鹤 / star 星船 */
+/** 纸船皮肤图标（FR-12 + P1 F-05）：paper 纸船 / crane 千纸鹤 / star 星船 / moon 月船 */
 
-export type SkinVariant = "paper" | "crane" | "star";
+export type SkinVariant = "paper" | "crane" | "star" | "moon";
 
 export function SkinBoat({
   variant = "paper",
@@ -9,6 +9,17 @@ export function SkinBoat({
   variant?: SkinVariant;
   className?: string;
 }) {
+  if (variant === "moon") {
+    // 月船：月牙帆 + 桅杆 + 船身（30 天连续奖励）
+    return (
+      <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+        <path d="M12 6.2a5 5 0 1 0 .2 0q2.4 2.2 0 4.4z" fill="currentColor" transform="rotate(-18 12 12)" />
+        <path d="M12 5.4 V13" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" />
+        <path d="M3.5 14.4 Q12 18.8 20.5 14.4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+        <path d="M7 17.4 Q9.5 18.9 12 17.4 T17 17.4" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" opacity=".6" />
+      </svg>
+    );
+  }
   if (variant === "crane") {
     // 千纸鹤：菱形折纸身体 + 头颈 + 翅膀
     return (

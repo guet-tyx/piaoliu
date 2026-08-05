@@ -41,19 +41,22 @@ export function nextLevelBond(bond: number): number | null {
   return ((level + 1) * (level + 2)) / 2;
 }
 
-/** 纸船皮肤（FR-12）：随等级解锁；id 与 sailors.bottle_style 对齐 */
+/** 纸船皮肤（FR-12 + P1 F-05）：随等级解锁；id 与 sailors.bottle_style 对齐 */
 interface BoatSkin {
   id: string;
   name: string;
   desc: string;
   unlockLevel: number;
   image: string; // 皮肤搭配场景插画
+  /** 特殊解锁：需持有指定徽章（P1 F-05 任务连续奖励皮肤用） */
+  unlockBadge?: string;
 }
 
 export const SKINS: BoatSkin[] = [
   { id: "paper", name: "纸船", desc: "最初的折纸船，风一吹就会晃。", unlockLevel: 1, image: "/images/boat-paper.png" },
   { id: "crane", name: "千纸鹤", desc: "折了 99 次才学会的航线。", unlockLevel: 4, image: "/images/boat-crane.png" },
   { id: "star", name: "星船", desc: "用星尘糊成的船，夜里会发光。", unlockLevel: 7, image: "/images/boat-star.png" },
+  { id: "moon", name: "月船", desc: "连续 30 天航行的月光之船。", unlockLevel: 0, image: "/images/boat-moon.png", unlockBadge: "streak-30" },
 ];
 
 /** 行为统计（徽章判定与羁绊数据源；真实模式由 action_logs 聚合） */
@@ -84,6 +87,9 @@ export const BADGES: BadgeDef[] = [
   { id: "first-reply", name: "有船靠岸", desc: "送出第一封回信", image: "/images/badge-first-reply.png", check: (s) => s.replied >= 1 },
   { id: "pick-10", name: "拾贝十人", desc: "拾起 10 艘漂流中的纸船", image: "/images/badge-pick-10.png", check: (s) => s.picked >= 10 },
   { id: "listen-3", name: "夜航三曲", desc: "一口气连续听完 3 首歌", image: "/images/badge-listen-3.png", check: (s) => s.maxListenStreak >= 3 },
+  // P1 F-05 每日任务连续奖励：条件由任务系统判定（check 恒 false，排除行为统计自动触发）
+  { id: "streak-7", name: "星海常客", desc: "连续 7 天完成每日漂流任务", image: "/images/badge-streak-7.png", check: () => false },
+  { id: "streak-30", name: "月船船客", desc: "连续 30 天完成每日漂流任务，解锁月船皮肤", image: "/images/badge-streak-30.png", check: () => false },
 ];
 
 /** 已达成但未解锁的徽章列表 */

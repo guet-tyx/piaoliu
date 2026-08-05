@@ -1,0 +1,37 @@
+/* 首页热门话题横条（P1 F-07） */
+
+.bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  max-width: var(--container, 1120px);
+  margin: 0 auto;
+  padding: 14px 24px 0;
+}
+
+.label {
+  font-size: .72rem;
+  font-weight: 800;
+  color: var(--ink-3);
+  letter-spacing: .08em;
+  display: inline-flex;
+  align-items: center;
+}
+
+.tag {
+  font-size: .78rem;
+  font-weight: 800;
+  color: var(--topicColor, var(--ice));
+  border: 1px solid color-mix(in srgb, var(--topicColor, var(--ice)) 50%, transparent);
+  background: color-mix(in srgb, var(--topicColor, var(--ice)) 9%, transparent);
+  padding: 6px 14px;
+  border-radius: 999px;
+  text-decoration: none;
+  letter-spacing: .02em;
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.tag:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px -6px color-mix(in srgb, var(--topicColor, var(--ice)) 55%, transparent);
+}

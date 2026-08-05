@@ -115,10 +115,30 @@
 
 .pNow { min-width: 0; }
 .nowKicker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   font-size: .66rem;
   letter-spacing: .24em;
   color: var(--pink-deep);
   font-weight: 700;
+}
+/* P1 F-02 播放器留言墙入口 */
+.wallEntry {
+  font-size: .62rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  color: var(--blue-bright);
+  border: 1px solid rgba(0, 174, 236, .45);
+  padding: 3px 10px;
+  border-radius: 999px;
+  text-decoration: none;
+  transition: color .2s ease, border-color .2s ease, background .2s ease;
+}
+.wallEntry:hover {
+  color: var(--ice);
+  border-color: var(--ice);
+  background: rgba(0, 174, 236, .08);
 }
 .nowTitle {
   font-size: 1.7rem;

@@ -1,0 +1,276 @@
+/* 歌曲留言墙页（P1 F-02） */
+
+.page {
+  padding-top: 96px;
+  padding-bottom: 96px;
+}
+
+.notFound {
+  margin-top: 48px;
+  text-align: center;
+  font-size: .9rem;
+  color: var(--ink-3);
+  letter-spacing: .08em;
+}
+
+/* 歌曲头 */
+.trackHead {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  max-width: 720px;
+  margin: 30px auto 0;
+  padding: 20px 22px;
+  border-radius: 20px;
+  border: 1px solid var(--line-panel);
+  background: rgba(17, 26, 51, .72);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+.cover {
+  flex: none;
+  border-radius: 16px;
+  object-fit: cover;
+}
+.trackMeta {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.trackName {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--ink-panel);
+  letter-spacing: .03em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.trackName em {
+  font-style: normal;
+  font-size: .72rem;
+  font-weight: 600;
+  color: var(--ink-panel-3);
+  letter-spacing: .18em;
+  margin-left: 8px;
+}
+.trackSub {
+  margin: 0;
+  font-size: .76rem;
+  color: var(--ink-panel-2);
+  letter-spacing: .05em;
+}
+.playBtn {
+  flex: none;
+  margin-left: auto;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 22px;
+  font-size: .8rem;
+  font-weight: 800;
+  letter-spacing: .06em;
+  color: #fff;
+  background: linear-gradient(120deg, var(--pink), var(--pink-deep));
+  cursor: pointer;
+  box-shadow: 0 12px 22px -12px rgba(251, 114, 153, .8);
+  transition: transform .2s ease, filter .2s ease;
+}
+.playBtn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.07);
+}
+
+/* 留言墙 */
+.wall {
+  max-width: 720px;
+  margin: 34px auto 0;
+}
+.wallTitle {
+  margin: 0 0 16px;
+  font-size: .94rem;
+  font-weight: 800;
+  color: var(--ink-2);
+  letter-spacing: .08em;
+}
+.empty {
+  padding: 34px 0;
+  text-align: center;
+  font-size: .84rem;
+  color: var(--ink-3);
+  letter-spacing: .05em;
+}
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.item {
+  padding: 16px 18px;
+  border-radius: 16px;
+  border: 1px solid var(--line-panel);
+  background: rgba(17, 26, 51, .6);
+}
+.itemHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.author {
+  font-size: .8rem;
+  font-weight: 800;
+  color: var(--pink-bright);
+  letter-spacing: .03em;
+}
+.itemRight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.fromBottle,
+.fromDirect {
+  font-style: normal;
+  font-size: .64rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+.fromBottle {
+  color: var(--gold);
+  background: rgba(201, 160, 67, .12);
+}
+.fromDirect {
+  color: var(--blue-bright);
+  background: rgba(0, 174, 236, .1);
+}
+.time {
+  font-size: .66rem;
+  color: var(--ink-panel-3);
+}
+.text {
+  margin: 10px 0 12px;
+  font-size: .88rem;
+  line-height: 1.75;
+  color: var(--ink-panel-2);
+  word-break: break-word;
+}
+.heart {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid var(--line-panel);
+  background: rgba(255, 255, 255, .04);
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: .72rem;
+  font-weight: 700;
+  color: var(--ink-panel-3);
+  cursor: pointer;
+  transition: color .2s ease, border-color .2s ease;
+  font-family: inherit;
+}
+.heart i { font-style: normal; }
+.heart:hover {
+  color: var(--pink);
+  border-color: rgba(251, 114, 153, .5);
+}
+.heart:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+/* 发布感想 */
+.postBox {
+  max-width: 720px;
+  margin: 30px auto 0;
+  padding: 18px 20px;
+  border-radius: 18px;
+  border: 1px solid var(--line-panel);
+  background: rgba(17, 26, 51, .72);
+  position: relative;
+}
+.postLabel {
+  margin: 0 0 10px;
+  font-size: .72rem;
+  letter-spacing: .24em;
+  color: var(--ink-panel-3);
+  font-weight: 700;
+}
+.input {
+  width: 100%;
+  border: 1.5px solid var(--line-panel);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: .84rem;
+  line-height: 1.6;
+  font-family: var(--sans);
+  color: var(--ink-panel);
+  background: var(--panel);
+  resize: vertical;
+  transition: border-color .2s ease;
+}
+.input:focus {
+  outline: none;
+  border-color: var(--blue);
+}
+.count {
+  position: absolute;
+  right: 30px;
+  top: 52px;
+  font-size: .64rem;
+  color: var(--ink-panel-3);
+  letter-spacing: .04em;
+}
+.count.warn { color: var(--pink-deep); }
+.error {
+  margin: 8px 0 0;
+  font-size: .74rem;
+  color: var(--pink-deep);
+  letter-spacing: .03em;
+}
+.hint {
+  margin: 8px 0 0;
+  font-size: .72rem;
+  color: var(--ink-panel-3);
+}
+.postRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+}
+.postHint {
+  font-size: .68rem;
+  color: var(--ink-panel-3);
+  letter-spacing: .04em;
+}
+.postBtn {
+  flex: none;
+  border: none;
+  border-radius: 999px;
+  padding: 8px 24px;
+  font-size: .78rem;
+  font-weight: 800;
+  letter-spacing: .14em;
+  color: #fff;
+  background: linear-gradient(120deg, var(--pink), var(--pink-deep));
+  cursor: pointer;
+  transition: transform .2s ease, filter .2s ease, opacity .2s ease;
+}
+.postBtn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(1.06);
+}
+.postBtn:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+  .trackHead { flex-wrap: wrap; }
+  .playBtn { margin-left: 0; }
+}

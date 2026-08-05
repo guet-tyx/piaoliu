@@ -4,6 +4,7 @@ import { CharacterSection } from "@/components/character/CharacterSection";
 import { PlaylistSection } from "@/components/playlist/PlaylistSection";
 import { PlayerSection } from "@/components/player/PlayerSection";
 import { BottleSection } from "@/components/bottle/BottleSection";
+import { HotTopics } from "@/components/home/HotTopics";
 import { DownloadSection } from "@/components/download/DownloadSection";
 
 /** 首页：区块组装（顶栏/页脚已在根布局提供） */
@@ -15,6 +16,8 @@ export default function Home() {
       <CharacterSection />
       <PlaylistSection />
       <PlayerSection />
+      {/* P1 F-07 热门话题横条（漂流区上方；无活跃话题时不渲染） */}
+      <HotTopics />
       <BottleSection />
       <DownloadSection />
     </main>

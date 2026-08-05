@@ -157,12 +157,13 @@ export async function getDailyLimits(): Promise<DailyLimits> {
 
 /* ---------- 公开接口 ---------- */
 
-/** 投瓶（FR-7）：限每日 1 个；内容 10-200 字 + 绑定当前播放歌曲快照；style 为瓶面样式（默认纸船，活动期间传限定样式）；isPublic 决定是否进入漂流广场（P0 F-01，默认匿名只入随机拾取池） */
+/** 投瓶（FR-7）：限每日 1 个；内容 10-200 字 + 绑定当前播放歌曲快照；style 为瓶面样式（默认纸船，活动期间传限定样式）；isPublic 决定是否进入漂流广场（P0 F-01，默认匿名只入随机拾取池）；topic 为话题 id（P1 F-07 公开漂流可选，默认无） */
 export async function launchBottle(
   text: string,
   track: TrackSnapshot,
   style?: string,
   isPublic = false,
+  topic?: string,
 ): Promise<LaunchResult> {
   const trimmed = text.trim();
   if (trimmed.length < BOTTLE_TEXT_MIN) return { ok: false, reason: "too-short" };
@@ -172,13 +173,15 @@ export async function launchBottle(
   if (!isSupabaseReady()) {
     const limits = readLimits();
     if (limits.launched >= LAUNCH_LIMIT) return { ok: false, reason: "limit" };
+    // P1 修复：写真实匿名代号（排行榜/足迹按 anonMark 聚合的前提；旧数据占位符由聚合层过滤）
+    const sailor = await getOrCreateSailor();
     const bottle: Bottle = {
       id: genId(),
       authorId: GUEST_ID,
       text: trimmed,
       track,
       bottleStyle: style ?? "paper",
-      anonMark: "你的纸船", // 展示用占位，实际代号由船员证提供
+      anonMark: sailor?.anonMark ?? "匿名船客",
       status: "drifting",
       pickedBy: null,
       isSystem: false,
@@ -187,6 +190,7 @@ export async function launchBottle(
       readAt: null,
       isPublic,
       likedBy: [],
+      topic: isPublic ? topic : undefined,
     };
     const pool = readPool();
     pool.push(bottle);
@@ -202,6 +206,7 @@ export async function launchBottle(
     p_track: track,
     p_style: style ?? "paper",
     p_is_public: isPublic,
+    p_topic: topic ?? null,
   });
   if (error || !data) {
     return { ok: false, reason: reasonOf(error, "offline") } as LaunchResult;
@@ -247,10 +252,12 @@ export async function replyBottle(bottleId: string, text: string): Promise<Reply
     const bottle = pool.find((b) => b.id === bottleId);
     if (!bottle || bottle.pickedBy !== GUEST_ID) return { ok: false, reason: "forbidden" };
     if (bottle.repliedAt !== null) return { ok: false, reason: "limit" };
+    // P1 修复：回信写真实匿名代号（周榜回信积分按 anonMark 归属的前提）
+    const sailor = await getOrCreateSailor();
     const reply: Reply = {
       id: genId(),
       bottleId,
-      anonMark: "回信的船客", // 展示用占位
+      anonMark: sailor?.anonMark ?? "匿名船客",
       text: trimmed,
       createdAt: Date.now(),
     };
@@ -371,11 +378,11 @@ export async function toggleBottleLike(
   return { ok: true, liked: r.liked === true };
 }
 
-/** 举报（NFR-1 治理入口；V1.2 支持瓶子与回信两类目标） */
+/** 举报（NFR-1 治理入口；V1.2 支持瓶子与回信两类目标；P1 F-03 扩展船客） */
 export async function reportBottle(
   targetId: string,
   reason: string,
-  targetType: "bottle" | "reply" = "bottle",
+  targetType: "bottle" | "reply" | "sailor" = "bottle",
 ): Promise<boolean> {
   if (!isSupabaseReady()) {
     const reports = readStorage<
@@ -391,11 +398,15 @@ export async function reportBottle(
   }
   const sb = getSupabase();
   if (!sb) return false;
-  const { error } = await sb.rpc("report_content", {
-    p_target_type: targetType,
-    p_target_id: targetId,
-    p_reason: reason,
-  });
+  // 船客以匿名代号标识（reports.target_id 为 uuid 列，走专用 RPC + target_mark 列）
+  const { error } =
+    targetType === "sailor"
+      ? await sb.rpc("report_sailor", { p_mark: targetId, p_reason: reason })
+      : await sb.rpc("report_content", {
+          p_target_type: targetType,
+          p_target_id: targetId,
+          p_reason: reason,
+        });
   return !error;
 }
 
@@ -434,7 +445,7 @@ function mapReplyRow(row: unknown): Reply {
 }
 
 /** Supabase 行（snake_case）→ 本地模型（camelCase）；RPC 返回类型宽，逐字段安全转换 */
-function mapBottleRow(row: unknown): Bottle {
+export function mapBottleRow(row: unknown): Bottle {
   const r = (row ?? {}) as Record<string, unknown>;
   const track = (r.track_snapshot ?? {}) as TrackSnapshot;
   const parseTs = (v: unknown): number | null =>

@@ -65,11 +65,40 @@
   box-shadow: 0 6px 18px rgba(251, 114, 153, 0.35);
 }
 
+/* P1 F-02 留言墙入口 */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+}
+.wallLink {
+  flex: none;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--blue-bright);
+  border: 1px solid rgba(0, 174, 236, .45);
+  padding: 8px 14px;
+  border-radius: 999px;
+  text-decoration: none;
+  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+.wallLink:hover {
+  color: var(--ice);
+  border-color: var(--ice);
+  background: rgba(0, 174, 236, .08);
+}
+
 @media (max-width: 560px) {
   .card {
     flex-wrap: wrap;
   }
-  .playBtn {
+  .actions {
     width: 100%;
+  }
+  .wallLink,
+  .playBtn {
+    flex: 1;
+    text-align: center;
   }
 }

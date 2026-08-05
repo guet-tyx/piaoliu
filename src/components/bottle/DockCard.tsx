@@ -1,13 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
+import Link from "next/link";
 import { SkinBoat, type SkinVariant } from "@/components/shared/SkinBoat";
 import { useBottleStore } from "@/stores/bottle";
 import { useIdentityStore } from "@/stores/identity";
 import { useDanmakuStore } from "@/stores/danmaku";
+import { usePlayerStore } from "@/stores/player";
 import { reportBottle } from "@/lib/api/bottles";
 import { BOTTLE_TEXT_MAX, BOTTLE_TEXT_MIN } from "@/lib/bottle/limits";
+import { resolveTrackId } from "@/lib/player/playSnapshot";
 import { eventOfStyle } from "@/data/events";
 import { TrackAttachmentCard } from "@/components/bottle/TrackAttachmentCard";
 import type { Bottle } from "@/types/social";
@@ -21,6 +24,7 @@ export function DockCard() {
   const noteAction = useIdentityStore((s) => s.noteAction);
   const bond = useIdentityStore((s) => s.bond);
   const skin = (useIdentityStore((s) => s.sailor?.bottleStyle) ?? "paper") as SkinVariant;
+  const playerTrackId = usePlayerStore((s) => s.tracks[s.currentIndex]?.id);
 
   const [picked, setPicked] = useState<Bottle | null>(null);
   const [flipped, setFlipped] = useState(false);
@@ -28,11 +32,26 @@ export function DockCard() {
   const [notice, setNotice] = useState<string | null>(null);
   const [empty, setEmpty] = useState(false);
 
+  // P1 F-02 播完提醒：拾瓶曲目播放过且已切走 → 提示去留言墙写感想
+  const playedRef = useRef(false);
+  useEffect(() => {
+    if (!picked) return;
+    const pid = resolveTrackId(picked.track);
+    if (!pid) return;
+    if (playerTrackId === pid) {
+      playedRef.current = true;
+    } else if (playedRef.current && playerTrackId && playerTrackId !== pid) {
+      playedRef.current = false;
+      setNotice("♪ 听完了，写下感想吧？去歌曲留言墙留下一句。");
+    }
+  }, [playerTrackId, picked]);
+
   // 拾到的瓶子按自身样式渲染（活动限定瓶显示活动徽标；不再用拾瓶人皮肤渲染他人瓶子）
   const pickedEvent = picked ? eventOfStyle(picked.bottleStyle) : null;
   const pickedVariant = pickedEvent
     ? "paper"
     : ((picked?.bottleStyle ?? "paper") as SkinVariant);
+  const wallId = picked ? resolveTrackId(picked.track) : null;
 
   const onPick = async () => {
     setNotice(null);
@@ -131,6 +150,12 @@ export function DockCard() {
                         回信
                       </button>
                     </div>
+                  )}
+                  {/* P1 F-02 写下感想入口（留言墙） */}
+                  {wallId && (
+                    <Link href={`/song/${wallId}`} className={styles.wallBtn}>
+                      写下感想
+                    </Link>
                   )}
                   {/* 举报入口（NFR-1） */}
                   <button

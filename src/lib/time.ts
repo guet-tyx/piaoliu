@@ -23,3 +23,26 @@ export function timeAgo(ts: number, now: number = Date.now()): string {
   if (day < 30) return `${day} 天前`;
   return "30 天前";
 }
+
+/** 当天 00:00 的时间戳（P1 F-05 任务/跨天判定） */
+export function dayStart(d: Date = new Date()): number {
+  const copy = new Date(d);
+  copy.setHours(0, 0, 0, 0);
+  return copy.getTime();
+}
+
+/** 本周一 00:00 的时间戳（P1 F-06 本周船客积分窗口） */
+export function weekStart(d: Date = new Date()): number {
+  const copy = new Date(d);
+  copy.setHours(0, 0, 0, 0);
+  const dow = (copy.getDay() + 6) % 7; // 周一=0 … 周日=6
+  copy.setDate(copy.getDate() - dow);
+  return copy.getTime();
+}
+
+/** d 是否为昨天的日期（跨天任务连续判定用） */
+export function isYesterday(d: Date, now: Date = new Date()): boolean {
+  const yesterday = new Date(now);
+  yesterday.setDate(yesterday.getDate() - 1);
+  return localDate(d) === localDate(yesterday);
+}

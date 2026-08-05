@@ -137,3 +137,80 @@ export interface DriftPost {
   /** 回信数（热门排序因子） */
   replyCount: number;
 }
+
+/** 歌曲留言（F-02：10-100 字匿名感想，发布后不可编辑/删除） */
+export interface SongComment {
+  id: string;
+  /** 歌曲 id */
+  trackId: string;
+  /** 感想正文 10-100 字 */
+  text: string;
+  /** 发布者匿名代号 */
+  anonMark: string;
+  /** 来源：拾瓶听完发布 / 留言墙直接发布 */
+  source: "bottle" | "direct";
+  /** 来源为瓶子时关联的瓶子 id */
+  bottleId?: string;
+  /** 点赞者匿名代号集合（按 anonMark 去重） */
+  likedBy: string[];
+  /** 发布时间戳 */
+  createdAt: number;
+}
+
+/** 每日漂流任务数据（F-05） */
+export interface QuestDailyData {
+  /** 当前日期 YYYY-MM-DD */
+  date: string;
+  /** 4 个任务完成状态（comment_1 在留言墙未上线时隐藏） */
+  tasks: {
+    listen_3: boolean;
+    pick_1: boolean;
+    reply_1: boolean;
+    comment_1: boolean;
+  };
+  /** 连续完成天数 */
+  streak: number;
+  /** 最后一次有任务完成的日期 */
+  lastActiveDate: string;
+  /** 当日去重的已听曲目（listen_3 判定源） */
+  listenTrackIds: string[];
+  /** 今日已获得的任务羁绊数（全勤判定/汇总展示） */
+  earnedToday: number;
+  /** 已发放的连续奖励标记（14 天羁绊 +5 一次性） */
+  streak14Rewarded: boolean;
+}
+
+/** 船客足迹档案（F-03） */
+export interface SailorFootprint {
+  sailor: {
+    anonMark: string;
+    /** 推导等级（无船员证记录时按内容量推导） */
+    level: number;
+    /** 称号 */
+    title: string;
+    /** 徽章 id 列表（其他船客无数据源，通常为空） */
+    badges: string[];
+    /** 注册时间（取最早公开内容时间） */
+    createdAt: number;
+  };
+  stats: {
+    /** 获得的总点赞数（公开瓶子 likedBy 之和 + 感想获赞） */
+    totalLikes: number;
+    /** 公开瓶子数 */
+    bottlesCount: number;
+    /** 感想数 */
+    commentsCount: number;
+    /** 粉丝数（本地无多用户数据示 0） */
+    followerCount: number;
+    /** 关注数（本地不可见示 0） */
+    followingCount: number;
+  };
+  /** 公开瓶子（时间倒序） */
+  bottles: Bottle[];
+  /** 听歌感想（时间倒序） */
+  comments: SongComment[];
+  /** 当前用户是否已关注 */
+  isFollowing: boolean;
+  /** 是否自己的页面 */
+  isSelf: boolean;
+}

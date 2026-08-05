@@ -45,6 +45,19 @@
   flex: none;
 }
 
+/* P1 F-07 话题标签 */
+.topicTag {
+  align-self: flex-start;
+  font-size: .68rem;
+  font-weight: 800;
+  color: var(--topicColor, var(--ice));
+  border: 1px solid color-mix(in srgb, var(--topicColor, var(--ice)) 55%, transparent);
+  background: color-mix(in srgb, var(--topicColor, var(--ice)) 10%, transparent);
+  padding: 3px 11px;
+  border-radius: 999px;
+  letter-spacing: .04em;
+}
+
 /* 正文：最多 3 行，超出省略号 */
 .text {
   margin: 0;
@@ -85,6 +98,20 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+/* P1 F-02：曲名跳转留言墙 */
+.trackName {
+  font-size: .84rem;
+  font-weight: 700;
+  color: var(--ink-panel);
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color .2s ease;
+}
+.trackName:hover {
+  color: var(--blue-bright);
 }
 .trackMeta small {
   font-size: .66rem;

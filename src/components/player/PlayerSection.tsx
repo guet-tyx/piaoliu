@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import type { CSSProperties } from "react";
 import { usePlayerStore, type PlayMode } from "@/stores/player";
 import { useBondTracker } from "@/hooks/useBondTracker";
@@ -203,6 +204,12 @@ export function PlayerSection() {
               {channelId === "ch-fm"
                 ? `📻 私人 FM · 为你现调 第 ${currentIndex + 1} 站`
                 : `星海电台 · 第 ${currentIndex + 1}/${total} 站`}
+              {/* P1 F-02 留言墙入口（曲库曲目必有 id） */}
+              {track.id && (
+                <Link href={`/song/${track.id}`} className={styles.wallEntry}>
+                  查看留言
+                </Link>
+              )}
             </p>
             <h3 className={styles.nowTitle}>
               「{track.t}」<em className={styles.nowTag}>{track.tag}</em>

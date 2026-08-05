@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { CSSProperties } from "react";
 import Image from "next/image";
 import { SkinBoat, type SkinVariant } from "@/components/shared/SkinBoat";
 import { usePlayerStore } from "@/stores/player";
@@ -10,6 +11,7 @@ import { useDanmakuStore } from "@/stores/danmaku";
 import { isSafeText } from "@/lib/api/moderation";
 import { BOTTLE_TEXT_MAX, BOTTLE_TEXT_MIN } from "@/lib/bottle/limits";
 import { getActiveEvent, getEventForTest } from "@/data/events";
+import { TOPICS } from "@/data/topics";
 import type { DriftEvent } from "@/data/events";
 import type { TrackSnapshot } from "@/types/social";
 import styles from "./BottleSection.module.css";
@@ -30,6 +32,8 @@ export function LaunchCard() {
   const [error, setError] = useState<string | null>(null);
   // P0 F-01 公开漂流：默认匿名（仅随机拾取），勾选后进入漂流广场
   const [isPublic, setIsPublic] = useState(false);
+  // P1 F-07 话题：单选，仅公开漂流可见/生效；不选不影响投瓶
+  const [topic, setTopic] = useState<string | null>(null);
   // 节日活动（FR-14）：URL 测试开关优先，否则按日期自动生效
   const [event, setEvent] = useState<DriftEvent | null>(null);
   useEffect(() => {
@@ -63,7 +67,13 @@ export function LaunchCard() {
     if (!canLaunch) return;
     setError(null);
     // 活动期间投瓶使用限定瓶面样式（FR-14）
-    const result = await launch(text, snapshot, event ? event.bottleStyle : skin, isPublic);
+    const result = await launch(
+      text,
+      snapshot,
+      event ? event.bottleStyle : skin,
+      isPublic,
+      topic ?? undefined,
+    );
     if (!result.ok) {
       const msg =
         result.reason === "limit"
@@ -163,7 +173,10 @@ export function LaunchCard() {
           type="checkbox"
           className={styles.publicInput}
           checked={isPublic}
-          onChange={(e) => setIsPublic(e.target.checked)}
+          onChange={(e) => {
+            setIsPublic(e.target.checked);
+            if (!e.target.checked) setTopic(null); // 取消公开时清除话题
+          }}
         />
         <span className={styles.publicBox} aria-hidden="true" />
         <span className={styles.publicText}>
@@ -171,6 +184,28 @@ export function LaunchCard() {
           <small>公开，所有人都能看到这艘船和你的代号</small>
         </span>
       </label>
+
+      {/* P1 F-07 话题选择：仅公开漂流时展示（单选，再点取消；不选不影响投瓶） */}
+      {isPublic && (
+        <div className={styles.topicWrap}>
+          <p className={styles.topicLabel}>话题（可选）：</p>
+          <div className={styles.topicList}>
+            {TOPICS.map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                className={`${styles.topic}${topic === t.id ? ` ${styles.topicOn}` : ""}`}
+                style={{ "--topicColor": t.color } as CSSProperties}
+                aria-pressed={topic === t.id}
+                title={t.description}
+                onClick={() => setTopic(topic === t.id ? null : t.id)}
+              >
+                {t.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {phase === "done" ? (
         <p className={styles.success}>

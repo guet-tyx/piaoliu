@@ -2,9 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import type { CSSProperties } from "react";
 import type { DriftPost } from "@/types/social";
 import { timeAgo } from "@/lib/time";
-import { playTrackSnapshot } from "@/lib/player/playSnapshot";
+import { playTrackSnapshot, resolveTrackId } from "@/lib/player/playSnapshot";
+import { topicOf } from "@/data/topics";
 import styles from "./DriftCard.module.css";
 
 interface DriftCardProps {
@@ -22,6 +24,10 @@ interface DriftCardProps {
  */
 export function DriftCard({ post, busy, onLike, onBookmark }: DriftCardProps) {
   const { bottle, liked, bookmarked, likeCount } = post;
+  // P1 F-02 留言墙入口：快照可回查曲库时曲名可点击
+  const wallId = resolveTrackId(bottle.track);
+  // P1 F-07 话题标签（公开漂流专属）
+  const topic = topicOf(bottle.topic);
   return (
     <article className={styles.card}>
       <header className={styles.head}>
@@ -30,6 +36,15 @@ export function DriftCard({ post, busy, onLike, onBookmark }: DriftCardProps) {
         </Link>
         <span className={styles.time}>{timeAgo(bottle.createdAt)}</span>
       </header>
+
+      {topic && (
+        <span
+          className={styles.topicTag}
+          style={{ "--topicColor": topic.color } as CSSProperties}
+        >
+          🏷 {topic.name}
+        </span>
+      )}
 
       <p className={styles.text}>{bottle.text}</p>
 
@@ -42,7 +57,13 @@ export function DriftCard({ post, busy, onLike, onBookmark }: DriftCardProps) {
           className={styles.cover}
         />
         <div className={styles.trackMeta}>
-          <b>{bottle.track.t}</b>
+          {wallId ? (
+            <Link href={`/song/${wallId}`} className={styles.trackName}>
+              {bottle.track.t}
+            </Link>
+          ) : (
+            <b>{bottle.track.t}</b>
+          )}
           <small>
             {bottle.track.tag} · {bottle.track.s}
           </small>

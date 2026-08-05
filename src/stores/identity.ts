@@ -7,17 +7,20 @@ import {
   genRecoveryCode,
   getLocalSailorSync,
   getOrCreateSailor,
+  mapSailorRow,
   pushListen,
   resetListenStreak,
   updateNickname,
   type BondKind,
 } from "@/lib/api/sailor";
+import { reportQuest, type QuestRewardResult } from "@/lib/api/quests";
+import { useQuestStore } from "@/stores/quests";
 import { ensureAnonSession, isSupabaseReady } from "@/lib/supabase/anon";
 import { getSupabase } from "@/lib/supabase/client";
 import { useDanmakuStore } from "@/stores/danmaku";
 import { readStorage, writeStorage, STORAGE } from "@/lib/storage";
 import { pickRandom } from "@/lib/random";
-import { SKINS, titleOf } from "@/data/collection";
+import { levelOfBond, SKINS, titleOf } from "@/data/collection";
 import {
   BOND_MILESTONE_KINDS,
   SHIO_RESPONSES,
@@ -84,6 +87,12 @@ interface IdentityState {
   noteListen: (trackId: string) => void;
   /** 听歌中断重置 */
   resetListen: () => void;
+  /** P1 F-05：一次性发放 N 点羁绊（任务奖励/全勤/连续奖励） */
+  rewardBond: (points: number) => Promise<void>;
+  /** P1 F-05：解锁徽章（连续任务奖励；真实模式 badges 以本地为准，符合需求 localStorage-first） */
+  unlockBadge: (badgeId: string) => void;
+  /** P1 F-05：结算任务奖励结果（单任务 + 全勤 + 连续奖励）并同步任务面板 */
+  applyQuestReward: (r: QuestRewardResult) => Promise<void>;
   /** 生成找回码 */
   recoveryCode: () => Promise<string | null>;
   /** 输入找回码恢复 */
@@ -140,6 +149,8 @@ export const useIdentityStore = create<IdentityState>()((set, get) => ({
     if (!sailor) return false;
     const skin = SKINS.find((s) => s.id === skinId);
     if (!skin || sailor.level < skin.unlockLevel) return false;
+    // P1 F-05 月船：需持有「月船船客」徽章（连续 30 天任务奖励）
+    if (skin.unlockBadge && !sailor.badges.includes(skin.unlockBadge)) return false;
     sailor.bottleStyle = skinId;
     // 本地模拟直接持久化（真实模式由 RPC 同步）
     writeStorage(STORAGE.sailor, sailor);
@@ -180,6 +191,18 @@ export const useIdentityStore = create<IdentityState>()((set, get) => ({
       writeStorage(STORAGE.sailor, sailor);
       set({ sailor: { ...sailor } });
     }
+    // P1 F-05 任务埋点：拾瓶/回信推动每日任务（fire-and-forget，不阻塞行为链路）
+    // noteAction 用漂流瓶词汇（picked/replied），任务接口用任务词汇（pick/reply），传入前映射
+    const questKind = kind === "picked" ? "pick" : kind === "replied" ? "reply" : kind;
+    if (questKind === "pick" || questKind === "reply") {
+      void (async () => {
+        const r = await reportQuest(questKind);
+        if (r) {
+          await get().applyQuestReward(r);
+          useQuestStore.getState().applyResult(r);
+        }
+      })();
+    }
   },
 
   noteListen: (trackId) => {
@@ -210,11 +233,58 @@ export const useIdentityStore = create<IdentityState>()((set, get) => ({
       writeStorage(STORAGE.sailor, sailor);
       set({ sailor: { ...sailor } });
     }
+    // P1 F-05 任务埋点：听歌推进「听歌 3 首」（当日去重曲目，trackId 传入）
+    void (async () => {
+      const r = await reportQuest("listen", trackId);
+      if (r) {
+        await get().applyQuestReward(r);
+        useQuestStore.getState().applyResult(r);
+      }
+    })();
   },
 
   resetListen: () => {
     // 暂停时重置连续计数（不更新徽章）
     resetListenStreak();
+  },
+
+  rewardBond: async (points) => {
+    if (points <= 0 || !get().sailor) return;
+    if (!isSupabaseReady()) {
+      const sailor = getLocalSailorSync();
+      if (!sailor) return;
+      const updated = {
+        ...sailor,
+        bondValue: sailor.bondValue + points,
+        level: levelOfBond(sailor.bondValue + points),
+      };
+      writeStorage(STORAGE.sailor, updated);
+      set({ sailor: updated, title: titleOf(updated.level) });
+      return;
+    }
+    const sb = getSupabase();
+    if (!sb) return;
+    const { data } = await sb.rpc("reward_quest", { p_amount: points });
+    if (data) {
+      const sailor = mapSailorRow(data);
+      if (sailor) set({ sailor, title: titleOf(sailor.level) });
+    }
+  },
+
+  unlockBadge: (badgeId) => {
+    const sailor = get().sailor;
+    if (!sailor || sailor.badges.includes(badgeId)) return;
+    sailor.badges = [...sailor.badges, badgeId];
+    // 徽章以本地为准（需求「跨设备时以 localStorage 记录为准」）
+    writeStorage(STORAGE.sailor, sailor);
+    set({ sailor: { ...sailor } });
+  },
+
+  applyQuestReward: async (r) => {
+    // 单任务/全勤奖励 + 14 天连续一次性奖励
+    await get().rewardBond(r.reward);
+    for (const badgeId of r.badgesToUnlock) get().unlockBadge(badgeId);
+    if (r.streak14Reward) await get().rewardBond(5);
   },
 
   recoveryCode: () => genRecoveryCode(),

@@ -1,6 +1,7 @@
 import { TRACKS } from "@/data/tracks";
 import { CHANNELS } from "@/data/channels";
 import { usePlayerStore } from "@/stores/player";
+import type { Track } from "@/types/music";
 import type { TrackSnapshot } from "@/types/social";
 
 /**
@@ -9,9 +10,7 @@ import type { TrackSnapshot } from "@/types/social";
  * 不在任何频道则直接播放当前队列/兜底单曲；播放后平滑滚动到播放器。
  */
 export function playTrackSnapshot(snapshot: TrackSnapshot): void {
-  const full = snapshot.id
-    ? TRACKS.find((t) => t.id === snapshot.id)
-    : TRACKS.find((t) => t.t === snapshot.t);
+  const full = resolveTrackFull(snapshot);
   if (!full) return;
 
   // 找到歌曲所属频道（私人 FM 动态队列除外）
@@ -32,4 +31,16 @@ export function playTrackSnapshot(snapshot: TrackSnapshot): void {
     }
   }
   document.getElementById("player")?.scrollIntoView({ behavior: "smooth" });
+}
+
+/** 快照回查曲库完整曲目（id 优先，旧数据无 id 时按曲名匹配） */
+export function resolveTrackFull(snapshot: TrackSnapshot): Track | undefined {
+  return snapshot.id
+    ? TRACKS.find((t) => t.id === snapshot.id)
+    : TRACKS.find((t) => t.t === snapshot.t);
+}
+
+/** 快照对应的曲库 id（留言墙跳转用；匹配不到返回 null） */
+export function resolveTrackId(snapshot: TrackSnapshot): string | null {
+  return resolveTrackFull(snapshot)?.id ?? null;
 }

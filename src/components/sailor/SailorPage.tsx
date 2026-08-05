@@ -9,6 +9,7 @@ import { NicknameForm } from "@/components/sailor/NicknameForm";
 import { RecoverySection } from "@/components/sailor/RecoverySection";
 import { MyPlaylists } from "@/components/sailor/MyPlaylists";
 import { SocialEntries } from "@/components/sailor/SocialEntries";
+import { QuestPanel } from "@/components/sailor/QuestPanel";
 import { useIdentityStore } from "@/stores/identity";
 import styles from "./SailorPage.module.css";
 
@@ -39,6 +40,8 @@ export function SailorPage() {
           <div className={styles.grid}>
             <SailorCard />
             <div className={styles.column}>
+              {/* P1 F-05 每日漂流任务（SailorCard 下、SkinPicker 上） */}
+              <QuestPanel />
               <NicknameForm />
               <SkinPicker />
               <BadgeWall />

@@ -49,6 +49,12 @@ export const STORAGE = {
   bookmarks: "drift-bookmarks",
   /** 星海关注关系列表（P0 F-04，上限 100） */
   follows: "drift-follows",
+  /** 每日漂流任务数据（P1 F-05） */
+  questDaily: "drift-quest-daily",
+  /** 歌曲留言墙感想（P1 F-02） */
+  songComments: "drift-song-comments",
+  /** 歌曲留言 5 分钟限频记录（trackId → 最近发布时间戳） */
+  commentCooldown: "drift-comment-cooldown",
   /** 同船在线心跳（本地模拟） */
   presence: "drift-presence",
   /** 角色情感状态（人机感，每角色：drift-emotion-<roleId>） */

@@ -321,6 +321,44 @@
   color: var(--ink-panel-3);
   letter-spacing: .02em;
 }
+/* P1 F-07 话题选择（公开漂流时展示） */
+.topicWrap {
+  margin-top: 12px;
+}
+.topicLabel {
+  margin: 0 0 8px;
+  font-size: .72rem;
+  font-weight: 700;
+  color: var(--ink-panel-3);
+  letter-spacing: .05em;
+}
+.topicList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.topic {
+  border: 1px solid var(--line-panel);
+  background: rgba(255, 255, 255, .04);
+  color: var(--ink-panel-2);
+  font-size: .72rem;
+  font-weight: 700;
+  padding: 6px 13px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all .2s ease;
+  font-family: inherit;
+}
+.topic:hover {
+  border-color: var(--topicColor, var(--ice));
+  color: var(--topicColor, var(--ice));
+}
+.topicOn {
+  border-color: var(--topicColor, var(--pink));
+  background: color-mix(in srgb, var(--topicColor, var(--pink)) 14%, transparent);
+  color: var(--topicColor, var(--pink));
+  box-shadow: 0 0 0 1px var(--topicColor, var(--pink));
+}
 .success {
   display: flex;
   align-items: center;
@@ -541,6 +579,25 @@
 }
 .reportBtn:hover {
   color: var(--pink-deep);
+}
+/* P1 F-02 写下感想入口（蓝色胶囊，与举报区分） */
+.wallBtn {
+  align-self: flex-start;
+  border: 1px solid rgba(0, 174, 236, .45);
+  background: rgba(0, 174, 236, .06);
+  color: var(--blue-bright);
+  font-size: .66rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  padding: 5px 14px;
+  border-radius: 999px;
+  text-decoration: none;
+  transition: color .2s ease, border-color .2s ease, background .2s ease;
+}
+.wallBtn:hover {
+  color: var(--ice);
+  border-color: var(--ice);
+  background: rgba(0, 174, 236, .12);
 }
 .replyBox {
   width: 100%;

@@ -63,7 +63,7 @@ export function getLocalSailorSync(): Sailor | null {
 }
 
 /** Supabase sailors 行（snake_case）→ 本地模型（camelCase）；RPC 返回类型宽，逐字段安全转换 */
-function mapSailorRow(row: unknown): Sailor | null {
+export function mapSailorRow(row: unknown): Sailor | null {
   const r = (row ?? {}) as Record<string, unknown>;
   if (typeof r.id !== "string") return null;
   return {

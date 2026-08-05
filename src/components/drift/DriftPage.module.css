@@ -36,6 +36,34 @@
   box-shadow: 0 0 0 1px rgba(251, 114, 153, .4), 0 6px 20px rgba(251, 114, 153, .22);
 }
 
+/* P1 F-07 话题筛选下拉（与 Tab 同风格） */
+.topicSelect {
+  margin-left: 6px;
+  border: 1px solid var(--line-panel);
+  background: rgba(17, 26, 51, .8);
+  color: var(--ink-2);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 8px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color .2s ease, color .2s ease;
+}
+.topicSelect:hover:not(:disabled) {
+  border-color: var(--ice);
+  color: var(--ice);
+}
+.topicSelect.topicOn {
+  border-color: var(--pink);
+  color: var(--pink);
+  background: rgba(251, 114, 153, .1);
+}
+.topicSelect:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
 /* 卡片流（单列） */
 .grid {
   display: flex;
