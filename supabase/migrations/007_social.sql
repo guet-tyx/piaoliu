@@ -33,6 +33,9 @@ create policy "follows_manage_own" on public.follows
 -- insert 仅经 RPC（toggle_follow，SECURITY DEFINER），此处无直接插入策略
 
 -- ---------- 投瓶 RPC 更新：p_is_public 参数 ----------
+-- 注意：必须 drop 旧 3 参版本（004 建立），否则与带默认值的 4 参版本
+-- 并存导致「Could not choose the best candidate function」重载歧义
+drop function if exists public.launch_bottle(text, jsonb, text);
 drop function if exists public.launch_bottle(text, jsonb, text, boolean);
 create or replace function public.launch_bottle(
   p_text text, p_track jsonb, p_style text default 'paper', p_is_public boolean default false)
