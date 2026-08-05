@@ -182,6 +182,7 @@ export async function launchBottle(
       track,
       bottleStyle: style ?? "paper",
       anonMark: sailor?.anonMark ?? "匿名船客",
+      nickname: sailor?.nickname ?? null,
       status: "drifting",
       pickedBy: null,
       isSystem: false,
@@ -201,12 +202,14 @@ export async function launchBottle(
 
   const sb = getSupabase();
   if (!sb) return { ok: false, reason: "offline" };
+  const sailor = await getOrCreateSailor();
   const { data, error } = await sb.rpc("launch_bottle", {
     p_text: trimmed,
     p_track: track,
     p_style: style ?? "paper",
     p_is_public: isPublic,
     p_topic: topic ?? null,
+    p_nickname: sailor?.nickname ?? null,
   });
   if (error || !data) {
     return { ok: false, reason: reasonOf(error, "offline") } as LaunchResult;
@@ -462,6 +465,7 @@ export function mapBottleRow(row: unknown): Bottle {
     },
     bottleStyle: typeof r.bottle_style === "string" ? r.bottle_style : "paper",
     anonMark: typeof r.anon_mark === "string" ? r.anon_mark : "匿名船客",
+    nickname: typeof r.nickname === "string" ? r.nickname : null,
     status: (r.status as Bottle["status"]) ?? "drifting",
     pickedBy: typeof r.picked_by === "string" ? r.picked_by : null,
     isSystem: r.is_system === true,

@@ -125,6 +125,24 @@ describe("launchBottle 公开透传", () => {
     if (!r.ok) return;
     expect(r.bottle.isPublic).toBe(false);
   });
+
+  it("投瓶冻结当前船客昵称（广场展示用；未设置时 null）", async () => {
+    vi.mocked(sailorApi.getOrCreateSailor).mockResolvedValueOnce({
+      id: "g1",
+      anonMark: "晚风船客·A7F3",
+      nickname: "晚风",
+      bottleStyle: "paper",
+      bondValue: 0,
+      level: 1,
+      badges: [],
+      createdAt: 1,
+    });
+    const r = await api.launchBottle("这是一艘带着昵称出航的纸船内容哦", track);
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.bottle.nickname).toBe("晚风");
+    expect(r.bottle.anonMark).toBe("晚风船客·A7F3");
+  });
 });
 
 describe("toggleBottleLike 点赞去重", () => {

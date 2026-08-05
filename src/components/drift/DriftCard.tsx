@@ -7,6 +7,7 @@ import type { DriftPost } from "@/types/social";
 import { timeAgo } from "@/lib/time";
 import { playTrackSnapshot, resolveTrackId } from "@/lib/player/playSnapshot";
 import { openCoListenRoom } from "@/lib/colisten/openRoom";
+import { bottleDisplayName } from "@/lib/social-name";
 import { topicOf } from "@/data/topics";
 import styles from "./DriftCard.module.css";
 
@@ -33,7 +34,7 @@ export function DriftCard({ post, busy, onLike, onBookmark }: DriftCardProps) {
     <article className={styles.card}>
       <header className={styles.head}>
         <Link href={`/sailor/${encodeURIComponent(bottle.anonMark)}`} className={styles.author}>
-          🎭 {bottle.anonMark}
+          🎭 {bottleDisplayName(bottle)}
         </Link>
         <span className={styles.time}>{timeAgo(bottle.createdAt)}</span>
       </header>

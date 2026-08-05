@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { bottleDisplayName } from "@/lib/social-name";
 import type { Bottle, Reply } from "@/types/social";
 import styles from "./BottleCard.module.css";
 
@@ -87,7 +88,7 @@ function drawBottleCard(ctx: CanvasRenderingContext2D, bottle: Bottle, replies: 
   // 匿名代号
   ctx.fillStyle = "rgba(255,255,255,.72)";
   ctx.font = `500 30px ${SHARE_FONT}`;
-  ctx.fillText(bottle.anonMark, W / 2, 452);
+  ctx.fillText(bottleDisplayName(bottle), W / 2, 452);
 
   // 瓶中信（最多 8 行）
   ctx.fillStyle = "#fff";

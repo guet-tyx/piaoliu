@@ -51,6 +51,8 @@ export interface Bottle {
   likedBy: string[];
   /** 话题标签（P1 预留：本轮 P0 不实现 UI） */
   topic?: string;
+  /** 投瓶人自定义昵称（P2 展示需求：卡片优先昵称，旧瓶/未设置时兜底 anonMark） */
+  nickname?: string | null;
 }
 
 /** 回信（对应 supabase.replies） */

@@ -8,6 +8,7 @@ import { useBottleStore, type InboxItem } from "@/stores/bottle";
 import { useIdentityStore } from "@/stores/identity";
 import { useDanmakuStore } from "@/stores/danmaku";
 import { reportBottle } from "@/lib/api/bottles";
+import { bottleDisplayName } from "@/lib/social-name";
 import styles from "./InboxModal.module.css";
 
 /**
@@ -83,7 +84,7 @@ function InboxItemView({ item }: { item: InboxItem }) {
     <li className={styles.item}>
       <div className={styles.orig}>
         <p className={styles.origMark}>
-          你的纸船 <em>{bottle.anonMark}</em>
+          你的纸船 <em>{bottleDisplayName(bottle)}</em>
         </p>
         <p className={styles.origText}>{bottle.text}</p>
         {/* P3-02 收信歌曲卡片（可播放跳转） */}

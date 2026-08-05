@@ -12,6 +12,7 @@ import { reportBottle } from "@/lib/api/bottles";
 import { BOTTLE_TEXT_MAX, BOTTLE_TEXT_MIN } from "@/lib/bottle/limits";
 import { resolveTrackId } from "@/lib/player/playSnapshot";
 import { eventOfStyle } from "@/data/events";
+import { bottleDisplayName } from "@/lib/social-name";
 import { TrackAttachmentCard } from "@/components/bottle/TrackAttachmentCard";
 import type { Bottle } from "@/types/social";
 import styles from "./BottleSection.module.css";
@@ -120,7 +121,7 @@ export function DockCard() {
               {/* 正面：开箱内容 */}
               <div className={styles.flipFront}>
                 <p className={styles.dockMark}>
-                  {picked.anonMark}
+                  {bottleDisplayName(picked)}
                   {picked.isSystem && <em className={styles.sysTag}>星海信使</em>}
                   {pickedEvent && (
                     <em className={styles.festTag}>{pickedEvent.name}限定</em>

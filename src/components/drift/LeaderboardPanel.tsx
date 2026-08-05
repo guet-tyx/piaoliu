@@ -11,6 +11,7 @@ import {
   type WeeklySailorEntry,
 } from "@/lib/api/leaderboard";
 import { playTrackSnapshot } from "@/lib/player/playSnapshot";
+import { bottleDisplayName } from "@/lib/social-name";
 import styles from "./LeaderboardPanel.module.css";
 
 type BoardKind = "hot" | "sailors" | "quotes";
@@ -98,7 +99,7 @@ export function LeaderboardPanel() {
                       href={`/sailor/${encodeURIComponent(e.bottle.anonMark)}`}
                       className={styles.sailor}
                     >
-                      🎭 {e.bottle.anonMark}
+                      🎭 {bottleDisplayName(e.bottle)}
                     </Link>
                     <span className={styles.likes}>♥ {e.likes}</span>
                   </div>
