@@ -25,7 +25,7 @@ export const PLAYLISTS: Playlist[] = [
   },
   {
     id: "pl-jp-breeze",
-    name: "🎌 日系 breeze · 风之旅",
+    name: "🎐 日系 breeze · 风之旅",
     cover: "/images/playlist-covers/pl-jp-breeze.webp",
     alt: "日系 breeze 风之旅歌单封面",
     desc: "像一阵风穿过夏日祭的街道。耳机里全是轻快的晴天，适合把通勤路走成一段旅程。",

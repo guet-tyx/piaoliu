@@ -36,7 +36,7 @@ export const CHANNELS: Channel[] = [
   {
     id: "ch-jp",
     name: "日系频道",
-    icon: "🎌",
+    icon: "🎐",
     desc: "像一阵风穿过夏日祭的街道",
     host: "soku",
     style: ["日系", "J-Pop", "电子"],
