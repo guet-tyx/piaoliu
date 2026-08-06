@@ -93,6 +93,8 @@ export type UpstreamOnceResult =
 export interface CompletionOnceOptions {
   /** 输出上限（对话自动总结等短文场景默认 300 足够） */
   maxTokens?: number;
+  /** 动态温度（随角色情绪 0.6-1.0，与流式模式一致；缺省用 provider 配置或默认 0.85） */
+  temperature?: number;
 }
 
 /**
@@ -121,7 +123,7 @@ export async function callChatCompletionOnce(
           model,
           messages,
           stream: false,
-          temperature: provider.temperature ?? DEFAULT_TEMPERATURE,
+          temperature: options.temperature ?? provider.temperature ?? DEFAULT_TEMPERATURE,
           max_tokens: options.maxTokens ?? DEFAULT_MAX_TOKENS,
         }),
       },

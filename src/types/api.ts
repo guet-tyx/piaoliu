@@ -25,6 +25,8 @@ export interface ChatApiRequest {
   communityContext?: string;
   /** P3 A-04 被角色关注的用户瓶子提及（客户端挑选后携带；服务端同样守卫后注入） */
   bottleMention?: string;
+  /** 非流式模式（小程序端 wx.request 无法消费 SSE；true 时返回 {ok, content} 整段 JSON） */
+  stream?: boolean;
 }
 
 /** /api/chat 失败响应（no-key / bad-request / too-long / bad-word / all-models-failed） */

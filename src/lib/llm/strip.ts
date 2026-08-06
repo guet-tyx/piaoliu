@@ -62,6 +62,11 @@ export function stripThinkState() {
   };
 }
 
+/** 单段文本剥离（非流式场景：整段文本一次喂入 stripThinkState，剥离 <think>…</think>） */
+export function stripText(text: string): string {
+  return stripThinkState()(text);
+}
+
 /** 重建 SSE 流：逐帧解析，剥离 delta.content 内的思维链 */
 export function stripThinking(body: ReadableStream<Uint8Array>): ReadableStream<Uint8Array> {
   const decoder = new TextDecoder();

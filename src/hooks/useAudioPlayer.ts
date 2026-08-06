@@ -72,7 +72,8 @@ export function useAudioPlayer() {
       if (nextSource < track.src.length) {
         sourceIndexRef.current = nextSource;
         audio.src = track.src[nextSource];
-        if (usePlayerStore.getState().isPlaying) {
+        // 幂等：仅当确实处于暂停态才 play()，避免打断上一轮 pending 的 play()
+        if (usePlayerStore.getState().isPlaying && audio.paused) {
           audio.play().catch(() => {});
         }
       } else {
@@ -103,8 +104,12 @@ export function useAudioPlayer() {
     usePlayerStore.getState().setProgress(0, 0);
     usePlayerStore.getState().setFailed(false);
     sourceIndexRef.current = 0;
-    audio.src = track.src[0] ?? "";
-    if (usePlayerStore.getState().isPlaying) {
+    const nextSrc = track.src[0] ?? "";
+    // 幂等：src 未变化不重复赋值（避免 abort 上一轮加载打断 pending 的 play()）
+    if (audio.src !== nextSrc) {
+      audio.src = nextSrc;
+    }
+    if (usePlayerStore.getState().isPlaying && audio.paused) {
       audio.play().catch(() => {});
     }
   }, [currentIndex, tracks]);
@@ -114,10 +119,17 @@ export function useAudioPlayer() {
     const audio = audioRef.current;
     if (!audio) return;
     if (isPlaying) {
+      // 幂等：仅当暂停态才 play()（重复 play() 会打断上一轮 promise）
       // autoplay 策略拒绝时静默（用户点击触发则正常播放）
-      audio.play().catch(() => {});
+      if (audio.paused) {
+        audio.play().catch(() => {});
+      }
     } else {
-      audio.pause();
+      // 幂等：仅当播放中才 pause()——pending 的 play() 时 paused 仍为 true，
+      // 此守卫可避免「play() 被 pause() 打断」的 DOMException
+      if (!audio.paused) {
+        audio.pause();
+      }
     }
   }, [isPlaying]);
 

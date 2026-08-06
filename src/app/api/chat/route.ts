@@ -3,8 +3,9 @@ import { affinityTextOf, emotionTextOf, isEmotionState } from "@/data/emotion";
 import { isSafeText } from "@/lib/api/moderation";
 import { activeProviders } from "@/lib/llm/providers";
 import { buildSchedule, isCooled, isProviderCooled, markCooled, markProviderCooled } from "@/lib/llm/scheduler";
-import { stripThinking } from "@/lib/llm/strip";
+import { stripText, stripThinking } from "@/lib/llm/strip";
 import {
+  callChatCompletionOnce,
   callChatCompletions,
   getDynamicTemperature,
   type ChatCompletionMessage,
@@ -33,7 +34,7 @@ export async function POST(req: Request) {
     return Response.json({ error: "bad-request" }, { status: 400 });
   }
   if (!body) return Response.json({ error: "bad-request" }, { status: 400 });
-  const { roleId, messages, probe, summary, initiative, emotion, memories, communityContext, bottleMention } = body;
+  const { roleId, messages, probe, summary, initiative, emotion, memories, communityContext, bottleMention, stream } = body;
   if (probe === true) {
     // 连通性探测：确认至少一个 provider 就绪，不调用模型
     return Response.json({ ok: true, providers: providers.map((p) => p.id) }, { status: 200 });
@@ -144,6 +145,18 @@ export async function POST(req: Request) {
       // V2.8 网关短路：skipRestOnFail 的 provider（如 freellmapi）整家冷却后跳过其全部后续模型
       if (provider.skipRestOnFail && isProviderCooled(provider.id)) continue;
       if (isCooled(coolKey)) continue;
+      // 非流式模式（小程序端 wx.request 无法消费 SSE）：callChatCompletionOnce 返回整段文本，
+      // 经 stripText 剥离 <think> 思维链后以 JSON 返回
+      if (stream === false) {
+        const result = await callChatCompletionOnce(provider, model, openaiMessages, { temperature });
+        if (!result.ok) {
+          lastErr = result.detail;
+          markCooled(coolKey);
+          if (provider.skipRestOnFail) markProviderCooled(provider.id);
+          continue;
+        }
+        return Response.json({ ok: true as const, content: stripText(result.content) });
+      }
       const result = await callChatCompletions(provider, model, openaiMessages, { temperature });
       if (!result.ok) {
         lastErr = result.detail;
