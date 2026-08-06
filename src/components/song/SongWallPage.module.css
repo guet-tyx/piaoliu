@@ -207,6 +207,29 @@
   opacity: .55;
   cursor: not-allowed;
 }
+/* 爬取热评种子（历史热评）：badge + 真实点赞数，不可点赞 */
+.hotLike {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.hotBadge {
+  font-style: normal;
+  font-size: .64rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  color: var(--gold);
+  background: rgba(201, 160, 67, .12);
+  border: 1px solid rgba(201, 160, 67, .35);
+  border-radius: 999px;
+  padding: 4px 10px;
+}
+.hotLikes {
+  font-size: .74rem;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: .02em;
+}
 
 /* 发布感想 */
 .postBox {

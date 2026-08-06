@@ -3,6 +3,7 @@
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 import { useBondTracker } from "@/hooks/useBondTracker";
 import { useTrackDanmaku } from "@/hooks/useTrackDanmaku";
+import { useCrawledDanmaku } from "@/hooks/useCrawledDanmaku";
 
 /**
  * 全局电台引擎（V3.2 修复「进聊天页音乐停止」）：
@@ -15,5 +16,6 @@ export function PlayerBridge() {
   useAudioPlayer();
   useBondTracker();
   useTrackDanmaku();
+  useCrawledDanmaku();
   return null;
 }

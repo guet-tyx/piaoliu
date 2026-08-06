@@ -124,3 +124,35 @@ describe("toggleCommentLike 去重", () => {
     expect((await api.fetchComments("t1"))[0].likedBy).toEqual([]);
   });
 });
+
+describe("crawled 热评种子合并（本地模式）", () => {
+  it("fetchComments 合并种子 + 本地评论：种子带 hotLikes、用户新评论排最前", async () => {
+    // 模拟 public/data/crawled-comments.json（仅 t48 有种子）
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          t48: [
+            { text: "这是一条足够长度的爬取热评内容，来自真实评论区。", liked: 72075 },
+            { text: "另一条足够长度的爬取热评内容，来自真实评论区。", liked: 647 },
+          ],
+        }),
+      }),
+    );
+    const r = await api.postComment("t48", "用户刚发布的感想内容，足够长度。");
+    if (!r.ok) throw new Error("发布失败");
+
+    const list = await api.fetchComments("t48");
+    expect(list.length).toBe(3);
+    const seed = list.find((c) => c.hotLikes === 72075);
+    expect(seed).toBeDefined();
+    expect(seed?.text).toContain("真实评论区");
+    expect(seed?.anonMark).toBeTruthy();
+    // 用户新评论时间最新，排在所有种子前
+    expect(list[0].id).toBe(r.comment.id);
+    // 种子 top1（liked 最大）排在种子 top2 前
+    const seedIdx = list.findIndex((c) => c.hotLikes === 72075);
+    expect(seedIdx).toBeLessThan(list.findIndex((c) => c.hotLikes === 647));
+  });
+});

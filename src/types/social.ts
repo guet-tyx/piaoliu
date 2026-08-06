@@ -161,6 +161,8 @@ export interface SongComment {
   likedBy: string[];
   /** 发布时间戳 */
   createdAt: number;
+  /** 爬取热评的真实点赞数（历史热评种子；用户发布无此字段） */
+  hotLikes?: number;
 }
 
 /** 每日漂流任务数据（F-05） */

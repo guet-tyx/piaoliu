@@ -33,8 +33,15 @@ interface SongWallPageProps {
 /**
  * 歌曲留言墙页（P1 F-02）：
  * 歌曲头 + 漂流留言墙（匿名感想列表，🏺来自漂流瓶 / 🎵听了这首歌 来源标识 +
- * ♥ 点赞）+ 底部发布感想（10-100 字、敏感词、5 分钟限频）。
+ * ♥ 点赞；爬取热评种子带「🔥 历史热评」+ 真实点赞数，不可点赞）+ 底部发布感想
+ * （10-100 字、敏感词、5 分钟限频）。
  */
+
+/** 热评真实点赞数格式化：≥1 万显示 x.x 万（如 72075 → 7.2 万） */
+function fmtHotLikes(n: number): string {
+  return n >= 10_000 ? `${(n / 10_000).toFixed(1).replace(/\.0$/, "")} 万` : String(n);
+}
+
 export function SongWallPage({ track }: SongWallPageProps) {
   const [comments, setComments] = useState<SongComment[]>([]);
   const [loaded, setLoaded] = useState(false);
@@ -197,16 +204,23 @@ export function SongWallPage({ track }: SongWallPageProps) {
                     </span>
                   </header>
                   <p className={styles.text}>{c.text}</p>
-                  <button
-                    type="button"
-                    className={`${styles.heart}${c.likedBy.length > 0 ? "" : ""}`}
-                    aria-label="点赞感想"
-                    aria-pressed={false}
-                    disabled={likeBusy === c.id}
-                    onClick={() => onLike(c.id)}
-                  >
-                    <i>♡</i> <b>{c.likedBy.length}</b>
-                  </button>
+                  {c.hotLikes ? (
+                    <span className={styles.hotLike}>
+                      <em className={styles.hotBadge}>🔥 历史热评</em>
+                      <b className={styles.hotLikes}>♡ {fmtHotLikes(c.hotLikes)}</b>
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      className={styles.heart}
+                      aria-label="点赞感想"
+                      aria-pressed={false}
+                      disabled={likeBusy === c.id}
+                      onClick={() => onLike(c.id)}
+                    >
+                      <i>♡</i> <b>{c.likedBy.length}</b>
+                    </button>
+                  )}
                 </article>
               </Reveal>
             ))}
