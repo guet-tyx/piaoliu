@@ -2,7 +2,10 @@ import { SectionHead } from "@/components/shared/SectionHead";
 import { Reveal } from "@/components/shared/Reveal";
 import styles from "./DownloadSection.module.css";
 
-/** 下载 CTA（静态）：双应用商店按钮，SVG 与原型一致 */
+/** Android APK 直链（GitHub Release latest 资产，后续版本发布自动跟随） */
+const APK_URL = "https://github.com/guet-tyx/drift-app/releases/latest/download/app-release.apk";
+
+/** 下载 CTA：Android APK 已上线直链，App Store 仍为占位 */
 export function DownloadSection() {
   return (
     <section className={`section ${styles.download}`} id="download">
@@ -32,7 +35,7 @@ export function DownloadSection() {
           </span>
           <b className={styles.soonTag}>敬请期待</b>
         </span>
-        <span className={`${styles.storeBtn} ${styles.soon}`} aria-label="Android 免费下载，敬请期待">
+        <a className={styles.storeBtn} href={APK_URL} aria-label="Android 免费下载 APK">
           <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
             <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-2 14.5v-9l7 4.5-7 4.5z" />
           </svg>
@@ -40,12 +43,15 @@ export function DownloadSection() {
             <em>Android</em>
             <small>免费下载</small>
           </span>
-          <b className={styles.soonTag}>敬请期待</b>
-        </span>
+          <b className={styles.soonTag}>APK 直装</b>
+        </a>
       </Reveal>
 
       <Reveal as="p" className={styles.dlNote}>
         第一次打开，就有一条漂流线在等你。<b>✦</b>
+      </Reveal>
+      <Reveal as="p" className={styles.dlHint}>
+        Android 版为 APK 直装包（约 160MB，全机型），安装时需允许「安装未知应用」；iOS 版正在路上。
       </Reveal>
     </section>
   );
