@@ -29,12 +29,16 @@
   height: 32px;
   border-radius: 10px;
   flex: none;
-  background: linear-gradient(135deg, var(--pink), var(--blue));
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
   box-shadow: 0 6px 14px -6px rgba(251, 114, 153, .6);
+}
+.brandMark img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 .brandName {
   font-size: 1.08rem;

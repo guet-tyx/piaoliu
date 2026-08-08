@@ -28,15 +28,7 @@ export function Topbar() {
       <div className={styles.topbarIn}>
         <a className={styles.brand} href={anchor("#top")} aria-label="漂流 DRIFT 星海版 回到顶部">
           <span className={styles.brandMark} aria-hidden="true">
-            <svg viewBox="0 0 32 32" width="20" height="20" fill="none">
-              {/* 音符标志（漂流 DRIFT 品牌图标） */}
-              <ellipse cx="12" cy="21" rx="5" ry="3.8" transform="rotate(-18 12 21)" fill="currentColor"/>
-              <line x1="16" y1="19" x2="16" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-              <path d="M16 6Q22 8 23 14Q21 11 16 11" fill="currentColor"/>
-              <path d="M16 11Q20 12 21 16Q19 14 16 14" fill="currentColor"/>
-              <path d="M16 14Q24 18 28 16" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" opacity=".6"/>
-              <path d="M28 16L29 13L30 16L33 16L30.5 18L31 21L28 19L25 21L25.5 18L23 16Z" fill="currentColor" opacity=".8" transform="scale(.45) translate(34,20)"/>
-            </svg>
+            <img src="/logo.png" alt="" width={32} height={32} />
           </span>
           <span className={styles.brandName}>
             漂流<em className={styles.demoBadge}>星海版</em>

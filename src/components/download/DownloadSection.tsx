@@ -37,7 +37,7 @@ export function DownloadSection() {
         </span>
         <a className={styles.storeBtn} href={APK_URL} aria-label="Android 免费下载 APK">
           <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-2 14.5v-9l7 4.5-7 4.5z" />
+            <path d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.26-.85-.29-.15-.65-.06-.83.22l-1.88 3.24a11.4 11.4 0 0 0-8.94 0L5.65 5.67c-.19-.29-.58-.38-.87-.2-.28.18-.37.54-.22.83l1.84 3.18C3.95 11 2.5 13.42 2.5 16.17h19c0-2.75-1.45-5.17-3.9-6.69zM7.5 13.75a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5zm9 0a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5z" />
           </svg>
           <span className={styles.stTxt}>
             <em>Android</em>
